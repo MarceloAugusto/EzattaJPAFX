@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.effect.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane fx:id="principalEnvase" alignment="TOP_CENTER" nodeOrientation="LEFT_TO_RIGHT" prefHeight="349.0" prefWidth="430.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.ezatta.controller.EnvaseBicoController">
+   <children>
+      <BorderPane fx:id="bPane" nodeOrientation="LEFT_TO_RIGHT">
+         <top>
+            <AnchorPane>
+               <children>
+                  <AnchorPane minHeight="40.0" prefHeight="40.0" style="-fx-background-color: lightgray;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                     <children>
+                        <Text layoutX="14.0" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Ponto de abastencimento">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Text>
+                     </children>
+                  </AnchorPane>
+               </children>
+            </AnchorPane>
+         </top>
+         <center>
+            <StackPane fx:id="stackPane" BorderPane.alignment="TOP_LEFT">
+               <children>
+                  <GridPane hgap="5.0" maxHeight="284.0" maxWidth="400.0" minHeight="-Infinity" minWidth="400.0" prefHeight="284.0" prefWidth="400.0" vgap="5.0" BorderPane.alignment="CENTER" StackPane.alignment="TOP_LEFT">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="285.0" minWidth="10.0" prefWidth="72.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="510.0" minWidth="10.0" prefWidth="313.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Bico" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Operador" GridPane.rowIndex="1" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Volume" GridPane.rowIndex="2" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="O.S" GridPane.rowIndex="3" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="KM" GridPane.rowIndex="4" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Placa" GridPane.rowIndex="5" />
+                        <ComboBox fx:id="cbBico" prefHeight="25.0" prefWidth="213.0" promptText="Ponto de abastecimento" GridPane.columnIndex="1" />
+                        <ComboBox fx:id="cbOperador" prefWidth="150.0" promptText="Operador" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextField fx:id="txtVolume" maxWidth="95.0" prefHeight="25.0" prefWidth="95.0" promptText="00.00" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                           <tooltip>
+                              <Tooltip fx:id="toolVolume" text="Empty Tooltip" />
+                           </tooltip></TextField>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Efetivo" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                           <GridPane.margin>
+                              <Insets left="105.0" />
+                           </GridPane.margin>
+                        </Text>
+                        <TextField fx:id="txtEfetivo" editable="false" maxWidth="95.0" prefWidth="95.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                           <GridPane.margin>
+                              <Insets left="160.0" />
+                           </GridPane.margin>
+                           <tooltip>
+                              <Tooltip fx:id="mensagens" text="Empty Tooltip" />
+                           </tooltip>
+                        </TextField>
+                        <TextField fx:id="txtOs" maxWidth="159.0" prefHeight="25.0" prefWidth="159.0" promptText="Ordem de serviço" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <TextField fx:id="txtKm" maxWidth="150.0" promptText="Kilometragem" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <TextField fx:id="txtPlaca" maxWidth="150.0" promptText="AAA-1234" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <HBox GridPane.columnIndex="1" GridPane.rowIndex="7">
+                           <children>
+                              <Button fx:id="btnCancelar" minHeight="30.0" minWidth="95.0" mnemonicParsing="false" onAction="#cancelar" style="-fx-background-color: #FF6633;" text="Voltar">
+                                 <HBox.margin>
+                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                 </HBox.margin>
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
+                                 <graphic>
+                                    <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@images/leftturnarrow32.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
+                              <Button fx:id="btnEnviarPPlaca" minHeight="30.0" minWidth="95.0" mnemonicParsing="false" onAction="#enviarPPlaca" style="-fx-background-color: lightgreen;" text="Gravar" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                                 <HBox.margin>
+                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                 </HBox.margin>
+                                 <graphic>
+                                    <ImageView fitWidth="20.0" nodeOrientation="RIGHT_TO_LEFT" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@images/papercheck32.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
+                              <Text fx:id="txtStatus" strokeType="OUTSIDE" strokeWidth="0.0" text="text">
+                                 <font>
+                                    <Font size="21.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                 </HBox.margin>
+                              </Text>
+                           </children>
+                        </HBox>
+                        <ProgressBar fx:id="progressBar" prefHeight="20.0" prefWidth="308.0" progress="0.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        <StackPane fx:id="stackEfetivo" prefHeight="150.0" prefWidth="200.0" GridPane.rowIndex="6">
+                           <children>
+                              <VBox fx:id="estoqueAtualBico" prefHeight="200.0" prefWidth="100.0" />
+                           </children></StackPane>
+                     </children>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                     <StackPane.margin>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </StackPane.margin>
+                  </GridPane>
+               </children>
+            </StackPane>
+         </center>
+      </BorderPane>
+   </children>
+</StackPane>

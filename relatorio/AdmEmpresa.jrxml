@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.4.final using JasperReports Library version 6.0.4  -->
+<!-- 2015-06-23T01:17:24 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AdmEmpresa" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1988d086-ed06-4b25-b0c3-f045bbea30a2">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="h2db"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT e."EMAIL" AS email
+FROM "PUBLIC"."EZATTA_EMPRESA" AS e]]>
+	</queryString>
+	<field name="EMAIL" class="java.lang.String"/>
+	<background>
+		<band/>
+	</background>
+	<title>
+		<band height="40" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="185" height="20" uuid="8e504ea8-b967-4bdf-916b-7c7c9c535c0a"/>
+				<box leftPadding="5"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[EMAIL]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="18" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="185" height="18" uuid="0b431e2d-8c16-427a-ae65-26d919bbc663"/>
+				<box leftPadding="5"/>
+				<textFieldExpression><![CDATA[$F{EMAIL}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

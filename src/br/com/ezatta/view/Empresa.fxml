@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.effect.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" minHeight="-Infinity" minWidth="-Infinity" prefWidth="800.0" style="-fx-background-color: lightgray;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.ezatta.controller.EmpresaController">
+   <children>
+      <BorderPane layoutX="10.0" layoutY="10.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <top>
+            <AnchorPane>
+               <children>
+                  <AnchorPane prefHeight="31.0" prefWidth="800.0" style="-fx-background-color: lightgray;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <Text layoutX="14.0" layoutY="22.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Cadastro &gt; Empresa">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Text>
+                     </children>
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                  </AnchorPane>
+               </children>
+            </AnchorPane>
+         </top>
+         <center>
+            <TabPane fx:id="tabTela" prefWidth="500.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+               <tabs>
+                  <Tab fx:id="tabConsulta" text="Consulta">
+                     <content>
+                        <AnchorPane prefHeight="447.0" prefWidth="800.0">
+                           <children>
+                              <AnchorPane layoutY="29.0" prefHeight="447.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <TextField fx:id="txtBuscar" layoutX="13.0" layoutY="37.0" maxHeight="20.0" prefHeight="25.0" prefWidth="382.0" promptText="Buscar registro" />
+                                    <Button fx:id="btnBuscar" layoutX="400.0" layoutY="35.0" mnemonicParsing="false" onAction="#btnBuscar" prefHeight="25.0" prefWidth="89.0" text="Buscar">
+                                       <graphic>
+                                          <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@images/search32.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                    </Button>
+                                    <TableView fx:id="tbEmpresa" layoutX="6.0" layoutY="69.0" prefHeight="325.0" prefWidth="788.0" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="6.0" AnchorPane.topAnchor="69.0">
+                                       <columnResizePolicy>
+                                          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                       </columnResizePolicy>
+                                    </TableView>
+                                    <RadioButton fx:id="rbNome" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="106.0" text="Por Nome">
+                                       <toggleGroup>
+                                          <ToggleGroup fx:id="buscarPor" />
+                                       </toggleGroup>
+                                    </RadioButton>
+                                    <RadioButton fx:id="rbEmail" layoutX="134.0" layoutY="14.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="166.0" text="E-mail" toggleGroup="$buscarPor" />
+                                    <Button fx:id="btnImprimirRegistros" layoutX="668.0" layoutY="35.0" mnemonicParsing="false" onAction="#btnImprimir" prefHeight="30.0" prefWidth="121.0" text="Imprimir">
+                                       <graphic>
+                                          <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@images/printer32.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                    </Button>
+                                    <Button layoutX="499.0" layoutY="35.0" mnemonicParsing="false" onAction="#redefinirConsulta" text="Redefinir consulta">
+                                       <graphic>
+                                          <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@images/exchange32.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                    </Button>
+                                    <HBox layoutX="514.0" layoutY="406.0" AnchorPane.bottomAnchor="6.0" AnchorPane.rightAnchor="6.0">
+                                       <children>
+                                          <Button fx:id="btnNovoF" layoutX="514.0" layoutY="406.0" mnemonicParsing="false" onAction="#btnNovoFrontal" prefHeight="25.0" prefWidth="89.0" text="Novo" AnchorPane.rightAnchor="197.0">
+                                             <graphic>
+                                                <ImageView fx:id="btnNovoFrontal" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@images/paperplus32.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                             <HBox.margin>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </HBox.margin>
+                                          </Button>
+                                          <Button fx:id="btnAlterarF" layoutX="611.0" layoutY="407.0" mnemonicParsing="false" onAction="#btnAlterarFrontal" text="Alterar" AnchorPane.rightAnchor="102.0">
+                                             <graphic>
+                                                <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@images/paperpencil32.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                             <HBox.margin>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </HBox.margin>
+                                          </Button>
+                                          <Button layoutX="705.0" layoutY="407.0" mnemonicParsing="false" onAction="#btnExcluirFrontal" text="Excluir" AnchorPane.rightAnchor="9.0">
+                                             <graphic>
+                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@images/paperminus32.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                             <HBox.margin>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </HBox.margin>
+                                          </Button>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </AnchorPane>
+                           </children>
+                        </AnchorPane>
+                     </content>
+                  </Tab>
+                  <Tab fx:id="tabCadastro" text="Cadastro">
+                     <content>
+                        <Pane>
+                           <children>
+                              <BorderPane>
+                                 <bottom>
+                                    <HBox>
+                                       <children>
+                                          <Button fx:id="btnIncluir" mnemonicParsing="false" onAction="#btnSalvar" prefHeight="25.0" prefWidth="90.0" text="Salvar">
+                                             <graphic>
+                                                <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@images/papercheck32.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                             <HBox.margin>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </HBox.margin>
+                                          </Button>
+                                          <Button fx:id="btnNovo" mnemonicParsing="false" onAction="#btnNovo" prefHeight="25.0" prefWidth="90.0" text="Novo">
+                                             <graphic>
+                                                <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@images/paperplus32.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                             <HBox.margin>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </HBox.margin>
+                                          </Button>
+                                          <Button fx:id="btnExcluir" mnemonicParsing="false" onAction="#btnExcluir" prefHeight="25.0" prefWidth="90.0" text="Excluir">
+                                             <graphic>
+                                                <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@images/paperminus32.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                             <HBox.margin>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </HBox.margin>
+                                          </Button>
+                                          <Button fx:id="btnCancelar" mnemonicParsing="false" onAction="#cancelar" text="Cancelar">
+                                             <graphic>
+                                                <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@images/leftturnarrow32.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                             <HBox.margin>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </HBox.margin>
+                                          </Button>
+                                       </children>
+                                    </HBox>
+                                 </bottom>
+                                 <center>
+                                    <AnchorPane maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+                                       <children>
+                                          <GridPane prefHeight="191.0" prefWidth="424.0">
+                                             <children>
+                                                <TextField fx:id="txtId" disable="true" editable="false" GridPane.columnIndex="1" />
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Codigo" />
+                                                <Label text="Nome" GridPane.rowIndex="1" />
+                                                <Label text="Login" GridPane.rowIndex="2" />
+                                                <TextField fx:id="txtNome" promptText="Nome da empresa" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                </TextField>
+                                                <TextField fx:id="txtLogin" promptText="Login para acessar o sistema" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <Label text="Senha" GridPane.rowIndex="3" />
+                                                <Label text="E-mail" GridPane.rowIndex="4" />
+                                                <PasswordField fx:id="txtSenha" prefHeight="25.0" prefWidth="240.0" promptText="Senha do usuário" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                <TextField fx:id="txtEmail" promptText="E-mail " GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                             </children>
+                                             <columnConstraints>
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="176.0" minWidth="10.0" prefWidth="60.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="344.0" minWidth="10.0" prefWidth="344.0" />
+                                             </columnConstraints>
+                                             <rowConstraints>
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                             </rowConstraints>
+                                             <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                             </padding>
+                                          </GridPane>
+                                       </children>
+                                    </AnchorPane>
+                                 </center>
+                              </BorderPane>
+                           </children>
+                        </Pane>
+                     </content>
+                  </Tab>
+               </tabs>
+            </TabPane>
+         </center>
+      </BorderPane>
+   </children>
+</AnchorPane>

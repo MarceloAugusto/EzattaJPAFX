@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.web.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane fx:id="stackPanePrincipal" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.ezatta.controller.EnvaseProdutoController">
+   <children>
+      <AnchorPane id="AnchorPane" nodeOrientation="LEFT_TO_RIGHT" prefHeight="400.0">
+         <children>
+            <BorderPane nodeOrientation="LEFT_TO_RIGHT" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <center>
+                  <StackPane fx:id="stackPane" alignment="TOP_LEFT">
+                     <children>
+                        <AnchorPane>
+                           <children>
+                              <ListView fx:id="lvProdutos" onEditStart="#listaProdutos" prefHeight="370.0" prefWidth="625.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                           </children>
+                        </AnchorPane>
+                     </children>
+                     <BorderPane.margin>
+                        <Insets top="2.0" />
+                     </BorderPane.margin>
+                  </StackPane>
+               </center>
+               <top>
+                  <AnchorPane prefHeight="40.0" style="-fx-background-color: lightgray;" BorderPane.alignment="CENTER">
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                     <children>
+                        <Text nodeOrientation="LEFT_TO_RIGHT" strokeType="OUTSIDE" strokeWidth="0.0" text="Selecione um produtos para abastecer" textOrigin="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="542.54736328125" AnchorPane.topAnchor="10.0">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Text>
+                     </children>
+                  </AnchorPane>
+               </top>
+            </BorderPane>
+         </children>
+      </AnchorPane>
+   </children>
+</StackPane>

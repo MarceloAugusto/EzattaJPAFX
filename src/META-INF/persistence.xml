@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="TesteH2DBJPAPU2" transaction-type="RESOURCE_LOCAL">
+    <provider>org.hibernate.ejb.HibernatePersistence</provider>
+    <class>br.com.ezatta.model.EzattaUsuario</class>
+    <class>br.com.ezatta.model.EzattaBico</class>
+    <class>br.com.ezatta.model.EzattaProduto</class>
+    <class>br.com.ezatta.model.EzattaEmpresa</class>
+    <class>br.com.ezatta.model.EzattaOperador</class>
+    <class>br.com.ezatta.model.EzattaEstoque</class>
+    <properties>
+      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+      <property name="hibernate.connection.username" value="ezatta"/>
+      <property name="hibernate.connection.driver_class" value="org.h2.Driver"/>
+      <property name="hibernate.connection.password" value="Uberaba@123"/>
+      <property name="hibernate.cache.provider_class" value="org.hibernate.cache.NoCacheProvider"/>
+      <property name="hibernate.hbm2ddl.auto" value="update"/>
+    </properties>
+  </persistence-unit>
+</persistence>

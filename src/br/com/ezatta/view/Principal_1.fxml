@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.input.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="borderPanePrincipal" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.ezatta.controller.PrincipalController">
+   <top>
+      <VBox>
+         <children>
+            <MenuBar BorderPane.alignment="CENTER">
+              <menus>
+                <Menu mnemonicParsing="false" text="Arquivo">
+                  <items>
+                    <MenuItem fx:id="miFechar" mnemonicParsing="false" onAction="#fechar" text="Fechar" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Cadastro">
+                  <items>
+                    <MenuItem fx:id="miEmpresa" onAction="#cadEmpresa" text="Empresa" />
+                        <MenuItem fx:id="miProduto" mnemonicParsing="false" onAction="#cadProduto" text="Produto" />
+                        <MenuItem fx:id="miBico" mnemonicParsing="false" onAction="#cadBico" text="Bico" />
+                        <MenuItem fx:id="miOperador" mnemonicParsing="false" onAction="#cadOperador" text="Operador" />
+                        <MenuItem fx:id="miUsuario" mnemonicParsing="false" onAction="#cadUsuario" text="Usuario" />
+                  </items>
+                </Menu>
+                  <Menu mnemonicParsing="false" text="Relatorios">
+                    <items>
+                      <MenuItem fx:id="miRGeral" mnemonicParsing="false" text="Geral" />
+                        <MenuItem fx:id="miRProduto" mnemonicParsing="false" text="Produto" />
+                        <MenuItem fx:id="miRBico" mnemonicParsing="false" text="Bico" />
+                        <MenuItem fx:id="miRPlaca" mnemonicParsing="false" text="Placa" />
+                        <MenuItem fx:id="miRAplicador" mnemonicParsing="false" text="Aplicador" />
+                        <MenuItem fx:id="miRLiberabor" mnemonicParsing="false" text="Liberador" />
+                        <MenuItem fx:id="miRLog" mnemonicParsing="false" text="Logs" />
+                    </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Configuraçao">
+                    <items>
+                        <MenuItem fx:id="miBackUp" mnemonicParsing="false" onAction="#backup" text="Back up" />
+                      <MenuItem fx:id="miCBico" mnemonicParsing="false" onAction="#calibrarBico" text="Calibrar" />
+                    </items>
+                  </Menu>
+                <Menu mnemonicParsing="false" text="Ajuda">
+                  <items>
+                    <MenuItem fx:id="miAjuda" mnemonicParsing="false" text="Ajuda" />
+                        <MenuItem fx:id="miManual" mnemonicParsing="false" text="Manual" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
+            <ToolBar prefHeight="40.0" prefWidth="200.0">
+              <items>
+                  <Button fx:id="btnEnvase" mnemonicParsing="false" onAction="#envase" text="Envase" />
+                <Button fx:id="btnEstoque" mnemonicParsing="false" onAction="#estoquePrincipal" text="Estoque" />
+                  <Button fx:id="btnOperacoes" mnemonicParsing="false" onAction="#operacoes" text="Operaçoes" />
+                  <Button fx:id="btnCancelamento" mnemonicParsing="false" onAction="#cancelamento" text="Cancelamento" />
+                  <Text fx:id="txtNomeEmpresa" nodeOrientation="RIGHT_TO_LEFT" strokeType="OUTSIDE" strokeWidth="0.0">
+                     <font>
+                        <Font size="14.0" />
+                     </font></Text>
+              </items>
+            </ToolBar>
+         </children>
+         <effect>
+            <DropShadow />
+         </effect>
+      </VBox>
+   </top>
+   <center>
+      <AnchorPane fx:id="AnchorPanePrincipal">
+         <children>
+            <SplitPane dividerPositions="0.7731829573934837" prefHeight="481.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <items>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                     <children>
+                        <StackPane fx:id="stack" alignment="TOP_LEFT" nodeOrientation="LEFT_TO_RIGHT" prefHeight="479.0" prefWidth="234.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                  </AnchorPane>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="479.0" prefWidth="200.0">
+                     <children>
+                        <Accordion fx:id="acPrincipal" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <panes>
+                            <TitledPane fx:id="acEstoqueAtual" alignment="TOP_LEFT" text="Processo de Envase">
+                              <content>
+                                    <ScrollPane fitToHeight="true" fitToWidth="true" nodeOrientation="LEFT_TO_RIGHT" prefViewportHeight="428.0" prefViewportWidth="175.0">
+                                       <content>
+                                          <VBox fx:id="estoqueAtual" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" nodeOrientation="LEFT_TO_RIGHT">
+                                             <children>
+                                                <VBox fx:id="vbList" nodeOrientation="LEFT_TO_RIGHT">
+                                                   <VBox.margin>
+                                                      <Insets bottom="5.0" top="5.0" />
+                                                   </VBox.margin>
+                                                   <padding>
+                                                      <Insets bottom="5.0" top="5.0" />
+                                                   </padding>
+                                                </VBox>
+                                             </children>
+                                          </VBox>
+                                       </content>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </ScrollPane>
+                              </content>
+                            </TitledPane>
+                            <TitledPane fx:id="acProcessosEnvase" prefHeight="454.0" prefWidth="175.0" text="Containers / Estoque">
+                              <content>
+                                    <AnchorPane nodeOrientation="LEFT_TO_RIGHT">
+                                       <children>
+                                          <StackPane fx:id="stackFilaPrincipal" alignment="TOP_LEFT" nodeOrientation="LEFT_TO_RIGHT" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                          <VBox fx:id="FilaPrincipal" layoutX="10.399999618530273" layoutY="10.399999618530273" nodeOrientation="LEFT_TO_RIGHT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                       </children>
+                                    </AnchorPane>
+                              </content>
+                            </TitledPane>
+                              <TitledPane fx:id="acCancelarEnvasePrincipal" animated="false" text="Cancelamento">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                </content>
+                              </TitledPane>
+                          </panes>
+                        </Accordion>
+                     </children></AnchorPane>
+              </items>
+            </SplitPane>
+         </children>
+      </AnchorPane>
+   </center>
+   <bottom>
+      <HBox alignment="CENTER_LEFT" maxHeight="50.0" minHeight="50.0" prefHeight="50.0" style="-fx-background-color: lightgray;">
+         <children>
+            <ImageView fitHeight="46.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@images/logo.png" />
+               </image>
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </HBox.margin>
+            </ImageView>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Ezatta Inteligente Oil supply  -  34 3334 .9990" textAlignment="CENTER" wrappingWidth="569.142578125">
+               <HBox.margin>
+                  <Insets left="50.0" />
+               </HBox.margin>
+               <effect>
+                  <Lighting>
+                     <bumpInput>
+                        <Shadow />
+                     </bumpInput>
+                  </Lighting>
+               </effect>
+            </Text>
+         </children>
+         <effect>
+            <DropShadow />
+         </effect>
+      </HBox>
+   </bottom>
+</BorderPane>
