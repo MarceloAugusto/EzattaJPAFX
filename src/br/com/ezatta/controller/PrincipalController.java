@@ -297,15 +297,14 @@ public class PrincipalController implements Initializable {
 
                 ScrollPane sp = new ScrollPane();
                 volTotalAEnvasar.setText(dado.getQtdEstoque() + "");
-                separator[idEstoqueTh].setMinHeight(15);
+                //separator[idEstoqueTh].setMinHeight(15);
                 btnEnviar[idEstoqueTh].setText("Enviar");
                 btnEnviar[idEstoqueTh].setMinWidth(70);
                 btnCancelarEstoque[idEstoqueTh].setText("Cancelar");
                 btnCancelarEstoque[idEstoqueTh].setMinWidth(75);
                 btnSalvarEstoque[idEstoqueTh].setText("Salvar");
                 btnSalvarEstoque[idEstoqueTh].setMinWidth(75);
-                btnSalvarEstoque[idEstoqueTh].setVisible(false);
-                btnSalvarEstoque[idEstoqueTh].setMaxWidth(0);
+                btnSalvarEstoque[idEstoqueTh].setDisable(true);
                 sp.setContent(hb[idEstoqueTh]);
                 hb[idEstoqueTh].setSpacing(15.0);
 
@@ -320,13 +319,19 @@ public class PrincipalController implements Initializable {
                 progressBarEstoque[idEstoqueTh].setMinWidth(150);
                 progressBarEstoque[idEstoqueTh].setMinHeight(22);
                 progressBarEstoque[idEstoqueTh].setVisible(false);
-                hb[idEstoqueTh].getChildren().addAll(btnEnviar[idEstoqueTh], btnCancelarEstoque[idEstoqueTh], btnSalvarEstoque[idEstoqueTh], progressBarEstoque[idEstoqueTh], efetivo[idEstoqueTh]);
+                hb[idEstoqueTh].getChildren().addAll(btnEnviar[idEstoqueTh], btnCancelarEstoque[idEstoqueTh], btnSalvarEstoque[idEstoqueTh]);
 
                 GridPane.setHalignment(stringEstoque[idEstoqueTh], HPos.LEFT);
                 gridpane[idEstoqueTh].add(stringEstoque[idEstoqueTh], 0, 0);
 
                 GridPane.setHalignment(hb[idEstoqueTh], HPos.LEFT);
                 gridpane[idEstoqueTh].add(hb[idEstoqueTh], 0, 1);
+
+                GridPane.setHalignment(efetivo[idEstoqueTh], HPos.LEFT);
+                gridpane[idEstoqueTh].add(efetivo[idEstoqueTh], 0, 2);
+
+                GridPane.setHalignment(progressBarEstoque[idEstoqueTh], HPos.LEFT);
+                gridpane[idEstoqueTh].add(progressBarEstoque[idEstoqueTh], 1, 2);
 
                 System.out.println("idEstoqueTh: " + idEstoqueTh);
                 System.out.println("Efetivo: " + efetivo[idEstoqueTh]);
@@ -339,7 +344,6 @@ public class PrincipalController implements Initializable {
                     public void handle(ActionEvent e) {
                         try {
                             idEstoqueTh = dado.getId();
-                            progressBarEstoque[idEstoqueTh].setVisible(true);
                             volumeTotal[idEstoqueTh] = dado.getQtdEstoque();
                             endBico[idEstoqueTh] = dado.getBico().getEndereco();
                             //teste toString
@@ -537,12 +541,13 @@ public class PrincipalController implements Initializable {
 
                             //alterando status do botão enviar
                             btnCancelarEstoque[idEstoqueTh].disableProperty();
-                            btnCancelarEstoque[idEstoqueTh].setVisible(false);
-                            
+                            btnCancelarEstoque[idEstoqueTh].setDisable(true);
+
                             //btnSalvar
-                            btnSalvarEstoque[idEstoqueTh].setVisible(true);
-                            btnSalvarEstoque[idEstoqueTh].setMinWidth(85);
-                            
+                            btnSalvarEstoque[idEstoqueTh].setDisable(false);
+
+                            //ProgressBar
+                            progressBarEstoque[idEstoqueTh].setVisible(true);
 
                             String volumeTratado = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[15 + contAux], readBuffer[16 + contAux], readBuffer[17 + contAux], readBuffer[18 + contAux], readBuffer[19 + contAux], readBuffer[20 + contAux], readBuffer[21 + contAux], readBuffer[22 + contAux]);
                             String volumeTratadoDouble = String.format("%02x%02x%02x%02x", readBuffer[19 + contAux], readBuffer[20 + contAux], readBuffer[21 + contAux], readBuffer[22 + contAux]);
@@ -566,7 +571,7 @@ public class PrincipalController implements Initializable {
                             if (readBuffer[15 + contAux] == (byte) 0x56 && outputBfj.length() > 5) {
                                 try {
                                     efetivo[idEstoqueTh].setText(outputBfj.toString());
-                                   // efetivo[idEstoqueTh].setText(volumeBfj.toString());
+                                    // efetivo[idEstoqueTh].setText(volumeBfj.toString());
                                     System.out.println("VolumeTotal " + volumeTotal[idEstoqueTh]);
                                     if (!volumeSemVol.isEmpty() && volumeSemVol.length() > 0) {
                                         atualizaBarraProgress(volumeBfj.toString());//barra de progresso
@@ -590,11 +595,19 @@ public class PrincipalController implements Initializable {
                             gridpane[idEstoqueTh].setGridLinesVisible(false);
                             gridpane[idEstoqueTh].setMinHeight(0);
                             gridpane[idEstoqueTh].setMaxHeight(0);
+                            gridpane[idEstoqueTh].setMaxWidth(0);
+                            gridpane[idEstoqueTh].setMinWidth(0);
                             hb[idEstoqueTh].setVisible(false);
                             hb[idEstoqueTh].setMaxHeight(0);
                             separator[idEstoqueTh].setVisible(false);
                             separator[idEstoqueTh].setMaxHeight(0);
                             stringEstoque[idEstoqueTh].setText("");
+                            efetivo[idEstoqueTh].setText("");
+                            progressBarEstoque[idEstoqueTh].setMinHeight(0);
+                            progressBarEstoque[idEstoqueTh].setMaxHeight(0);
+                            progressBarEstoque[idEstoqueTh].setMaxWidth(0);
+                            progressBarEstoque[idEstoqueTh].setMinWidth(0);
+                            progressBarEstoque[idEstoqueTh].setVisible(false);
 
                             //cancela thread
                             taskLeituraEnvase.cancel();
@@ -1251,15 +1264,15 @@ public class PrincipalController implements Initializable {
         Text volTotalAEnvasar = new Text();
 
         ScrollPane sp = new ScrollPane();
-        separator[idEstoqueTh].setMinHeight(15);
+        //separator[idEstoqueTh].setMinHeight(15);
         volTotalAEnvasar.setText(estoqueRecebido.getQtdEstoque() + "");
         btnEnviar[idEstoqueTh].setText("Enviar");
         btnEnviar[idEstoqueTh].setMinWidth(70);
         btnCancelarEstoque[idEstoqueTh].setText("Cancelar");
         btnCancelarEstoque[idEstoqueTh].setMinWidth(75);
-        btnSalvarEstoque[idEstoqueTh].setText("Cancelar");
+        btnSalvarEstoque[idEstoqueTh].setText("Salvar");
         btnSalvarEstoque[idEstoqueTh].setMinWidth(75);
-        btnSalvarEstoque[idEstoqueTh].setMaxWidth(0);
+        btnSalvarEstoque[idEstoqueTh].setDisable(true);
         sp.setContent(hb[idEstoqueTh]);
         hb[idEstoqueTh].setSpacing(15.0);
 
@@ -1274,13 +1287,19 @@ public class PrincipalController implements Initializable {
         progressBarEstoque[idEstoqueTh].setMinWidth(150);
         progressBarEstoque[idEstoqueTh].setMinHeight(22);
         progressBarEstoque[idEstoqueTh].setVisible(false);
-        hb[idEstoqueTh].getChildren().addAll(btnEnviar[idEstoqueTh], btnCancelarEstoque[idEstoqueTh],btnSalvarEstoque[idEstoqueTh], progressBarEstoque[idEstoqueTh], efetivo[idEstoqueTh]);
+        hb[idEstoqueTh].getChildren().addAll(btnEnviar[idEstoqueTh], btnCancelarEstoque[idEstoqueTh], btnSalvarEstoque[idEstoqueTh], progressBarEstoque[idEstoqueTh], efetivo[idEstoqueTh]);
 
         GridPane.setHalignment(stringEstoque[idEstoqueTh], HPos.LEFT);
         gridpane[idEstoqueTh].add(stringEstoque[idEstoqueTh], 0, 0);
 
         GridPane.setHalignment(hb[idEstoqueTh], HPos.LEFT);
         gridpane[idEstoqueTh].add(hb[idEstoqueTh], 0, 1);
+
+        GridPane.setHalignment(efetivo[idEstoqueTh], HPos.LEFT);
+        gridpane[idEstoqueTh].add(efetivo[idEstoqueTh], 0, 2);
+
+        GridPane.setHalignment(progressBarEstoque[idEstoqueTh], HPos.LEFT);
+        gridpane[idEstoqueTh].add(progressBarEstoque[idEstoqueTh], 1, 2);
 
         System.out.println("idEstoqueTh: " + idEstoqueTh);
         System.out.println("Efetivo: " + efetivo[idEstoqueTh]);
@@ -1293,7 +1312,6 @@ public class PrincipalController implements Initializable {
             public void handle(ActionEvent e) {
                 try {
                     idEstoqueTh = estoqueRecebido.getId();
-                    progressBarEstoque[idEstoqueTh].setVisible(true);
                     volumeTotal[idEstoqueTh] = estoqueRecebido.getQtdEstoque();
                     endBico[idEstoqueTh] = estoqueRecebido.getBico().getEndereco();
                     //teste toString
@@ -1318,7 +1336,7 @@ public class PrincipalController implements Initializable {
 
                     //desabilitar botão enviar
                     btnEnviar[idEstoqueTh].setDisable(true);
-                    
+
                     new FXDialog(FXDialog.Type.INFO, "Enviado para a placa").showDialog();
                 } catch (InterruptedException ex) {
                     Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
