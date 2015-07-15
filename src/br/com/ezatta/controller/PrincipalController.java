@@ -100,7 +100,7 @@ public class PrincipalController implements Initializable {
     private BicosDAO bicoCtr = new BicosDAO();
     private EstoqueDAO estoqueCtr = new EstoqueDAO();
     private MaskTextField maskTextField = new MaskTextField();
-    private EzattaEstoque estoque ;
+    private EzattaEstoque estoque;
     //---------------------------------------fim vars bicos-------------------
 
     @FXML
@@ -265,6 +265,9 @@ public class PrincipalController implements Initializable {
     public String[] endBico = new String[10000];
     Button[] btnEnviar = new Button[10000];
     Button[] btnCancelarEstoque = new Button[10000];
+    Button[] btnSalvarEstoque = new Button[10000];
+    Separator[] separator = new Separator[10000];
+    Text[] stringEstoque = new Text[10000];
 
     //-------------------------------------------------metodos
     public void popularDadosListaEnvase() {
@@ -284,19 +287,25 @@ public class PrincipalController implements Initializable {
                 endBico[idEstoqueTh] = new String();
                 btnEnviar[idEstoqueTh] = new Button();
                 btnCancelarEstoque[idEstoqueTh] = new Button();
+                btnSalvarEstoque[idEstoqueTh] = new Button();
+                separator[idEstoqueTh] = new Separator();
+                stringEstoque[idEstoqueTh] = new Text();
 
                 //variaveis auxiliares
                 Text volTotalAEnvasar = new Text();
-                Text stringEstoque = new Text();
-                Separator separator = new Separator();
+                //Text stringEstoque = new Text();
 
                 ScrollPane sp = new ScrollPane();
-                separator.setMinHeight(15);
                 volTotalAEnvasar.setText(dado.getQtdEstoque() + "");
+                separator[idEstoqueTh].setMinHeight(15);
                 btnEnviar[idEstoqueTh].setText("Enviar");
                 btnEnviar[idEstoqueTh].setMinWidth(70);
                 btnCancelarEstoque[idEstoqueTh].setText("Cancelar");
                 btnCancelarEstoque[idEstoqueTh].setMinWidth(75);
+                btnSalvarEstoque[idEstoqueTh].setText("Salvar");
+                btnSalvarEstoque[idEstoqueTh].setMinWidth(75);
+                btnSalvarEstoque[idEstoqueTh].setVisible(false);
+                btnSalvarEstoque[idEstoqueTh].setMaxWidth(0);
                 sp.setContent(hb[idEstoqueTh]);
                 hb[idEstoqueTh].setSpacing(15.0);
 
@@ -307,15 +316,14 @@ public class PrincipalController implements Initializable {
                 ColumnConstraints column1 = new ColumnConstraints(100);
                 gridpane[idEstoqueTh].getColumnConstraints().addAll(column1);
 
-                //stringEstoque.setText("OS: " + dado.getOs() + " - Placa: " + dado.getPlaca() + " - Quantidade: " + dado.getQtdEstoque() + " - Produto: " + dado.getProduto().getNome() + " - Bico: " + dado.getBico().getNome());
-                stringEstoque.setText("ID: " + dado.getId() + " - OS: " + dado.getOs() + " - Qtd.: " + dado.getQtdEstoque() + " - Prod.: " + dado.getProduto().getNome() + " - " + dado.getBico().getNome());
+                stringEstoque[idEstoqueTh].setText("ID: " + dado.getId() + " - OS: " + dado.getOs() + " - Qtd.: " + dado.getQtdEstoque() + " - Prod.: " + dado.getProduto().getNome() + " - " + dado.getBico().getNome());
                 progressBarEstoque[idEstoqueTh].setMinWidth(150);
                 progressBarEstoque[idEstoqueTh].setMinHeight(22);
                 progressBarEstoque[idEstoqueTh].setVisible(false);
-                hb[idEstoqueTh].getChildren().addAll(btnEnviar[idEstoqueTh], btnCancelarEstoque[idEstoqueTh], progressBarEstoque[idEstoqueTh], efetivo[idEstoqueTh]);
+                hb[idEstoqueTh].getChildren().addAll(btnEnviar[idEstoqueTh], btnCancelarEstoque[idEstoqueTh], btnSalvarEstoque[idEstoqueTh], progressBarEstoque[idEstoqueTh], efetivo[idEstoqueTh]);
 
-                GridPane.setHalignment(stringEstoque, HPos.LEFT);
-                gridpane[idEstoqueTh].add(stringEstoque, 0, 0);
+                GridPane.setHalignment(stringEstoque[idEstoqueTh], HPos.LEFT);
+                gridpane[idEstoqueTh].add(stringEstoque[idEstoqueTh], 0, 0);
 
                 GridPane.setHalignment(hb[idEstoqueTh], HPos.LEFT);
                 gridpane[idEstoqueTh].add(hb[idEstoqueTh], 0, 1);
@@ -324,6 +332,7 @@ public class PrincipalController implements Initializable {
                 System.out.println("Efetivo: " + efetivo[idEstoqueTh]);
 
                 vbList.getChildren().add(gridpane[idEstoqueTh]);
+                vbList.getChildren().add(separator[idEstoqueTh]);
 
                 btnEnviar[idEstoqueTh].setOnAction(new EventHandler<ActionEvent>() {
                     @Override
@@ -353,6 +362,9 @@ public class PrincipalController implements Initializable {
                             est.setStatus(1);
                             EstoqueCtr.updateEstoque(est);
 
+                            //desabilitar botão enviar
+                            btnEnviar[idEstoqueTh].setDisable(true);
+
                             new FXDialog(FXDialog.Type.INFO, "Enviado para a placa").showDialog();
                         } catch (InterruptedException ex) {
                             Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
@@ -367,16 +379,14 @@ public class PrincipalController implements Initializable {
                     public void handle(ActionEvent e) {
                         idEstoqueTh = dado.getId();
                         vbList.getChildren().remove(gridpane[idEstoqueTh]);
+                        vbList.getChildren().remove(separator[idEstoqueTh]);
                         cancelarNoBanco(idEstoqueTh);
-                        //new FXDialog(FXDialog.Type.INFO, "Componente HBox id: " + idEstoqueTh + " Removido").showDialog();
                     }
 
                 });
             }
 
-            //acEstoqueAtual.isExpanded();
         } catch (Exception e) {
-            //new FXDialog(FXDialog.Type.ERROR, e.getCause().getMessage()).showDialog();
             e.printStackTrace();
         }
     }
@@ -474,12 +484,11 @@ public class PrincipalController implements Initializable {
 
         @Override
         public void run() {
-
+            System.out.println("entrou thread");
             try {
                 long numBytes = 0;
                 int contAux = 0;
                 byte[] readBuffer = new byte[1000];
-                //boolean[] execucaoWhile = new boolean[1000];
                 execucaoWhile[idEstoqueTh] = true;
                 while (execucaoWhile[idEstoqueTh]) {
                     entrada = null;
@@ -517,7 +526,7 @@ public class PrincipalController implements Initializable {
                     String endBicoRadio = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[4 + contAux], readBuffer[5 + contAux], readBuffer[6 + contAux], readBuffer[7 + contAux], readBuffer[8 + contAux], readBuffer[9 + contAux], readBuffer[10 + contAux], readBuffer[11 + contAux]);
                     if (endBico[idEstoqueTh].toUpperCase().equals(endBicoRadio.toUpperCase())) {
 
-                        if (readBuffer[15 + contAux] == (byte) 0x4c) {
+                        if (readBuffer[15 + contAux] == (byte) 0x4c) { //LIBERADO
                             //if (readBuffer[15] == (byte) 0x4c || readBuffer[02] == (byte) 0x07) {
                             String volumeTratado = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[15], readBuffer[16], readBuffer[17], readBuffer[18], readBuffer[19], readBuffer[20], readBuffer[21], readBuffer[22]);
                             System.out.println("Liberado: " + volumeTratado);
@@ -525,6 +534,16 @@ public class PrincipalController implements Initializable {
                             btnCancelarEstoque[idEstoqueTh].disableProperty();
                         }
                         if (readBuffer[15 + contAux] == (byte) 0x56) {//ENCHENDO
+
+                            //alterando status do botão enviar
+                            btnCancelarEstoque[idEstoqueTh].disableProperty();
+                            btnCancelarEstoque[idEstoqueTh].setVisible(false);
+                            
+                            //btnSalvar
+                            btnSalvarEstoque[idEstoqueTh].setVisible(true);
+                            btnSalvarEstoque[idEstoqueTh].setMinWidth(85);
+                            
+
                             String volumeTratado = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[15 + contAux], readBuffer[16 + contAux], readBuffer[17 + contAux], readBuffer[18 + contAux], readBuffer[19 + contAux], readBuffer[20 + contAux], readBuffer[21 + contAux], readBuffer[22 + contAux]);
                             String volumeTratadoDouble = String.format("%02x%02x%02x%02x", readBuffer[19 + contAux], readBuffer[20 + contAux], readBuffer[21 + contAux], readBuffer[22 + contAux]);
 
@@ -547,13 +566,11 @@ public class PrincipalController implements Initializable {
                             if (readBuffer[15 + contAux] == (byte) 0x56 && outputBfj.length() > 5) {
                                 try {
                                     efetivo[idEstoqueTh].setText(outputBfj.toString());
+                                   // efetivo[idEstoqueTh].setText(volumeBfj.toString());
                                     System.out.println("VolumeTotal " + volumeTotal[idEstoqueTh]);
-                                    //txtStatus.setText("APLICANDO"); //mostra texto aplicando
-                                    if (!volumeSemVol.isEmpty() && volumeSemVol != null && volumeSemVol.length() > 0) {
-                                        //atualizaBarraProgress(volumeBfj.toString());//barra de progresso
+                                    if (!volumeSemVol.isEmpty() && volumeSemVol.length() > 0) {
                                         atualizaBarraProgress(volumeBfj.toString());//barra de progresso
                                     }
-
                                 } catch (NullPointerException e) {
                                     System.out.println("nullpointer");
                                     e.printStackTrace();
@@ -564,22 +581,30 @@ public class PrincipalController implements Initializable {
                             outputBfj.delete(0, outputBfj.length());
                         }
                         if (readBuffer[15 + contAux] == (byte) 0x46) {
+                            //mensagem de fim
                             efetivo[idEstoqueTh].setText("FIM");
                             execucaoWhile[idEstoqueTh] = false;
+                            Thread.sleep(1000);
 
-                            //limparListaAposEnvase(idEstoqueTh);
-//                            gridpane[idEstoqueTh].setVisible(false);
-//                            vbList.getChildren().remove(gridpane[idEstoqueTh]);
-                            //idEstoqueTh = estoque.getId();
-//                            System.out.println("idEstoqueTh: "+idEstoqueTh);
-//                            vbList.getChildren().remove(gridpane[idEstoqueTh]);
-//                            new FXDialog(FXDialog.Type.INFO, "Componente HBox id: " + idEstoqueTh + " Finalizou").showDialog();
-//                            //task.cancel();
+                            //remove registro da tela
+                            gridpane[idEstoqueTh].setGridLinesVisible(false);
+                            gridpane[idEstoqueTh].setMinHeight(0);
+                            gridpane[idEstoqueTh].setMaxHeight(0);
+                            hb[idEstoqueTh].setVisible(false);
+                            hb[idEstoqueTh].setMaxHeight(0);
+                            separator[idEstoqueTh].setVisible(false);
+                            separator[idEstoqueTh].setMaxHeight(0);
+                            stringEstoque[idEstoqueTh].setText("");
+
+                            //cancela thread
+                            taskLeituraEnvase.cancel();
                             //--------------------------atualizar status
                             EzattaEstoque e = EstoqueCtr.getEstoque(idEstoqueTh);
                             e.setStatus(2);
                             EstoqueCtr.updateEstoque(e);
 
+                            //limpa outputBuffer
+                            outputBfj.delete(0, outputBfj.length());
                         }
                     }
                 }
@@ -1014,7 +1039,7 @@ public class PrincipalController implements Initializable {
 
     //---
     public PrincipalController() {
-        //this.t = new Thread(taskLeituraEnvase);
+
     }
 
     public void limpar() {
@@ -1189,26 +1214,26 @@ public class PrincipalController implements Initializable {
 
         new FXDialog(FXDialog.Type.INFO, "Solicitação confirmada. ").showDialog();
         estoqueCtr.addEstoque(estoque);
-        
+
         //EzattaEstoque ultimoRegistro = estoqueCtr.getUltimoEstoque();
         System.out.println("=================================inicio===================================================");
         List<EzattaEstoque> list = estoqueCtr.getUltimoEstoque();
         EzattaEstoque itemPassado = new EzattaEstoque();
         for (EzattaEstoque list1 : list) {
-            System.out.println("list1: "+list1);
+            System.out.println("list1: " + list1);
             itemPassado = list1;
-            System.out.println("itemPassado: "+itemPassado);
+            System.out.println("itemPassado: " + itemPassado);
         }
         System.out.println("=================================Fim===================================================");
-        
+
         adicionaElementoVbList(itemPassado);
-        
+
     }
 
     private void adicionaElementoVbList(EzattaEstoque estoqueRecebido) {
 
         System.out.println("================================================-------------------------------=========================");
-        System.out.println("estoqueRecebido: "+estoqueRecebido);
+        System.out.println("estoqueRecebido: " + estoqueRecebido);
         idEstoqueTh = estoqueRecebido.getId(); //id estoque -> identificado
         //instanciar componentes vetores
         hb[idEstoqueTh] = new HBox();
@@ -1218,19 +1243,23 @@ public class PrincipalController implements Initializable {
         endBico[idEstoqueTh] = new String();
         btnEnviar[idEstoqueTh] = new Button();
         btnCancelarEstoque[idEstoqueTh] = new Button();
+        btnSalvarEstoque[idEstoqueTh] = new Button();
+        stringEstoque[idEstoqueTh] = new Text();
+        separator[idEstoqueTh] = new Separator();
 
         //variaveis auxiliares
         Text volTotalAEnvasar = new Text();
-        Text stringEstoque = new Text();
-        Separator separator = new Separator();
 
         ScrollPane sp = new ScrollPane();
-        separator.setMinHeight(15);
+        separator[idEstoqueTh].setMinHeight(15);
         volTotalAEnvasar.setText(estoqueRecebido.getQtdEstoque() + "");
         btnEnviar[idEstoqueTh].setText("Enviar");
         btnEnviar[idEstoqueTh].setMinWidth(70);
         btnCancelarEstoque[idEstoqueTh].setText("Cancelar");
         btnCancelarEstoque[idEstoqueTh].setMinWidth(75);
+        btnSalvarEstoque[idEstoqueTh].setText("Cancelar");
+        btnSalvarEstoque[idEstoqueTh].setMinWidth(75);
+        btnSalvarEstoque[idEstoqueTh].setMaxWidth(0);
         sp.setContent(hb[idEstoqueTh]);
         hb[idEstoqueTh].setSpacing(15.0);
 
@@ -1241,14 +1270,14 @@ public class PrincipalController implements Initializable {
         ColumnConstraints column1 = new ColumnConstraints(100);
         gridpane[idEstoqueTh].getColumnConstraints().addAll(column1);
 
-        stringEstoque.setText("ID: " + estoqueRecebido.getId() + " - OS: " + estoqueRecebido.getOs() + " - Qtd.: " + estoqueRecebido.getQtdEstoque() + " - Prod.: " + estoqueRecebido.getProduto().getNome() + " - " + estoqueRecebido.getBico().getNome());
+        stringEstoque[idEstoqueTh].setText("ID: " + estoqueRecebido.getId() + " - OS: " + estoqueRecebido.getOs() + " - Qtd.: " + estoqueRecebido.getQtdEstoque() + " - Prod.: " + estoqueRecebido.getProduto().getNome() + " - " + estoqueRecebido.getBico().getNome());
         progressBarEstoque[idEstoqueTh].setMinWidth(150);
         progressBarEstoque[idEstoqueTh].setMinHeight(22);
         progressBarEstoque[idEstoqueTh].setVisible(false);
-        hb[idEstoqueTh].getChildren().addAll(btnEnviar[idEstoqueTh], btnCancelarEstoque[idEstoqueTh], progressBarEstoque[idEstoqueTh], efetivo[idEstoqueTh]);
+        hb[idEstoqueTh].getChildren().addAll(btnEnviar[idEstoqueTh], btnCancelarEstoque[idEstoqueTh],btnSalvarEstoque[idEstoqueTh], progressBarEstoque[idEstoqueTh], efetivo[idEstoqueTh]);
 
-        GridPane.setHalignment(stringEstoque, HPos.LEFT);
-        gridpane[idEstoqueTh].add(stringEstoque, 0, 0);
+        GridPane.setHalignment(stringEstoque[idEstoqueTh], HPos.LEFT);
+        gridpane[idEstoqueTh].add(stringEstoque[idEstoqueTh], 0, 0);
 
         GridPane.setHalignment(hb[idEstoqueTh], HPos.LEFT);
         gridpane[idEstoqueTh].add(hb[idEstoqueTh], 0, 1);
@@ -1256,13 +1285,8 @@ public class PrincipalController implements Initializable {
         System.out.println("idEstoqueTh: " + idEstoqueTh);
         System.out.println("Efetivo: " + efetivo[idEstoqueTh]);
 
-        //hb[idEstoqueTh].getChildren().add(stringEstoque);
-        //hb[idEstoqueTh].getChildren().addAll(btnEnviar, btnCancelar, volTotalAEnvasar, progressBar[idEstoqueTh], efetivo[idEstoqueTh]);
-        //hb[idEstoqueTh].getChildren().add(separator);
-        //vbList.getChildren().add(stringEstoque);
-        //vbList.getChildren().add(hb[idEstoqueTh]);
         vbList.getChildren().add(gridpane[idEstoqueTh]);
-        //vbList.getChildren().add(separator);
+        vbList.getChildren().add(separator[idEstoqueTh]);
 
         btnEnviar[idEstoqueTh].setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -1287,6 +1311,14 @@ public class PrincipalController implements Initializable {
                     t[idEstoqueTh] = new Thread(taskLeituraEnvase);
                     t[idEstoqueTh].start();
 
+                    //atualiza banco
+                    EzattaEstoque est = EstoqueCtr.getEstoque(idEstoqueTh);
+                    est.setStatus(1);
+                    EstoqueCtr.updateEstoque(est);
+
+                    //desabilitar botão enviar
+                    btnEnviar[idEstoqueTh].setDisable(true);
+                    
                     new FXDialog(FXDialog.Type.INFO, "Enviado para a placa").showDialog();
                 } catch (InterruptedException ex) {
                     Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
