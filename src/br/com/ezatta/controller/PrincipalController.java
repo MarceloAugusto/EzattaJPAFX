@@ -384,7 +384,9 @@ public class PrincipalController implements Initializable {
                         idEstoqueTh = dado.getId();
                         vbList.getChildren().remove(gridpane[idEstoqueTh]);
                         vbList.getChildren().remove(separator[idEstoqueTh]);
+                        //cancela no banco de dados
                         cancelarNoBanco(idEstoqueTh);
+                        cancelarPlaca(idEstoqueTh);
                     }
 
                 });
@@ -583,7 +585,11 @@ public class PrincipalController implements Initializable {
                                 outputBfj.delete(0, outputBfj.length());//limpa buffer
                             }
                         } else {
-                            outputBfj.delete(0, outputBfj.length());
+                            try {
+                                outputBfj.delete(0, outputBfj.length());
+                            } catch (Exception e) {
+
+                            }
                         }
                         if (readBuffer[15 + contAux] == (byte) 0x46) {
                             //mensagem de fim
@@ -1351,7 +1357,10 @@ public class PrincipalController implements Initializable {
             public void handle(ActionEvent e) {
                 idEstoqueTh = estoqueRecebido.getId();
                 vbList.getChildren().remove(gridpane[idEstoqueTh]);
+                vbList.getChildren().remove(separator[idEstoqueTh]);
                 cancelarNoBanco(idEstoqueTh);
+                cancelarPlaca(idEstoqueTh);
+
             }
 
         });
@@ -1371,6 +1380,60 @@ public class PrincipalController implements Initializable {
         BigDecimal quantidadecalculada = quantidadeProduto.add(quantidadeEstoque).setScale(2, RoundingMode.FLOOR);
         prod.setQuantidade(quantidadecalculada);
         produtoCtr.updateProduto(prod);
+    }
+
+    private void cancelarPlaca(int idEstoqueTh) {
+
+        try {
+            saida = serialPort.getOutputStream();
+            System.out.println("FLUXO OK!");
+        } catch (Exception e) {
+            System.out.println("Erro.STATUS: " + e);
+        }
+
+        try {
+
+            String vo = "00.00";
+            String enviar = "00.00";
+            enviar = enviar.replace(".", "");
+
+            Integer volume_inteiro = Integer.parseInt(enviar); // Volume total como inteiro
+            String volumeLSB = vo.substring(3, 5);
+
+            int volumeMSBL = (volume_inteiro) & 255;
+            int volumeLSBL = ((volume_inteiro & 65280) / 256);
+            //mostrar parte alta e baixa do inteiro
+            System.out.println("String: " + (String.valueOf(volumeMSBL)) + " " + (String.valueOf(volumeLSBL)));
+
+            EzattaEstoque ezattaEstoqueCancelar = estoqueCtr.getEstoque(idEstoqueTh);
+            EzattaBico bico = ezattaEstoqueCancelar.getBico();
+            System.out.println("bico: " + bico.getNome());
+
+            long crc = 0xff - 0x11 - Long.parseLong(bico.getEndereco().substring(0, 2), 16) - Long.parseLong(bico.getEndereco().substring(2, 4), 16) - Long.parseLong(bico.getEndereco().substring(4, 6), 16) - Long.parseLong(bico.getEndereco().substring(6, 8), 16) - Long.parseLong(bico.getEndereco().substring(8, 10), 16) - Long.parseLong(bico.getEndereco().substring(10, 12), 16) - Long.parseLong(bico.getEndereco().substring(12, 14), 16) - Long.parseLong(bico.getEndereco().substring(14, 16), 16)
+                    - 0xFF - 0xFE - 0x57 - 0x4D - 0x01 - (volumeLSBL) - (volumeMSBL) - 0x0D;
+
+            String FinalrCrc = Long.toHexString(crc).substring(14, 16);
+
+            byte[] uartout = new byte[]{
+                (byte) 0x7E, (byte) 0x00, (byte) 0x14, (byte) 0x10, (byte) 0x01,
+                (byte) (Long.parseLong(bico.getEndereco().substring(0, 2), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(2, 4), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(4, 6), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(6, 8), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(8, 10), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(10, 12), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(12, 14), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(14, 16), 16)),
+                (byte) 0xFF, (byte) 0xFE, (byte) 0x00, (byte) 0x00, (byte) 0x57, (byte) 0x4D, (byte) 0x01,
+                (byte) volumeLSBL, (byte) volumeMSBL, (byte) 0x0D, (byte) crc};
+            try {
+                saida.write(uartout);
+                Thread.sleep(1000);
+            } catch (IOException ex) {
+                System.out.println("erro");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            serialPort.close();
+        }
+        if (!portFound) {
+            serialPort.close();
+        }
+
     }
 
     //----------------------------------------------------fim novos metodos
