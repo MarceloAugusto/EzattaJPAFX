@@ -100,7 +100,7 @@ public class PrincipalController implements Initializable {
     private BicosDAO bicoCtr = new BicosDAO();
     private EstoqueDAO estoqueCtr = new EstoqueDAO();
     private MaskTextField maskTextField = new MaskTextField();
-    private EzattaEstoque estoque = new EzattaEstoque();
+    private EzattaEstoque estoque ;
     //---------------------------------------fim vars bicos-------------------
 
     @FXML
@@ -308,7 +308,7 @@ public class PrincipalController implements Initializable {
                 gridpane[idEstoqueTh].getColumnConstraints().addAll(column1);
 
                 //stringEstoque.setText("OS: " + dado.getOs() + " - Placa: " + dado.getPlaca() + " - Quantidade: " + dado.getQtdEstoque() + " - Produto: " + dado.getProduto().getNome() + " - Bico: " + dado.getBico().getNome());
-                stringEstoque.setText("Id: " + dado.getId() + " - OS: " + dado.getOs() + " - Qtd.: " + dado.getQtdEstoque() + " - Prod.: " + dado.getProduto().getNome() + " - " + dado.getBico().getNome());
+                stringEstoque.setText("ID: " + dado.getId() + " - OS: " + dado.getOs() + " - Qtd.: " + dado.getQtdEstoque() + " - Prod.: " + dado.getProduto().getNome() + " - " + dado.getBico().getNome());
                 progressBarEstoque[idEstoqueTh].setMinWidth(150);
                 progressBarEstoque[idEstoqueTh].setMinHeight(22);
                 progressBarEstoque[idEstoqueTh].setVisible(false);
@@ -323,13 +323,7 @@ public class PrincipalController implements Initializable {
                 System.out.println("idEstoqueTh: " + idEstoqueTh);
                 System.out.println("Efetivo: " + efetivo[idEstoqueTh]);
 
-                //hb[idEstoqueTh].getChildren().add(stringEstoque);
-                //hb[idEstoqueTh].getChildren().addAll(btnEnviar, btnCancelar, volTotalAEnvasar, progressBar[idEstoqueTh], efetivo[idEstoqueTh]);
-                //hb[idEstoqueTh].getChildren().add(separator);
-                //vbList.getChildren().add(stringEstoque);
-                //vbList.getChildren().add(hb[idEstoqueTh]);
                 vbList.getChildren().add(gridpane[idEstoqueTh]);
-                //vbList.getChildren().add(separator);
 
                 btnEnviar[idEstoqueTh].setOnAction(new EventHandler<ActionEvent>() {
                     @Override
@@ -487,9 +481,7 @@ public class PrincipalController implements Initializable {
                 byte[] readBuffer = new byte[1000];
                 //boolean[] execucaoWhile = new boolean[1000];
                 execucaoWhile[idEstoqueTh] = true;
-                System.out.println("Thread 1");
                 while (execucaoWhile[idEstoqueTh]) {
-                    System.out.println("Thread 2");
                     entrada = null;
                     entrada = serialPort.getInputStream();
 
@@ -1173,6 +1165,7 @@ public class PrincipalController implements Initializable {
     }
 
     private void salvarNoBanco() {
+        estoque = new EzattaEstoque();
         estoque.setQtdEstoque(Float.parseFloat(txtVolume.getText()));
         estoque.setOperador((EzattaOperador) cbOperador.getValue());
         estoque.setBico((EzattaBico) cbBico.getValue());
@@ -1196,13 +1189,27 @@ public class PrincipalController implements Initializable {
 
         new FXDialog(FXDialog.Type.INFO, "Solicitação confirmada. ").showDialog();
         estoqueCtr.addEstoque(estoque);
-
-        adicionaElementoVbList(estoque);
+        
+        //EzattaEstoque ultimoRegistro = estoqueCtr.getUltimoEstoque();
+        System.out.println("=================================inicio===================================================");
+        List<EzattaEstoque> list = estoqueCtr.getUltimoEstoque();
+        EzattaEstoque itemPassado = new EzattaEstoque();
+        for (EzattaEstoque list1 : list) {
+            System.out.println("list1: "+list1);
+            itemPassado = list1;
+            System.out.println("itemPassado: "+itemPassado);
+        }
+        System.out.println("=================================Fim===================================================");
+        
+        adicionaElementoVbList(itemPassado);
+        
     }
 
-    private void adicionaElementoVbList(EzattaEstoque estoque) {
+    private void adicionaElementoVbList(EzattaEstoque estoqueRecebido) {
 
-        idEstoqueTh = estoque.getId(); //id estoque -> identificado
+        System.out.println("================================================-------------------------------=========================");
+        System.out.println("estoqueRecebido: "+estoqueRecebido);
+        idEstoqueTh = estoqueRecebido.getId(); //id estoque -> identificado
         //instanciar componentes vetores
         hb[idEstoqueTh] = new HBox();
         gridpane[idEstoqueTh] = new GridPane();
@@ -1219,7 +1226,7 @@ public class PrincipalController implements Initializable {
 
         ScrollPane sp = new ScrollPane();
         separator.setMinHeight(15);
-        volTotalAEnvasar.setText(estoque.getQtdEstoque() + "");
+        volTotalAEnvasar.setText(estoqueRecebido.getQtdEstoque() + "");
         btnEnviar[idEstoqueTh].setText("Enviar");
         btnEnviar[idEstoqueTh].setMinWidth(70);
         btnCancelarEstoque[idEstoqueTh].setText("Cancelar");
@@ -1234,7 +1241,7 @@ public class PrincipalController implements Initializable {
         ColumnConstraints column1 = new ColumnConstraints(100);
         gridpane[idEstoqueTh].getColumnConstraints().addAll(column1);
 
-        stringEstoque.setText("Id: " + estoque.getId() +" - OS: " + estoque.getOs() + " - Qtd.: " + estoque.getQtdEstoque() + " - Prod.: " + estoque.getProduto().getNome() + " - " + estoque.getBico().getNome());
+        stringEstoque.setText("ID: " + estoqueRecebido.getId() + " - OS: " + estoqueRecebido.getOs() + " - Qtd.: " + estoqueRecebido.getQtdEstoque() + " - Prod.: " + estoqueRecebido.getProduto().getNome() + " - " + estoqueRecebido.getBico().getNome());
         progressBarEstoque[idEstoqueTh].setMinWidth(150);
         progressBarEstoque[idEstoqueTh].setMinHeight(22);
         progressBarEstoque[idEstoqueTh].setVisible(false);
@@ -1261,21 +1268,21 @@ public class PrincipalController implements Initializable {
             @Override
             public void handle(ActionEvent e) {
                 try {
-                    idEstoqueTh = estoque.getId();
+                    idEstoqueTh = estoqueRecebido.getId();
                     progressBarEstoque[idEstoqueTh].setVisible(true);
-                    volumeTotal[idEstoqueTh] = estoque.getQtdEstoque();
-                    endBico[idEstoqueTh] = estoque.getBico().getEndereco();
+                    volumeTotal[idEstoqueTh] = estoqueRecebido.getQtdEstoque();
+                    endBico[idEstoqueTh] = estoqueRecebido.getBico().getEndereco();
                     //teste toString
                     System.out.println("idEstoqueTh: " + idEstoqueTh);
                     System.out.println("ProgressBar: " + progressBarEstoque[idEstoqueTh].toString());
                     System.out.println("Efetivo: " + efetivo[idEstoqueTh].toString());
                     System.out.println("endBico: " + endBico[idEstoqueTh]);
 
-                    atualizaFatorEscala(estoque);
+                    atualizaFatorEscala(estoqueRecebido);
                     Thread.sleep(1000);
-                    enviarStringPlaca(estoque);
+                    enviarStringPlaca(estoqueRecebido);
                     Thread.sleep(1000);
-                    enviarVolume(estoque);
+                    enviarVolume(estoqueRecebido);
 
                     t[idEstoqueTh] = new Thread(taskLeituraEnvase);
                     t[idEstoqueTh].start();
@@ -1292,7 +1299,7 @@ public class PrincipalController implements Initializable {
         btnCancelarEstoque[idEstoqueTh].setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                idEstoqueTh = estoque.getId();
+                idEstoqueTh = estoqueRecebido.getId();
                 vbList.getChildren().remove(gridpane[idEstoqueTh]);
                 cancelarNoBanco(idEstoqueTh);
             }

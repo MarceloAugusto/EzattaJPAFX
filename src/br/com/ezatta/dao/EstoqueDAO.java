@@ -46,8 +46,8 @@ public class EstoqueDAO extends GenericDAO implements Serializable {
         return estoque;
     }
     
-    public List getIdEstoque() {
-        List resultList = em.createQuery("SELECT e FROM EzattaEstoque e ORDER BY e.id").setMaxResults(1).getResultList();
+    public List getUltimoEstoque() {
+        List resultList = em.createQuery("SELECT e FROM EzattaEstoque e ORDER BY e.id desc").setMaxResults(1).getResultList();
         return resultList;
     }
     
