@@ -23,9 +23,7 @@ import br.com.ezatta.view.FXDialog;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
-
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.List;
@@ -64,7 +62,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -82,17 +79,12 @@ public class PrincipalController implements Initializable {
     public static PrincipalController principal = new PrincipalController();
 
     private ObservableList<EzattaEstoque> dadosParaEnvase = FXCollections.observableArrayList();
-    private int Operacao;
     private EstoqueDAO EstoqueCtr = new EstoqueDAO();
-    private EzattaEstoque ezattaEstoque;
-
     static StringBuilder outputBfj;
     static StringBuilder volumeBfj;
     static BufferedInputStream bufferedinputStream;
-
     public int tipoBaixa = 0;
     boolean enchendoo;
-
     //----------------------------------------Vars bicos----------------------
     private ObservableList<EzattaBico> dadosBico = FXCollections.observableArrayList();
     private ObservableList<EzattaOperador> dadosOperador = FXCollections.observableArrayList();
@@ -102,6 +94,22 @@ public class PrincipalController implements Initializable {
     private MaskTextField maskTextField = new MaskTextField();
     private EzattaEstoque estoque;
     //---------------------------------------fim vars bicos-------------------
+    //--------------------------------------inicio var componentes envase
+    private HBox[] hb = new HBox[10000];
+    private GridPane[] gridpane = new GridPane[10000];
+    private Text[] efetivo = new Text[10000];
+    private ProgressBar[] progressBarEstoque = new ProgressBar[10000];
+    private Float[] volumeTotal = new Float[10000];
+    private Thread[] t = new Thread[10000];
+    private Integer idEstoqueTh = 0;
+    private boolean[] execucaoWhile = new boolean[10000];
+    private String[] endBico = new String[10000];
+    private Button[] btnEnviar = new Button[10000];
+    private Button[] btnCancelarEstoque = new Button[10000];
+    private Button[] btnSalvarEstoque = new Button[10000];
+    private Separator[] separator = new Separator[10000];
+    private Text[] stringEstoque = new Text[10000];
+    //--------------------------------------fim var componentes envase
 
     @FXML
     private ListView<EzattaEstoque> lvEstoque;
@@ -205,7 +213,6 @@ public class PrincipalController implements Initializable {
     @FXML
     private BorderPane borderPanePrincipal;
 
-    //-----------------------------------------------------inicio novos componentes
     @FXML
     private ComboBox<EzattaBico> cbBico;
 
@@ -242,7 +249,6 @@ public class PrincipalController implements Initializable {
     @FXML
     private TextField txtPlaca;
 
-    //--------------------------------------------------------fim novos componentes
     public StackPane getStack() {
         return stack;
     }
@@ -252,188 +258,89 @@ public class PrincipalController implements Initializable {
         this.stack = stack;
     }
 
-    public HBox[] hb = new HBox[10000];
-    public GridPane[] gridpane = new GridPane[10000];
-    public Text[] efetivo = new Text[10000];
-    ProgressBar[] progressBarEstoque = new ProgressBar[10000];
-    public Float[] volumeTotal = new Float[10000];
-    public Thread[] t = new Thread[10000];
-    public Thread threadAtualizaTitledPanel = new Thread();
-    public Integer idEstoqueTh = 0;
-    public boolean[] execucaoWhile = new boolean[10000];
-    public String[] endBico = new String[10000];
-    Button[] btnEnviar = new Button[10000];
-    Button[] btnCancelarEstoque = new Button[10000];
-    Button[] btnSalvarEstoque = new Button[10000];
-    Separator[] separator = new Separator[10000];
-    Text[] stringEstoque = new Text[10000];
-
-    //-------------------------------------------------metodos
     public void popularDadosListaEnvase() {
         try {
             dadosParaEnvase.clear();
             dadosParaEnvase.addAll(EstoqueCtr.getEstoqueByStatus(0));
 
             for (EzattaEstoque dado : dadosParaEnvase) {
-
-                idEstoqueTh = dado.getId(); //id estoque -> identificado
-                //instanciar componentes vetores
-                hb[idEstoqueTh] = new HBox();
-                gridpane[idEstoqueTh] = new GridPane();
-                progressBarEstoque[idEstoqueTh] = new ProgressBar(0);
-                efetivo[idEstoqueTh] = new Text();
-                endBico[idEstoqueTh] = new String();
-                btnEnviar[idEstoqueTh] = new Button();
-                btnCancelarEstoque[idEstoqueTh] = new Button();
-                btnSalvarEstoque[idEstoqueTh] = new Button();
-                separator[idEstoqueTh] = new Separator();
-                stringEstoque[idEstoqueTh] = new Text();
-
-                //variaveis auxiliares
-                Text volTotalAEnvasar = new Text();
-                //Text stringEstoque = new Text();
-
-                ScrollPane sp = new ScrollPane();
-                volTotalAEnvasar.setText(dado.getQtdEstoque() + "");
-                //separator[idEstoqueTh].setMinHeight(15);
-                btnEnviar[idEstoqueTh].setText("Enviar");
-                btnEnviar[idEstoqueTh].setMinWidth(70);
-                btnCancelarEstoque[idEstoqueTh].setText("Cancelar");
-                btnCancelarEstoque[idEstoqueTh].setMinWidth(75);
-                btnSalvarEstoque[idEstoqueTh].setText("Salvar");
-                btnSalvarEstoque[idEstoqueTh].setMinWidth(75);
-                btnSalvarEstoque[idEstoqueTh].setDisable(true);
-                sp.setContent(hb[idEstoqueTh]);
-                hb[idEstoqueTh].setSpacing(15.0);
-
-                //gridPane
-                gridpane[idEstoqueTh].setPadding(new Insets(5));
-                gridpane[idEstoqueTh].setHgap(5);
-                gridpane[idEstoqueTh].setVgap(5);
-                ColumnConstraints column1 = new ColumnConstraints(100);
-                gridpane[idEstoqueTh].getColumnConstraints().addAll(column1);
-
-                stringEstoque[idEstoqueTh].setText("ID: " + dado.getId() + " - OS: " + dado.getOs() + " - Qtd.: " + dado.getQtdEstoque() + " - Prod.: " + dado.getProduto().getNome() + " - " + dado.getBico().getNome());
-                progressBarEstoque[idEstoqueTh].setMinWidth(150);
-                progressBarEstoque[idEstoqueTh].setMinHeight(22);
-                progressBarEstoque[idEstoqueTh].setVisible(false);
-                hb[idEstoqueTh].getChildren().addAll(btnEnviar[idEstoqueTh], btnCancelarEstoque[idEstoqueTh], btnSalvarEstoque[idEstoqueTh]);
-
-                GridPane.setHalignment(stringEstoque[idEstoqueTh], HPos.LEFT);
-                gridpane[idEstoqueTh].add(stringEstoque[idEstoqueTh], 0, 0);
-
-                GridPane.setHalignment(hb[idEstoqueTh], HPos.LEFT);
-                gridpane[idEstoqueTh].add(hb[idEstoqueTh], 0, 1);
-
-                GridPane.setHalignment(efetivo[idEstoqueTh], HPos.LEFT);
-                gridpane[idEstoqueTh].add(efetivo[idEstoqueTh], 0, 2);
-
-                GridPane.setHalignment(progressBarEstoque[idEstoqueTh], HPos.LEFT);
-                gridpane[idEstoqueTh].add(progressBarEstoque[idEstoqueTh], 1, 2);
-
-                System.out.println("idEstoqueTh: " + idEstoqueTh);
-                System.out.println("Efetivo: " + efetivo[idEstoqueTh]);
-
-                vbList.getChildren().add(gridpane[idEstoqueTh]);
-                vbList.getChildren().add(separator[idEstoqueTh]);
-
-                btnEnviar[idEstoqueTh].setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent e) {
-                        try {
-                            idEstoqueTh = dado.getId();
-                            volumeTotal[idEstoqueTh] = dado.getQtdEstoque();
-                            endBico[idEstoqueTh] = dado.getBico().getEndereco();
-                            //teste toString
-                            System.out.println("idEstoqueTh: " + idEstoqueTh);
-                            System.out.println("ProgressBar: " + progressBarEstoque[idEstoqueTh].toString());
-                            System.out.println("Efetivo: " + efetivo[idEstoqueTh].toString());
-                            System.out.println("endBico: " + endBico[idEstoqueTh]);
-
-                            atualizaFatorEscala(dado);
-                            Thread.sleep(1000);
-                            enviarStringPlaca(dado);
-                            Thread.sleep(1000);
-                            enviarVolume(dado);
-
-                            t[idEstoqueTh] = new Thread(taskLeituraEnvase);
-                            t[idEstoqueTh].start();
-
-                            //atualiza banco
-                            EzattaEstoque est = EstoqueCtr.getEstoque(idEstoqueTh);
-                            est.setStatus(1);
-                            EstoqueCtr.updateEstoque(est);
-
-                            //desabilitar botão enviar
-                            btnEnviar[idEstoqueTh].setDisable(true);
-
-                            new FXDialog(FXDialog.Type.INFO, "Enviado para a placa").showDialog();
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (IOException ex) {
-                            Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-                });
-
-                btnCancelarEstoque[idEstoqueTh].setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent e) {
-                        idEstoqueTh = dado.getId();
-                        vbList.getChildren().remove(gridpane[idEstoqueTh]);
-                        vbList.getChildren().remove(separator[idEstoqueTh]);
-                        //cancela no banco de dados
-                        cancelarNoBanco(idEstoqueTh);
-                        cancelarPlaca(idEstoqueTh);
-                    }
-
-                });
-
-                btnSalvarEstoque[idEstoqueTh].setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        completarTanque(idEstoqueTh);
-                    }
-                });
+                adicionarVbList(dado);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    private void enviarVolumePlaca(Integer idEstoqueTh) {
+        try {
+            EzattaEstoque dado = estoqueCtr.getEstoque(idEstoqueTh);
+
+            volumeTotal[idEstoqueTh] = dado.getQtdEstoque();
+            endBico[idEstoqueTh] = dado.getBico().getEndereco();
+            //teste toString
+            System.out.println("idEstoqueTh: " + idEstoqueTh);
+            System.out.println("ProgressBar: " + progressBarEstoque[idEstoqueTh].toString());
+            System.out.println("Efetivo: " + efetivo[idEstoqueTh].toString());
+            System.out.println("endBico: " + endBico[idEstoqueTh]);
+
+            atualizaFatorEscala(dado);
+            Thread.sleep(1000);
+            enviarStringPlaca(dado);
+            Thread.sleep(1000);
+            enviarVolume(dado);
+
+            t[idEstoqueTh] = new Thread(taskLeituraEnvase);
+            t[idEstoqueTh].start();
+
+            //atualiza banco
+            EzattaEstoque est = EstoqueCtr.getEstoque(idEstoqueTh);
+            est.setStatus(1);
+            EstoqueCtr.updateEstoque(est);
+
+            //desabilitar botão enviar
+            btnEnviar[idEstoqueTh].setDisable(true);
+
+            new FXDialog(FXDialog.Type.INFO, "Enviado para a placa").showDialog();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void cancelarVolumePlaca(Integer idEstoqueTh) {
+        vbList.getChildren().remove(gridpane[idEstoqueTh]);
+        vbList.getChildren().remove(separator[idEstoqueTh]);
+        //cancela no banco de dados
+        cancelarNoBanco(idEstoqueTh);
+        cancelarPlaca(idEstoqueTh);
+    }
+
     public void completarTanque(int idEstoqueTh) {
         try {
             EzattaEstoque ezattaEstoqueSalvar = estoqueCtr.getEstoque(idEstoqueTh);
-            
+
             //Atualizar qtd Tbl_Produto-------------------------------------------------------------------
             EzattaProduto ezattaProdutoSalvar = produtoCtr.getProduto(ezattaEstoqueSalvar.getProduto().getId());//busca produto 
             //pega o valor atual na tabela produto
             Float qtdProduto = ezattaProdutoSalvar.getQuantidade().floatValue();
-            System.out.println("Quantidade atual tblProduto: "+qtdProduto);
-            
             //pega o valor do estoque a ser retornado na tabela produto
             Float valorARetornar = ezattaEstoqueSalvar.getQtdEstoque();
-            System.out.println("Valor a ser retornado a tabela produto: "+valorARetornar);
-            
             //soma a quantidade tblEstoque a tblProduto
             Float calcularValor = 0f;
             calcularValor = qtdProduto + valorARetornar;
-            System.out.println("2 - calcularValor: "+calcularValor);
             calcularValor = calcularValor - Float.parseFloat(efetivo[idEstoqueTh].getText());
-            System.out.println("3 - calcularValor: "+calcularValor);
-            
+
             //atualizar quantidade tblProduto
             ezattaProdutoSalvar.setQuantidade(new BigDecimal(calcularValor));
             produtoCtr.updateProduto(ezattaProdutoSalvar);
-            System.out.println("Atualizou a quantidade");
-            
+
             //Salvar no vanco volume efetivo----------------------------------------------------------------
             Float quantidadeEfetiva = new Float(efetivo[idEstoqueTh].getText());
             ezattaEstoqueSalvar.setQtdEstoque(quantidadeEfetiva);
+            ezattaEstoqueSalvar.setStatus(4);
             Thread.sleep(100);
             estoqueCtr.updateEstoque(ezattaEstoqueSalvar);
-            System.out.println("Atualizou!!!");
 
             //Parar Thread
             execucaoWhile[idEstoqueTh] = false;
@@ -446,10 +353,6 @@ public class PrincipalController implements Initializable {
 
             //remove Registro Tela
             removerRegistroTela(idEstoqueTh);
-            
-            
-            
-            
 
         } catch (InterruptedException ex) {
             Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
@@ -998,6 +901,7 @@ public class PrincipalController implements Initializable {
 
     @FXML
     void fechar(ActionEvent event) {
+        //fechar conex'ao
         System.out.println("Fechou");
         JPAUtil.closeManager(JPAUtil.getEntityManager());
         //fecha aporta
@@ -1145,12 +1049,15 @@ public class PrincipalController implements Initializable {
     }
 
     public void stop() {
-        System.out.println("fffeeeccchhhaaarrrr");
+        //fechar conex'ao
+        System.out.println("fechar");
         JPAUtil.closeManager(JPAUtil.getEntityManager());
 
         //fecha aporta
         System.out.println("port " + defaultPort + " not found.");
         serialPort.close();
+
+        //fechar app
         System.out.println("Porta fechada...");
         Platform.exit();
     }
@@ -1181,7 +1088,7 @@ public class PrincipalController implements Initializable {
     @FXML
     void enviarPPlaca(ActionEvent event) {
         if (isValidaTela()) {
-            salvarNoBanco();
+            salvarNoBanco(); 
             cancelar(event);
         }
     }
@@ -1257,10 +1164,9 @@ public class PrincipalController implements Initializable {
         prod.setQuantidade(quantidadecalculada);
         produtoCtr.updateProduto(prod);
 
-        new FXDialog(FXDialog.Type.INFO, "Solicitação confirmada. ").showDialog();
+        //new FXDialog(FXDialog.Type.INFO, "Solicitação confirmada. ").showDialog();
         estoqueCtr.addEstoque(estoque);
 
-        //EzattaEstoque ultimoRegistro = estoqueCtr.getUltimoEstoque();
         System.out.println("=================================inicio===================================================");
         List<EzattaEstoque> list = estoqueCtr.getUltimoEstoque();
         EzattaEstoque itemPassado = new EzattaEstoque();
@@ -1271,139 +1177,16 @@ public class PrincipalController implements Initializable {
         }
         System.out.println("=================================Fim===================================================");
 
-        adicionaElementoVbList(itemPassado);
+        adicionarVbList(itemPassado);
 
     }
 
-    private void adicionaElementoVbList(EzattaEstoque estoqueRecebido) {
 
-        System.out.println("================================================-------------------------------=========================");
-        System.out.println("estoqueRecebido: " + estoqueRecebido);
-        idEstoqueTh = estoqueRecebido.getId(); //id estoque -> identificado
-        //instanciar componentes vetores
-        hb[idEstoqueTh] = new HBox();
-        gridpane[idEstoqueTh] = new GridPane();
-        progressBarEstoque[idEstoqueTh] = new ProgressBar(0);
-        efetivo[idEstoqueTh] = new Text();
-        endBico[idEstoqueTh] = new String();
-        btnEnviar[idEstoqueTh] = new Button();
-        btnCancelarEstoque[idEstoqueTh] = new Button();
-        btnSalvarEstoque[idEstoqueTh] = new Button();
-        stringEstoque[idEstoqueTh] = new Text();
-        separator[idEstoqueTh] = new Separator();
-
-        //variaveis auxiliares
-        Text volTotalAEnvasar = new Text();
-
-        ScrollPane sp = new ScrollPane();
-        //separator[idEstoqueTh].setMinHeight(15);
-        volTotalAEnvasar.setText(estoqueRecebido.getQtdEstoque() + "");
-        btnEnviar[idEstoqueTh].setText("Enviar");
-        btnEnviar[idEstoqueTh].setMinWidth(70);
-        btnCancelarEstoque[idEstoqueTh].setText("Cancelar");
-        btnCancelarEstoque[idEstoqueTh].setMinWidth(75);
-        btnSalvarEstoque[idEstoqueTh].setText("Salvar");
-        btnSalvarEstoque[idEstoqueTh].setMinWidth(75);
-        btnSalvarEstoque[idEstoqueTh].setDisable(true);
-        sp.setContent(hb[idEstoqueTh]);
-        hb[idEstoqueTh].setSpacing(15.0);
-
-        //gridPane
-        gridpane[idEstoqueTh].setPadding(new Insets(5));
-        gridpane[idEstoqueTh].setHgap(5);
-        gridpane[idEstoqueTh].setVgap(5);
-        ColumnConstraints column1 = new ColumnConstraints(100);
-        gridpane[idEstoqueTh].getColumnConstraints().addAll(column1);
-
-        stringEstoque[idEstoqueTh].setText("ID: " + estoqueRecebido.getId() + " - OS: " + estoqueRecebido.getOs() + " - Qtd.: " + estoqueRecebido.getQtdEstoque() + " - Prod.: " + estoqueRecebido.getProduto().getNome() + " - " + estoqueRecebido.getBico().getNome());
-        progressBarEstoque[idEstoqueTh].setMinWidth(150);
-        progressBarEstoque[idEstoqueTh].setMinHeight(22);
-        progressBarEstoque[idEstoqueTh].setVisible(false);
-        hb[idEstoqueTh].getChildren().addAll(btnEnviar[idEstoqueTh], btnCancelarEstoque[idEstoqueTh], btnSalvarEstoque[idEstoqueTh], progressBarEstoque[idEstoqueTh], efetivo[idEstoqueTh]);
-
-        GridPane.setHalignment(stringEstoque[idEstoqueTh], HPos.LEFT);
-        gridpane[idEstoqueTh].add(stringEstoque[idEstoqueTh], 0, 0);
-
-        GridPane.setHalignment(hb[idEstoqueTh], HPos.LEFT);
-        gridpane[idEstoqueTh].add(hb[idEstoqueTh], 0, 1);
-
-        GridPane.setHalignment(efetivo[idEstoqueTh], HPos.LEFT);
-        gridpane[idEstoqueTh].add(efetivo[idEstoqueTh], 0, 2);
-
-        GridPane.setHalignment(progressBarEstoque[idEstoqueTh], HPos.LEFT);
-        gridpane[idEstoqueTh].add(progressBarEstoque[idEstoqueTh], 1, 2);
-
-        System.out.println("idEstoqueTh: " + idEstoqueTh);
-        System.out.println("Efetivo: " + efetivo[idEstoqueTh]);
-
-        vbList.getChildren().add(gridpane[idEstoqueTh]);
-        vbList.getChildren().add(separator[idEstoqueTh]);
-
-        btnEnviar[idEstoqueTh].setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                try {
-                    idEstoqueTh = estoqueRecebido.getId();
-                    volumeTotal[idEstoqueTh] = estoqueRecebido.getQtdEstoque();
-                    endBico[idEstoqueTh] = estoqueRecebido.getBico().getEndereco();
-                    //teste toString
-                    System.out.println("idEstoqueTh: " + idEstoqueTh);
-                    System.out.println("ProgressBar: " + progressBarEstoque[idEstoqueTh].toString());
-                    System.out.println("Efetivo: " + efetivo[idEstoqueTh].toString());
-                    System.out.println("endBico: " + endBico[idEstoqueTh]);
-
-                    atualizaFatorEscala(estoqueRecebido);
-                    Thread.sleep(1000);
-                    enviarStringPlaca(estoqueRecebido);
-                    Thread.sleep(1000);
-                    enviarVolume(estoqueRecebido);
-
-                    t[idEstoqueTh] = new Thread(taskLeituraEnvase);
-                    t[idEstoqueTh].start();
-
-                    //atualiza banco
-                    EzattaEstoque est = EstoqueCtr.getEstoque(idEstoqueTh);
-                    est.setStatus(1);
-                    EstoqueCtr.updateEstoque(est);
-
-                    //desabilitar botão enviar
-                    btnEnviar[idEstoqueTh].setDisable(true);
-
-                    new FXDialog(FXDialog.Type.INFO, "Enviado para a placa").showDialog();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        });
-
-        btnCancelarEstoque[idEstoqueTh].setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                idEstoqueTh = estoqueRecebido.getId();
-                vbList.getChildren().remove(gridpane[idEstoqueTh]);
-                vbList.getChildren().remove(separator[idEstoqueTh]);
-                cancelarNoBanco(idEstoqueTh);
-                cancelarPlaca(idEstoqueTh);
-
-            }
-
-        });
-
-        btnSalvarEstoque[idEstoqueTh].setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                completarTanque(idEstoqueTh);
-            }
-        });
-    }
 
     private void cancelarNoBanco(Integer idEstoqueTh) {
         EzattaEstoque e = EstoqueCtr.getEstoque(idEstoqueTh);
         e.setStatus(3);
         EstoqueCtr.updateEstoque(e);
-
         //atualizar Quantidade do produto
         ProdutoDAO produtoCtr = new ProdutoDAO();
         EzattaProduto prod = new EzattaProduto();
@@ -1470,4 +1253,89 @@ public class PrincipalController implements Initializable {
     }
 
     //----------------------------------------------------fim novos metodos
+    private void adicionarVbList(EzattaEstoque dado) {
+        idEstoqueTh = dado.getId(); //id estoque -> identificado
+        //instanciar componentes vetores
+        hb[idEstoqueTh] = new HBox();
+        gridpane[idEstoqueTh] = new GridPane();
+        progressBarEstoque[idEstoqueTh] = new ProgressBar(0);
+        efetivo[idEstoqueTh] = new Text();
+        endBico[idEstoqueTh] = new String();
+        btnEnviar[idEstoqueTh] = new Button();
+        btnCancelarEstoque[idEstoqueTh] = new Button();
+        btnSalvarEstoque[idEstoqueTh] = new Button();
+        separator[idEstoqueTh] = new Separator();
+        stringEstoque[idEstoqueTh] = new Text();
+
+        //variaveis auxiliares
+        Text volTotalAEnvasar = new Text();
+        //Text stringEstoque = new Text();
+
+        ScrollPane sp = new ScrollPane();
+        volTotalAEnvasar.setText(dado.getQtdEstoque() + "");
+        //separator[idEstoqueTh].setMinHeight(15);
+        btnEnviar[idEstoqueTh].setText("Enviar");
+        btnEnviar[idEstoqueTh].setMinWidth(70);
+        btnCancelarEstoque[idEstoqueTh].setText("Cancelar");
+        btnCancelarEstoque[idEstoqueTh].setMinWidth(75);
+        btnSalvarEstoque[idEstoqueTh].setText("Salvar");
+        btnSalvarEstoque[idEstoqueTh].setMinWidth(75);
+        btnSalvarEstoque[idEstoqueTh].setDisable(true);
+        sp.setContent(hb[idEstoqueTh]);
+        hb[idEstoqueTh].setSpacing(15.0);
+
+        //gridPane
+        gridpane[idEstoqueTh].setPadding(new Insets(5));
+        gridpane[idEstoqueTh].setHgap(5);
+        gridpane[idEstoqueTh].setVgap(5);
+        ColumnConstraints column1 = new ColumnConstraints(100);
+        gridpane[idEstoqueTh].getColumnConstraints().addAll(column1);
+
+        stringEstoque[idEstoqueTh].setText("OS: " + dado.getOs() + " - Qtd.: " + dado.getQtdEstoque() + " - Prod.: " + dado.getProduto().getNome() + " - " + dado.getBico().getNome());
+        progressBarEstoque[idEstoqueTh].setMinWidth(150);
+        progressBarEstoque[idEstoqueTh].setMinHeight(22);
+        progressBarEstoque[idEstoqueTh].setVisible(false);
+        hb[idEstoqueTh].getChildren().addAll(btnEnviar[idEstoqueTh], btnCancelarEstoque[idEstoqueTh], btnSalvarEstoque[idEstoqueTh]);
+
+        GridPane.setHalignment(stringEstoque[idEstoqueTh], HPos.LEFT);
+        gridpane[idEstoqueTh].add(stringEstoque[idEstoqueTh], 0, 0);
+
+        GridPane.setHalignment(hb[idEstoqueTh], HPos.LEFT);
+        gridpane[idEstoqueTh].add(hb[idEstoqueTh], 0, 1);
+
+        GridPane.setHalignment(efetivo[idEstoqueTh], HPos.LEFT);
+        gridpane[idEstoqueTh].add(efetivo[idEstoqueTh], 0, 2);
+
+        GridPane.setHalignment(progressBarEstoque[idEstoqueTh], HPos.LEFT);
+        gridpane[idEstoqueTh].add(progressBarEstoque[idEstoqueTh], 1, 2);
+
+        System.out.println("idEstoqueTh: " + idEstoqueTh);
+        System.out.println("Efetivo: " + efetivo[idEstoqueTh]);
+
+        vbList.getChildren().add(gridpane[idEstoqueTh]);
+        vbList.getChildren().add(separator[idEstoqueTh]);
+
+        btnEnviar[idEstoqueTh].setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                idEstoqueTh = dado.getId();
+                enviarVolumePlaca(idEstoqueTh);
+            }
+        });
+
+        btnCancelarEstoque[idEstoqueTh].setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                idEstoqueTh = dado.getId();
+                cancelarVolumePlaca(idEstoqueTh);
+            }
+        });
+
+        btnSalvarEstoque[idEstoqueTh].setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                completarTanque(idEstoqueTh);
+            }
+        });
+    }
 }
