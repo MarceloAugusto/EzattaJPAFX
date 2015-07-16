@@ -254,7 +254,6 @@ public class PrincipalController implements Initializable {
 
     public HBox[] hb = new HBox[10000];
     public GridPane[] gridpane = new GridPane[10000];
-    //public TitledPane[] titledPane = new TitledPane[10000];
     public Text[] efetivo = new Text[10000];
     ProgressBar[] progressBarEstoque = new ProgressBar[10000];
     public Float[] volumeTotal = new Float[10000];
@@ -272,7 +271,6 @@ public class PrincipalController implements Initializable {
     //-------------------------------------------------metodos
     public void popularDadosListaEnvase() {
         try {
-
             dadosParaEnvase.clear();
             dadosParaEnvase.addAll(EstoqueCtr.getEstoqueByStatus(0));
 
@@ -390,11 +388,73 @@ public class PrincipalController implements Initializable {
                     }
 
                 });
+
+                btnSalvarEstoque[idEstoqueTh].setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        completarTanque(idEstoqueTh);
+                    }
+                });
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void completarTanque(int idEstoqueTh) {
+        try {
+            EzattaEstoque ezattaEstoqueSalvar = estoqueCtr.getEstoque(idEstoqueTh);
+            
+            //Atualizar qtd Tbl_Produto-------------------------------------------------------------------
+            EzattaProduto ezattaProdutoSalvar = produtoCtr.getProduto(ezattaEstoqueSalvar.getProduto().getId());//busca produto 
+            //pega o valor atual na tabela produto
+            Float qtdProduto = ezattaProdutoSalvar.getQuantidade().floatValue();
+            System.out.println("Quantidade atual tblProduto: "+qtdProduto);
+            
+            //pega o valor do estoque a ser retornado na tabela produto
+            Float valorARetornar = ezattaEstoqueSalvar.getQtdEstoque();
+            System.out.println("Valor a ser retornado a tabela produto: "+valorARetornar);
+            
+            //soma a quantidade tblEstoque a tblProduto
+            Float calcularValor = 0f;
+            calcularValor = qtdProduto + valorARetornar;
+            System.out.println("2 - calcularValor: "+calcularValor);
+            calcularValor = calcularValor - Float.parseFloat(efetivo[idEstoqueTh].getText());
+            System.out.println("3 - calcularValor: "+calcularValor);
+            
+            //atualizar quantidade tblProduto
+            ezattaProdutoSalvar.setQuantidade(new BigDecimal(calcularValor));
+            produtoCtr.updateProduto(ezattaProdutoSalvar);
+            System.out.println("Atualizou a quantidade");
+            
+            //Salvar no vanco volume efetivo----------------------------------------------------------------
+            Float quantidadeEfetiva = new Float(efetivo[idEstoqueTh].getText());
+            ezattaEstoqueSalvar.setQtdEstoque(quantidadeEfetiva);
+            Thread.sleep(100);
+            estoqueCtr.updateEstoque(ezattaEstoqueSalvar);
+            System.out.println("Atualizou!!!");
+
+            //Parar Thread
+            execucaoWhile[idEstoqueTh] = false;
+
+            //um segundos
+            Thread.sleep(1000);
+
+            //Cancelar Placa
+            cancelarPlaca(idEstoqueTh);
+
+            //remove Registro Tela
+            removerRegistroTela(idEstoqueTh);
+            
+            
+            
+            
+
+        } catch (InterruptedException ex) {
+            Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     @Override
@@ -462,14 +522,14 @@ public class PrincipalController implements Initializable {
 
     //inicio popula lista Produtos ==================================================================================
     private ObservableList<EzattaProduto> dadosProdutos = FXCollections.observableArrayList();
-    private ProdutoDAO ProdutoCtr = new ProdutoDAO();
+    private ProdutoDAO produtoCtr = new ProdutoDAO();
 
     private void popularProdutos() {
         dadosProdutos.clear();
         lvProdutos.getItems().clear();
 
         try {
-            dadosProdutos.addAll(ProdutoCtr.getAllProduto());
+            dadosProdutos.addAll(produtoCtr.getAllProduto());
         } catch (Exception e) {
             new FXDialog(FXDialog.Type.ERROR, e.getCause().getMessage()).showDialog();
         }
@@ -572,8 +632,8 @@ public class PrincipalController implements Initializable {
 
                             if (readBuffer[15 + contAux] == (byte) 0x56 && outputBfj.length() > 5) {
                                 try {
-                                    efetivo[idEstoqueTh].setText(outputBfj.toString());
-                                    // efetivo[idEstoqueTh].setText(volumeBfj.toString());
+                                    //efetivo[idEstoqueTh].setText(outputBfj.toString());
+                                    efetivo[idEstoqueTh].setText(volumeBfj.toString());
                                     System.out.println("VolumeTotal " + volumeTotal[idEstoqueTh]);
                                     if (!volumeSemVol.isEmpty() && volumeSemVol.length() > 0) {
                                         atualizaBarraProgress(volumeBfj.toString());//barra de progresso
@@ -597,23 +657,7 @@ public class PrincipalController implements Initializable {
                             execucaoWhile[idEstoqueTh] = false;
                             Thread.sleep(1000);
 
-                            //remove registro da tela
-                            gridpane[idEstoqueTh].setGridLinesVisible(false);
-                            gridpane[idEstoqueTh].setMinHeight(0);
-                            gridpane[idEstoqueTh].setMaxHeight(0);
-                            gridpane[idEstoqueTh].setMaxWidth(0);
-                            gridpane[idEstoqueTh].setMinWidth(0);
-                            hb[idEstoqueTh].setVisible(false);
-                            hb[idEstoqueTh].setMaxHeight(0);
-                            separator[idEstoqueTh].setVisible(false);
-                            separator[idEstoqueTh].setMaxHeight(0);
-                            stringEstoque[idEstoqueTh].setText("");
-                            efetivo[idEstoqueTh].setText("");
-                            progressBarEstoque[idEstoqueTh].setMinHeight(0);
-                            progressBarEstoque[idEstoqueTh].setMaxHeight(0);
-                            progressBarEstoque[idEstoqueTh].setMaxWidth(0);
-                            progressBarEstoque[idEstoqueTh].setMinWidth(0);
-                            progressBarEstoque[idEstoqueTh].setVisible(false);
+                            removerRegistroTela(idEstoqueTh);
 
                             //cancela thread
                             taskLeituraEnvase.cancel();
@@ -652,26 +696,26 @@ public class PrincipalController implements Initializable {
 
     };
 
-//    private void limparListaAposEnvase(Integer idEstoqueTh) {
-//
-//        System.out.println("LimparListaAposEnvase"+idEstoqueTh);
-//        ActionEvent ev = new ActionEvent();
-//        limparListaAposEnvaseFinal(ev);
-//    }
-//
-//    Button[] b = new Button[1000];
-//
-//    void limparListaAposEnvaseFinal(ActionEvent event) {
-//        b[idEstoqueTh].setOnAction(new EventHandler<ActionEvent>() {
-//            @Override
-//            public void handle(ActionEvent e) {
-//                vbList.getChildren().remove(gridpane[idEstoqueTh]);
-//                System.out.println("LimparListaAposEnvaseFinal: "+idEstoqueTh);
-//            }
-//
-//        });
-//
-//    }
+    private void removerRegistroTela(Integer idEstoqueTh) {
+        //remove registro da tela
+        gridpane[idEstoqueTh].setGridLinesVisible(false);
+        gridpane[idEstoqueTh].setMinHeight(0);
+        gridpane[idEstoqueTh].setMaxHeight(0);
+        gridpane[idEstoqueTh].setMaxWidth(0);
+        gridpane[idEstoqueTh].setMinWidth(0);
+        hb[idEstoqueTh].setVisible(false);
+        hb[idEstoqueTh].setMaxHeight(0);
+        separator[idEstoqueTh].setVisible(false);
+        separator[idEstoqueTh].setMaxHeight(0);
+        stringEstoque[idEstoqueTh].setText("");
+        efetivo[idEstoqueTh].setText("");
+        progressBarEstoque[idEstoqueTh].setMinHeight(0);
+        progressBarEstoque[idEstoqueTh].setMaxHeight(0);
+        progressBarEstoque[idEstoqueTh].setMaxWidth(0);
+        progressBarEstoque[idEstoqueTh].setMinWidth(0);
+        progressBarEstoque[idEstoqueTh].setVisible(false);
+    }
+
     public void atualizaBarraProgress(String txtEfetivo) {
         if (txtEfetivo != null && txtEfetivo.length() > 0) {
             try {
@@ -1137,26 +1181,8 @@ public class PrincipalController implements Initializable {
     @FXML
     void enviarPPlaca(ActionEvent event) {
         if (isValidaTela()) {
-//            btnEnviarPPlaca.isDisabled();
-//            btnEnviarPPlaca.disabledProperty();
-//            btnEnviarPPlaca.setDisable(true);
-
-//            try {
-//                //atualiza fator escala
-//                atualizaFatorEscala();
-//                Thread.sleep(1000);
-//                //Enviar operador e placa
-//                enviarStringPlaca();
-//                Thread.sleep(1000);
-//                //enviar Volume 00.00
-//                enviarVolume();
-//            } catch (IOException ex) {
-//                Logger.getLogger(EnvaseBicoController.class.getName()).log(Level.SEVERE, null, ex);
-//            }
             salvarNoBanco();
-
             cancelar(event);
-
         }
     }
 
@@ -1363,6 +1389,13 @@ public class PrincipalController implements Initializable {
 
             }
 
+        });
+
+        btnSalvarEstoque[idEstoqueTh].setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                completarTanque(idEstoqueTh);
+            }
         });
     }
 
