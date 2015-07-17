@@ -223,10 +223,9 @@
                             </TitledPane>
                             <TitledPane fx:id="acProcessosEnvase" prefHeight="454.0" prefWidth="175.0" text="Containers / Estoque">
                               <content>
-                                    <AnchorPane nodeOrientation="LEFT_TO_RIGHT">
+                                    <AnchorPane fx:id="anchorContainer" nodeOrientation="LEFT_TO_RIGHT">
                                        <children>
-                                          <StackPane fx:id="stackFilaPrincipal" alignment="TOP_LEFT" nodeOrientation="LEFT_TO_RIGHT" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                          <VBox fx:id="FilaPrincipal" layoutX="10.399999618530273" layoutY="10.399999618530273" nodeOrientation="LEFT_TO_RIGHT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                          <StackPane fx:id="stackContainer" alignment="TOP_LEFT" nodeOrientation="LEFT_TO_RIGHT" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                        </children>
                                     </AnchorPane>
                               </content>

@@ -120,8 +120,8 @@ public class PrincipalController implements Initializable {
     @FXML
     private StackPane stack;
 
-    @FXML
-    private VBox FilaPrincipal;
+//    @FXML
+//    private VBox FilaPrincipal;
 
     @FXML
     private Button btnOperacoes;
@@ -154,7 +154,7 @@ public class PrincipalController implements Initializable {
     private Button btnCancelamento;
 
     @FXML
-    private StackPane stackFilaPrincipal;
+    private StackPane stackContainer;
 
     @FXML
     private MenuItem miBackUp;
@@ -248,6 +248,9 @@ public class PrincipalController implements Initializable {
 
     @FXML
     private TextField txtPlaca;
+
+    @FXML
+    private AnchorPane anchorContainer;
 
     public StackPane getStack() {
         return stack;
@@ -404,6 +407,17 @@ public class PrincipalController implements Initializable {
         //popula listEstoque 
         popularDadosListaEnvase();
         popularProdutos();
+
+        //carregar Tela Container
+        try {
+            stackContainer.getChildren().clear();
+            stackContainer.getChildren().add(getNode("/br/com/ezatta/view/PrincipalListStatusProduto.fxml"));
+            //stackContainer.getChildren().add(getNode("/br/com/ezatta/view/Usuario.fxml"));
+        } catch (Exception e) {
+            new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
+            System.out.println("Erro ao carregar a tela de bicos");
+            e.printStackTrace();
+        }
     }
 
     //inicio popula dados Bicos =====================================================================================
@@ -430,7 +444,6 @@ public class PrincipalController implements Initializable {
     private void popularProdutos() {
         dadosProdutos.clear();
         lvProdutos.getItems().clear();
-
         try {
             dadosProdutos.addAll(produtoCtr.getAllProduto());
         } catch (Exception e) {
@@ -1004,14 +1017,23 @@ public class PrincipalController implements Initializable {
 
     }
 
-    //---
     public PrincipalController() {
 
     }
 
+    
     public void limpar() {
         try {
             stack.getChildren().clear();
+        } catch (Exception e) {
+            new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
+            e.printStackTrace();
+        }
+    }
+    
+    public void limparContainerPrincipal() {
+        try {
+            stackContainer.getChildren().clear();
         } catch (Exception e) {
             new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
             e.printStackTrace();
@@ -1088,7 +1110,7 @@ public class PrincipalController implements Initializable {
     @FXML
     void enviarPPlaca(ActionEvent event) {
         if (isValidaTela()) {
-            salvarNoBanco(); 
+            salvarNoBanco();
             cancelar(event);
         }
     }
@@ -1180,8 +1202,6 @@ public class PrincipalController implements Initializable {
         adicionarVbList(itemPassado);
 
     }
-
-
 
     private void cancelarNoBanco(Integer idEstoqueTh) {
         EzattaEstoque e = EstoqueCtr.getEstoque(idEstoqueTh);
@@ -1291,7 +1311,7 @@ public class PrincipalController implements Initializable {
         ColumnConstraints column1 = new ColumnConstraints(100);
         gridpane[idEstoqueTh].getColumnConstraints().addAll(column1);
 
-        stringEstoque[idEstoqueTh].setText("OS: " + dado.getOs() + " - Qtd.: " + dado.getQtdEstoque() + " - Prod.: " + dado.getProduto().getNome() + " - " + dado.getBico().getNome());
+        stringEstoque[idEstoqueTh].setText("OS: " + dado.getOs() + "\t Qtd.: " + dado.getQtdEstoque() + "\t Prod.: " + dado.getProduto().getNome() + "\t Bico " + dado.getBico().getNome());
         progressBarEstoque[idEstoqueTh].setMinWidth(150);
         progressBarEstoque[idEstoqueTh].setMinHeight(22);
         progressBarEstoque[idEstoqueTh].setVisible(false);

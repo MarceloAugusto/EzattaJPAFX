@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.ezatta.controller.PrincipalListStatusProdutoController">
+   <children>
+      <BorderPane layoutX="100.0" layoutY="23.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <top>
+            <AnchorPane maxHeight="20.0" prefHeight="20.0" style="-fx-background-color: lightgray;" BorderPane.alignment="TOP_LEFT">
+               <children>
+                  <Text layoutX="14.0" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Containers">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Text>
+                  <StackPane prefHeight="20.0" prefWidth="241.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#atualizarLitaStatusProduto" StackPane.alignment="TOP_RIGHT">
+                           <graphic>
+                              <ImageView fitHeight="15.0" fitWidth="15.0" onDragDetected="#atualizarLista" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/Refresh.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <StackPane.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </StackPane.margin>
+                        </Button>
+                     </children>
+                  </StackPane>
+               </children>
+               <effect>
+                  <DropShadow />
+               </effect>
+            </AnchorPane>
+         </top>
+         <center>
+            <AnchorPane BorderPane.alignment="TOP_LEFT">
+               <children>
+                  <ScrollPane prefHeight="364.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <content>
+                        <VBox fx:id="listaProdutoStatus" />
+                     </content>
+                  </ScrollPane>
+               </children>
+            </AnchorPane>
+         </center>
+      </BorderPane>
+   </children>
+</AnchorPane>

@@ -1,13 +1,14 @@
 package br.com.ezatta.dao;
 
-
 import br.com.ezatta.model.EzattaEmpresa;
 import br.com.ezatta.model.EzattaProduto;
+import br.com.ezatta.model.EzattaProdutoVo;
 import br.com.ezatta.util.JPAUtil;
 import java.sql.SQLException;
 
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 public class ProdutoDAO extends GenericDAO {
@@ -15,11 +16,11 @@ public class ProdutoDAO extends GenericDAO {
     private static final long serialVersionUID = 1L;
 
     EntityManager em = JPAUtil.getEntityManager();
-    
+
     public ProdutoDAO() {
     }
 
-    public void addProduto(EzattaProduto produto){
+    public void addProduto(EzattaProduto produto) {
         em.getTransaction().begin();
         em.persist(produto);
         em.getTransaction().commit();
@@ -46,11 +47,20 @@ public class ProdutoDAO extends GenericDAO {
     }
 
     public List<EzattaProduto> getAllProduto() {
-       TypedQuery<EzattaProduto> query = em.createNamedQuery("EzattaProduto.findAll",EzattaProduto.class);
-       List<EzattaProduto> listaProduto = query.getResultList();
-       return listaProduto;
+        TypedQuery<EzattaProduto> query = em.createNamedQuery("EzattaProduto.findAll", EzattaProduto.class);
+        List<EzattaProduto> listaProduto = query.getResultList();
+        return listaProduto;
     }
-    
+
+    public List<EzattaProdutoVo> getAllProdutoPersonalizado() {
+        TypedQuery<EzattaProdutoVo> query = em.createQuery("select p from EzattaProduto p", EzattaProdutoVo.class);
+        List<EzattaProdutoVo> listaProduto = query.getResultList();
+        for (EzattaProdutoVo listaProduto1 : listaProduto) {
+            System.out.println("listaProduto1: "+listaProduto1);
+        }
+        return listaProduto;
+    }
+
     public List<EzattaProduto> getAllProdutoByEmpresa(EzattaEmpresa empresa) {
         TypedQuery<EzattaProduto> query = em.createNamedQuery("EzattaProduto.findByEmpresa", EzattaProduto.class);
         query.setParameter("empresa", empresa);
@@ -64,7 +74,7 @@ public class ProdutoDAO extends GenericDAO {
         EzattaProduto p = query.getSingleResult();
         return p;
     }
-    
+
     public List<EzattaProduto> findAll(String qry, String parametros)
             throws SQLException {
         if (!parametros.isEmpty()) {

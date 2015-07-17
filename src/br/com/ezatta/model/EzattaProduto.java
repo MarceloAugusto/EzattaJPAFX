@@ -206,5 +206,9 @@ public class EzattaProduto implements Serializable {
     public String toString() {
         return getNome();
     }
+
+    
+    
+    
     
 }
