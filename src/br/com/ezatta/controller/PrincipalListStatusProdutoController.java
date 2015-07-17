@@ -8,8 +8,6 @@ package br.com.ezatta.controller;
 import br.com.ezatta.dao.ProdutoDAO;
 import br.com.ezatta.model.EzattaProduto;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,7 +20,6 @@ import javafx.scene.control.Separator;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
 /**
  * FXML Controller class
@@ -100,6 +97,7 @@ public class PrincipalListStatusProdutoController implements Initializable {
         //montando string container
         strContainer[idProduto].setText(dado.getNome() + "\t Qtd.: " + dado.getQuantidade() + "\t  %" + Math.round(porcent));
 
+        //adiciona StringContainer[idProduto]
         hbProduto[idProduto].getChildren().addAll(strContainer[idProduto]);
 
         //adiciona hbProduto ao VbLista
