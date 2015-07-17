@@ -8,6 +8,8 @@ package br.com.ezatta.controller;
 import br.com.ezatta.dao.ProdutoDAO;
 import br.com.ezatta.model.EzattaProduto;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -31,24 +33,19 @@ public class PrincipalListStatusProdutoController implements Initializable {
 
     private HBox[] hbProduto = new HBox[10000];
     private Label[] strContainer = new Label[10000];
-    private Separator[] separatorProduto = new Separator[10000];
-    private ObservableList<EzattaProduto> dadosProdutosPrincipal = FXCollections.observableArrayList();
-    private ProdutoDAO produtoCtr = new ProdutoDAO();
     private Integer idProduto = 0;
 
     @FXML
     private VBox listaProdutoStatus;
-    
+
     @FXML
     private BorderPane borderPanePrincipal;
 
     @FXML
     void atualizarLitaStatusProduto(ActionEvent event) {
-
-    }
-
-    @FXML
-    void atualizarLista(ActionEvent event) {
+        listaProdutoStatus.getChildren().clear();
+        hbProduto[idProduto].getChildren().clear();
+        popularProduto();
     }
 
     @Override
@@ -58,9 +55,11 @@ public class PrincipalListStatusProdutoController implements Initializable {
 
     private void popularProduto() {
         try {
+            ObservableList<EzattaProduto> dadosProdutosPrincipal = FXCollections.observableArrayList();
             dadosProdutosPrincipal.clear();
+            ProdutoDAO produtoCtr = new ProdutoDAO();
             dadosProdutosPrincipal.addAll(produtoCtr.getAllProduto());
-
+            
             for (EzattaProduto dado : dadosProdutosPrincipal) {
                 adicionaLista(dado);
             }
@@ -74,34 +73,34 @@ public class PrincipalListStatusProdutoController implements Initializable {
         idProduto = dado.getId();
         hbProduto[idProduto] = new HBox();
         strContainer[idProduto] = new Label();
-        hbProduto[idProduto].setSpacing(10.0);
+        hbProduto[idProduto].setSpacing(5.0);
         hbProduto[idProduto].setPadding(new Insets(10, 10, 10, 10));
+        Separator separatorProduto = new Separator();
+        separatorProduto.setMinHeight(5);
         
         //calcular porcentagem container
         Float qtdTotal = dado.getEstoqueMaximo().floatValue();
         Float qtdAtual = dado.getQuantidade().floatValue();
         Float porcent = (qtdAtual / qtdTotal) * 100;
-        
+
         if (porcent >= 60) {
             strContainer[idProduto].setStyle("-fx-font-style: italic;");
             strContainer[idProduto].setStyle("-fx-font-size: 9px;");
             strContainer[idProduto].setStyle("-fx-text-fill: darkgreen;");
-            
-        }else if(porcent >= 40){
+        } else if (porcent >= 40) {
             strContainer[idProduto].setStyle("-fx-font-style: italic;");
             strContainer[idProduto].setStyle("-fx-font-size: 9px;");
             strContainer[idProduto].setStyle("-fx-text-fill: darkorange;");
-        }else{
+        } else {
             strContainer[idProduto].setStyle("-fx-font-style: italic;");
             strContainer[idProduto].setStyle("-fx-font-size: 9px;");
             strContainer[idProduto].setStyle("-fx-text-fill: darkred;");
         }
-        
+
         //montando string container
         strContainer[idProduto].setText(dado.getNome() + "\t Qtd.: " + dado.getQuantidade() + "\t  %" + Math.round(porcent));
-       
+
         hbProduto[idProduto].getChildren().addAll(strContainer[idProduto]);
-        
 
         //adiciona hbProduto ao VbLista
         listaProdutoStatus.getChildren().add(hbProduto[idProduto]);
