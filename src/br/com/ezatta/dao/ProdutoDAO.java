@@ -52,15 +52,6 @@ public class ProdutoDAO extends GenericDAO {
         return listaProduto;
     }
 
-    public List<EzattaProdutoVo> getAllProdutoPersonalizado() {
-        TypedQuery<EzattaProdutoVo> query = em.createQuery("select p from EzattaProduto p", EzattaProdutoVo.class);
-        List<EzattaProdutoVo> listaProduto = query.getResultList();
-        for (EzattaProdutoVo listaProduto1 : listaProduto) {
-            System.out.println("listaProduto1: "+listaProduto1);
-        }
-        return listaProduto;
-    }
-
     public List<EzattaProduto> getAllProdutoByEmpresa(EzattaEmpresa empresa) {
         TypedQuery<EzattaProduto> query = em.createNamedQuery("EzattaProduto.findByEmpresa", EzattaProduto.class);
         query.setParameter("empresa", empresa);
