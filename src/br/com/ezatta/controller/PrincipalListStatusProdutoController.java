@@ -21,11 +21,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-/**
- * FXML Controller class
- *
- * @author marcelo
- */
 public class PrincipalListStatusProdutoController implements Initializable {
 
     private HBox[] hbProduto = new HBox[10000];
