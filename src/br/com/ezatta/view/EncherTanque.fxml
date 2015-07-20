@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.effect.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" minHeight="-Infinity" minWidth="-Infinity" prefWidth="800.0" style="-fx-background-color: lightgray;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.ezatta.controller.EncherTanqueController">
+   <children>
+      <BorderPane layoutX="10.0" layoutY="10.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <top>
+            <AnchorPane prefHeight="31.0" style="-fx-background-color: lightgray;">
+               <effect>
+                  <DropShadow />
+               </effect>
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Configuração &gt; Encher Tanque" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="36.0" AnchorPane.topAnchor="5.0">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </Text>
+                  <ImageView fitHeight="21.0" fitWidth="21.0" layoutX="-86.0" layoutY="-61.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="3.0" AnchorPane.topAnchor="3.0">
+                     <image>
+                        <Image url="@images/Tools.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </AnchorPane>
+         </top>
+         <center>
+            <TabPane fx:id="tabTela" prefWidth="500.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+               <tabs>
+                  <Tab fx:id="tabConsulta" text="Consulta">
+                     <content>
+                        <AnchorPane prefHeight="425.0" prefWidth="800.0">
+                           <children>
+                              <TextField fx:id="txtBuscar" layoutX="13.0" layoutY="37.0" maxHeight="20.0" prefHeight="25.0" prefWidth="382.0" promptText="Buscar registro..." />
+                              <Button fx:id="btnBuscar" layoutX="400.0" layoutY="35.0" mnemonicParsing="false" onAction="#btnBuscar" prefHeight="25.0" prefWidth="89.0" text="Buscar">
+                                 <graphic>
+                                    <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@images/search32.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
+                              <TableView fx:id="tb" layoutX="6.0" layoutY="69.0" prefHeight="304.0" prefWidth="788.0" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="6.0" AnchorPane.topAnchor="69.0">
+                                 <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
+                              </TableView>
+                              <RadioButton fx:id="rbNome" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="106.0" text="Por Nome">
+                                 <toggleGroup>
+                                    <ToggleGroup fx:id="buscarPor" />
+                                 </toggleGroup>
+                              </RadioButton>
+                              <Button fx:id="btnImprimirRegistros" layoutX="668.0" layoutY="35.0" mnemonicParsing="false" onAction="#btnImprimir" prefHeight="30.0" prefWidth="121.0" text="Imprimir">
+                                 <graphic>
+                                    <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@images/printer32.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
+                              <Button fx:id="btnRedefinirConsulta" layoutX="499.0" layoutY="35.0" mnemonicParsing="false" onAction="#redefinirConsulta" text="Redefinir consulta">
+                                 <graphic>
+                                    <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@images/exchange32.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
+                           </children>
+                        </AnchorPane>
+                     </content>
+                  </Tab>
+                  <Tab fx:id="tabCadastro" text="Cadastro">
+                     <content>
+                        <Pane prefHeight="200.0" prefWidth="200.0">
+                           <children>
+                              <GridPane layoutX="14.0" layoutY="14.0" prefHeight="326.0" prefWidth="490.0">
+                                 <children>
+                                    <Label text="Nome" GridPane.rowIndex="1" />
+                                    <Label text="Quantidade" GridPane.rowIndex="2" />
+                                    <TextField fx:id="txtNome" disable="true" editable="false" promptText="Nome do produto" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <TextField fx:id="txtQuantidade" disable="true" editable="false" promptText="Quantidade em estoque atual" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    <Label text="Reservatório" GridPane.rowIndex="3" />
+                                    <Label text="Minimo" GridPane.rowIndex="4" />
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Codigo" />
+                                    <TextField fx:id="txtId" disable="true" editable="false" GridPane.columnIndex="1" />
+                                    <TextField fx:id="txtEstoqueMaximo" disable="true" editable="false" promptText="Capacidade máxima do reservatório" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    <TextField fx:id="txtMinimo" disable="true" editable="false" promptText="Minimo permitido em estoque" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Cor" GridPane.rowIndex="5" />
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Empresa" GridPane.rowIndex="6" />
+                                    <ComboBox fx:id="cbCor" disable="true" prefWidth="150.0" promptText="cor" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                    <ComboBox fx:id="cbEmpresa" disable="true" prefHeight="25.0" promptText="Empresa" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Configuração" GridPane.rowIndex="8">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Text>
+                                    <TextField fx:id="qtdRedefinir" minHeight="30.0" prefHeight="30.0" promptText="Quantidade" GridPane.rowIndex="9" />
+                                    <HBox prefHeight="40.0" prefWidth="364.0" GridPane.columnIndex="1" GridPane.rowIndex="9">
+                                       <children>
+                                          <Button mnemonicParsing="false" onAction="#adicionarTanque" text="Adicionar">
+                                             <HBox.margin>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </HBox.margin>
+                                             <graphic>
+                                                <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@images/plus32.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                             <tooltip>
+                                                <Tooltip text="Adiciona quantidade informada ao Tanque" />
+                                             </tooltip>
+                                          </Button>
+                                          <Button mnemonicParsing="false" onAction="#removerTanque" text="Remover">
+                                             <HBox.margin>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </HBox.margin>
+                                             <graphic>
+                                                <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@images/minus32.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                             <tooltip>
+                                                <Tooltip text="Remove quantidade informada ao tanque" />
+                                             </tooltip>
+                                          </Button>
+                                          <Button mnemonicParsing="false" onAction="#vazioTanque" text="Vazio">
+                                             <HBox.margin>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </HBox.margin>
+                                             <graphic>
+                                                <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@images/box32.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                             <tooltip>
+                                                <Tooltip text="Tanque vazio" />
+                                             </tooltip>
+                                          </Button>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="176.0" minWidth="10.0" prefWidth="108.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="372.0" minWidth="10.0" prefWidth="371.0" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                 </rowConstraints>
+                              </GridPane>
+                           </children>
+                        </Pane>
+                     </content>
+                  </Tab>
+               </tabs>
+               <BorderPane.margin>
+                  <Insets />
+               </BorderPane.margin>
+            </TabPane>
+         </center>
+      </BorderPane>
+   </children>
+</AnchorPane>

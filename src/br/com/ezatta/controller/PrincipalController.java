@@ -261,10 +261,7 @@ public class PrincipalController implements Initializable {
         this.stack = stack;
     }
 
-    @FXML
-    void encherTank(ActionEvent event) {
-
-    }
+    
 
     public void popularDadosListaEnvase() {
         try {
@@ -989,6 +986,18 @@ public class PrincipalController implements Initializable {
         }
     }
 
+    @FXML
+    void encherTank(ActionEvent event) {
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/EncherTanque.fxml"));
+        } catch (Exception e) {
+            new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
+            System.out.println("Erro ao carregar a tela de bicos");
+            e.printStackTrace();
+        }
+    }
+    
     @FXML
     void backup(ActionEvent event) {
 

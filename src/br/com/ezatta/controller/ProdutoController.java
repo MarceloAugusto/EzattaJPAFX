@@ -155,11 +155,8 @@ public class ProdutoController implements Initializable {
         } else {
             tabTela.getSelectionModel().select(1);
             setOperacao(1);
-
-            setOperacao(1);
             setEzattaProduto(tb.getSelectionModel().getSelectedItem());
             SetValoresComponentes(getEzattaProduto());
-
         }
     }
 
@@ -225,6 +222,7 @@ public class ProdutoController implements Initializable {
         txtMinimo.setText("");
         cbCor.getSelectionModel().select(null);
         cbEmpresa.getSelectionModel().select(null);
+        txtQuantidade.setDisable(false);
     }
 
     @FXML
@@ -241,6 +239,7 @@ public class ProdutoController implements Initializable {
                 case 1:
                     Integer id = Integer.parseInt(txtId.getText());
                     EzattaProduto produtos = new EzattaProduto(id, txtNome.getText(), new BigDecimal(txtQuantidade.getText()), new BigDecimal(txtEstoqueMaximo.getText()), new BigDecimal(txtMinimo.getText()), cbCor.getSelectionModel().getSelectedItem(), cbEmpresa.getSelectionModel().getSelectedItem());
+                    //EzattaProduto produtos = new EzattaProduto(id, txtNome.getText(), new BigDecimal(txtEstoqueMaximo.getText()), new BigDecimal(txtMinimo.getText()), cbCor.getSelectionModel().getSelectedItem(), cbEmpresa.getSelectionModel().getSelectedItem());
                     produtoCtr.updateProduto(produtos);
                     new FXDialog(Type.INFO, "Registro atualizado com sucesso!").showDialog();
                     tabTela.getSelectionModel().select(0);
@@ -283,6 +282,7 @@ public class ProdutoController implements Initializable {
         txtMinimo.setText("");
         cbCor.getSelectionModel().select(null);
         cbEmpresa.getSelectionModel().select(null);
+        txtQuantidade.setDisable(false);
     }
 
     @Override
@@ -298,6 +298,10 @@ public class ProdutoController implements Initializable {
                     setOperacao(1);
                     setEzattaProduto(tb.getSelectionModel().getSelectedItem());
                     SetValoresComponentes(getEzattaProduto());
+                    
+                    if(txtQuantidade.getText() != "" || txtQuantidade.getText() != null ){
+                        txtQuantidade.setDisable(true);
+                    }
                 }
                 if (event.getClickCount() > 0) {
                     try {

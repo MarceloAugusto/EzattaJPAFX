@@ -100,6 +100,15 @@ public class EzattaProduto implements Serializable {
         this.id = id;
     }
 
+   public EzattaProduto(Integer id, String nome, BigDecimal estoqueMaximo, BigDecimal estoqueMinimo, String cor, EzattaEmpresa empresa) {
+        this.id = id;
+        this.nome = nome;
+        this.estoqueMaximo = estoqueMaximo;
+        this.estoqueMinimo = estoqueMinimo;
+        this.cor = cor;
+        this.empresa = empresa;
+    }
+
     public Integer getId() {
         return id;
     }
