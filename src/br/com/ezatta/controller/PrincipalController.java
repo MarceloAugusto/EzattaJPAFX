@@ -120,8 +120,8 @@ public class PrincipalController implements Initializable {
     @FXML
     private StackPane stack;
 
-//    @FXML
-//    private VBox FilaPrincipal;
+    @FXML
+    private MenuItem miEncherTank;
 
     @FXML
     private Button btnOperacoes;
@@ -261,6 +261,11 @@ public class PrincipalController implements Initializable {
         this.stack = stack;
     }
 
+    @FXML
+    void encherTank(ActionEvent event) {
+
+    }
+
     public void popularDadosListaEnvase() {
         try {
             dadosParaEnvase.clear();
@@ -360,7 +365,6 @@ public class PrincipalController implements Initializable {
         } catch (InterruptedException ex) {
             Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
 
     @Override
@@ -467,6 +471,7 @@ public class PrincipalController implements Initializable {
         @Override
         public void run() {
             System.out.println("entrou thread");
+            System.out.println("taskLeituraEnvase: " + taskLeituraEnvase.toString());
             try {
                 long numBytes = 0;
                 int contAux = 0;
@@ -1021,7 +1026,6 @@ public class PrincipalController implements Initializable {
 
     }
 
-    
     public void limpar() {
         try {
             stack.getChildren().clear();
@@ -1030,7 +1034,7 @@ public class PrincipalController implements Initializable {
             e.printStackTrace();
         }
     }
-    
+
     public void limparContainerPrincipal() {
         try {
             stackContainer.getChildren().clear();
@@ -1171,22 +1175,20 @@ public class PrincipalController implements Initializable {
         estoque.setOs(txtOs.getText());
         estoque.setKm(txtKm.getText());
         estoque.setPlaca(txtPlaca.getText());
-        estoque.setProduto(ezattaProdutoStatic);
+        estoque.setProduto(ezattaProdutoStatic);//ezattaProdutoStatic
         estoque.setStatus(0);
         Timestamp data = new Timestamp(System.currentTimeMillis());
         estoque.setDataEstoque(data);
         estoque.setUsuario(ezattaUsuarioStatic);
 
         ProdutoDAO produtoCtr = new ProdutoDAO();
-        EzattaProduto prod = new EzattaProduto();
-        prod = produtoCtr.getProduto(ezattaUsuarioStatic.getId());
-        BigDecimal quantidadeProduto = prod.getQuantidade().setScale(2, RoundingMode.FLOOR);
+        BigDecimal quantidadeProduto = ezattaProdutoStatic.getQuantidade().setScale(2, RoundingMode.FLOOR);
         BigDecimal quantidadeEstoque = new BigDecimal(estoque.getQtdEstoque()).setScale(2, RoundingMode.FLOOR);
         BigDecimal quantidadecalculada = quantidadeProduto.subtract(quantidadeEstoque).setScale(2, RoundingMode.FLOOR);
-        prod.setQuantidade(quantidadecalculada);
-        produtoCtr.updateProduto(prod);
+        ezattaProdutoStatic.setQuantidade(quantidadecalculada);
+        produtoCtr.updateProduto(ezattaProdutoStatic);
 
-        //new FXDialog(FXDialog.Type.INFO, "Solicitação confirmada. ").showDialog();
+        //new FXDialog(FXDialog.Type.INFO, "ezattaProdutoStatic: "+ezattaProdutoStatic.getNome()+" - id: "+ezattaProdutoStatic.getId()+ " qtd: "+ezattaProdutoStatic.getQuantidade()).showDialog();
         estoqueCtr.addEstoque(estoque);
 
         System.out.println("=================================inicio===================================================");
