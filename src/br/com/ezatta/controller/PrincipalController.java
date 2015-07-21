@@ -701,6 +701,11 @@ public class PrincipalController implements Initializable {
                 (byte) (int) Long.parseLong(bico.getEndereco().substring(14, 16), 16), -1, -2, 0, 0, 87, 77, (byte) label19, 0, (byte) stringConvertidaemInt, 13,
                 (byte) (int) crc};
             saida.write(uartout);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
         int stringConvertidaemInt = 32;
@@ -832,7 +837,7 @@ public class PrincipalController implements Initializable {
             (byte) 0x00, (byte) volume, (byte) 0x0D, (byte) crc};
 
         saida.write(uartout);
-        Thread.sleep(200);  // ??  
+        Thread.sleep(900);  // ??  
         //saida.flush();  // ??  
     }
 
