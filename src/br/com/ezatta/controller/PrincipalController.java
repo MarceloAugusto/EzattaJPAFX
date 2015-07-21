@@ -1179,56 +1179,65 @@ public class PrincipalController implements Initializable {
 
     private boolean validaFormatacaoVolume() {
 
-        boolean valida = true;
-        
+        boolean valida = false;
+
         String vol = txtVolume.getText();
         vol = vol.replace(",", ".");
-        
+
         CharSequence ponto = ".";
         if (vol.contains(ponto)) {
+            
             String parts[] = vol.trim().split("\\.");//04-03
             String part1 = parts[0]; // 04
-
+            valida = true;
+            
             if (part1.length() > 2) {
                 valida = false;
-                System.out.println("part1: "+part1);
+                System.out.println("part1: " + part1);
             }
+            
         }
 
         return valida;
     }
 
     private void salvarNoBanco() {
+
         estoque = new EzattaEstoque();
         String vol = txtVolume.getText();
+        System.out.println("Salva no banco 1");
         if (vol.contains(",")) {
             vol = vol.replace(",", ".");
-            if (vol.contains(".")) { //verifica se tem o ponto
-                String parts[] = vol.trim().split("\\.");//04-03
-                String part1 = parts[0]; // 04
-                String part2 = parts[1]; // 03
-                vol = "";
-                //part1------------------
-                if (part1.length() == 1) {
-                    part1 = "0" + part1;
-                } else if (part1.length() > 2) {
-                    part1 = part1.substring(0, 1);
-                }
-                //part2------------------
-                if (part2.length() == 1) {
-                    part2 = part2 + "0";
-                } else if (part2.length() > 2) {
-                    part2 = part2.substring(0, 1);
-                }
-                //junta as duas strings com ponto
-                vol = part1.concat(".").concat(part2);
-                System.out.println("Volume = " + vol);
-            } else {
-                vol = "0" + vol + "00";
-                System.out.println("Volume = " + vol);
-            }
         }
 
+        if (vol.contains(".")) { //verifica se tem o ponto
+            String parts[] = vol.trim().split("\\.");//04-03
+            String part1 = parts[0]; // 04
+            String part2 = parts[1]; // 03
+            vol = "";
+            //part1------------------
+            if (part1.length() == 1) {
+                part1 = "0" + part1;
+            } else if (part1.length() > 2) {
+                part1 = part1.substring(0, 1);
+            }
+            //part2------------------
+            System.out.println("part2: " + part2);
+            if (part2.length() == 1) {
+                part2 = part2 + "0";
+                System.out.println("part2: " + part2 + " 1 ");
+            } else if (part2.length() > 2) {
+                part2 = part2.substring(0, 2);
+                System.out.println("part2: " + part2 + " 2 ");
+            }
+            //junta as duas strings com ponto
+            vol = part1.concat(".").concat(part2);
+            System.out.println("Volume = " + vol);
+        }else{
+            vol = "0" + vol + "00";
+            System.out.println("Volume = " + vol);
+        }
+        //--------------------------fim valida antes de inserir
         estoque.setQtdEstoque(Float.parseFloat(vol));
         estoque.setOperador((EzattaOperador) cbOperador.getValue());
         estoque.setBico((EzattaBico) cbBico.getValue());
