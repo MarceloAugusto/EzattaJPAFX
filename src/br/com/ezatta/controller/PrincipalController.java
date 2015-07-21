@@ -261,8 +261,6 @@ public class PrincipalController implements Initializable {
         this.stack = stack;
     }
 
-    
-
     public void popularDadosListaEnvase() {
         try {
             dadosParaEnvase.clear();
@@ -858,6 +856,17 @@ public class PrincipalController implements Initializable {
             String enviar = txtVolume;
             System.out.println("enviar: " + enviar);
 
+            //substitui a virgula por ponto
+            if (enviar.contains(",")) {
+                enviar = enviar.replace(",", ".");
+                System.out.println("enviar 1: " + enviar);
+            }
+            //remove caracteres a mais
+            if (enviar.length() > 5) {
+                enviar = enviar.substring(1, 6);
+                System.out.println("enviar 2: " + enviar);
+            }
+
             //tratamento do volume
             if (enviar.contains(".")) { //verifica se tem o ponto
                 String parts[] = enviar.trim().split("\\.");//04-03
@@ -997,7 +1006,7 @@ public class PrincipalController implements Initializable {
             e.printStackTrace();
         }
     }
-    
+
     @FXML
     void backup(ActionEvent event) {
 
@@ -1152,7 +1161,8 @@ public class PrincipalController implements Initializable {
             txtVolume.requestFocus();
             ok = false;
         } else if (!validaFormatacaoVolume()) {
-            new FXDialog(FXDialog.Type.WARNING, "Favor preencher o Volume com a seguinte formatação 01.00!").showDialog();
+
+            new FXDialog(FXDialog.Type.WARNING, "Favor preencher o Volume com a seguinte formatação 01.00! \n Volume maximo 99.99").showDialog();
             txtVolume.requestFocus();
             ok = false;
         } else if (txtOs.getText().isEmpty()) {
@@ -1168,17 +1178,58 @@ public class PrincipalController implements Initializable {
     }
 
     private boolean validaFormatacaoVolume() {
-        boolean valida = false;
+
+        boolean valida = true;
+        
         String vol = txtVolume.getText();
+        vol = vol.replace(",", ".");
+        
         CharSequence ponto = ".";
-        valida = vol.contains(ponto);
-        System.out.println("se tem ou não ponto : " + valida);
+        if (vol.contains(ponto)) {
+            String parts[] = vol.trim().split("\\.");//04-03
+            String part1 = parts[0]; // 04
+
+            if (part1.length() > 2) {
+                valida = false;
+                System.out.println("part1: "+part1);
+            }
+        }
+
         return valida;
     }
 
     private void salvarNoBanco() {
         estoque = new EzattaEstoque();
-        estoque.setQtdEstoque(Float.parseFloat(txtVolume.getText()));
+        String vol = txtVolume.getText();
+        if (vol.contains(",")) {
+            vol = vol.replace(",", ".");
+            if (vol.contains(".")) { //verifica se tem o ponto
+                String parts[] = vol.trim().split("\\.");//04-03
+                String part1 = parts[0]; // 04
+                String part2 = parts[1]; // 03
+                vol = "";
+                //part1------------------
+                if (part1.length() == 1) {
+                    part1 = "0" + part1;
+                } else if (part1.length() > 2) {
+                    part1 = part1.substring(0, 1);
+                }
+                //part2------------------
+                if (part2.length() == 1) {
+                    part2 = part2 + "0";
+                } else if (part2.length() > 2) {
+                    part2 = part2.substring(0, 1);
+                }
+                //junta as duas strings com ponto
+                vol = part1.concat(".").concat(part2);
+                System.out.println("Volume = " + vol);
+            } else {
+                vol = "0" + vol + "00";
+                System.out.println("Volume = " + vol);
+            }
+        }
+
+        estoque.setQtdEstoque(Float.parseFloat(vol));
         estoque.setOperador((EzattaOperador) cbOperador.getValue());
         estoque.setBico((EzattaBico) cbBico.getValue());
         estoque.setOs(txtOs.getText());

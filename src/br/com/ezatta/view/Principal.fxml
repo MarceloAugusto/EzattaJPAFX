@@ -46,6 +46,7 @@
                     <items>
                         <MenuItem fx:id="miBackUp" mnemonicParsing="false" onAction="#backup" text="Back up" />
                       <MenuItem fx:id="miCBico" mnemonicParsing="false" onAction="#calibrarBico" text="Calibrar" />
+                        <MenuItem fx:id="miEncherTank" mnemonicParsing="false" onAction="#encherTank" text="Encher Tanque" />
                     </items>
                   </Menu>
                 <Menu mnemonicParsing="false" text="Ajuda">

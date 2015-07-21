@@ -237,15 +237,17 @@ public class EncherTanqueController implements Initializable {
 
     //--------------------------novos btns adicionar - remover - limpar
     BigDecimal qtd;
-
     @FXML
     void adicionarTanque(ActionEvent event) {     
         qtd = new BigDecimal(BigInteger.ONE);
         qtd = ezattaProduto.getQuantidade();
-        qtd = qtd.add(new BigDecimal(qtdRedefinir.getText()));
+        
+        String qtdRedefinirStr = qtdRedefinir.getText();
+        qtdRedefinirStr = qtdRedefinirStr.replace(",", ".");
+        qtd = qtd.add(new BigDecimal(qtdRedefinirStr));
+        
         ezattaProduto.setQuantidade(qtd);
         produtoCtr.updateProduto(ezattaProduto);
-        System.out.println("qtd: "+qtd);
         new FXDialog(FXDialog.Type.INFO, "Volume adicionado ao tanque.").showDialog();
         tabTela.getSelectionModel().select(0);
         redefinirConsulta(event);
@@ -255,9 +257,15 @@ public class EncherTanqueController implements Initializable {
     void removerTanque(ActionEvent event) {
         qtd = new BigDecimal(0);
         qtd = ezattaProduto.getQuantidade();
-        String qtdStr = qtdRedefinir.getText();
-        BigDecimal qtdN = new BigDecimal(qtdStr);
-        qtd = qtd.subtract(qtdN);
+        
+        String qtdRedefinirStr = qtdRedefinir.getText();
+        qtdRedefinirStr = qtdRedefinirStr.replace(",", ".");
+        qtd = qtd.subtract(new BigDecimal(qtdRedefinirStr));
+        
+//        String qtdStr = qtdRedefinir.getText();
+//        BigDecimal qtdN = new BigDecimal(qtdStr);
+//        qtd = qtd.subtract(qtdN);
+//        
         ezattaProduto.setQuantidade(qtd);
         produtoCtr.updateProduto(ezattaProduto);
         System.out.println("qtd: "+qtd);
