@@ -553,6 +553,8 @@ public class PrincipalController implements Initializable {
                                     System.out.println("VolumeTotal " + volumeTotal[idEstoqueTh]);
                                     if (!volumeSemVol.isEmpty() && volumeSemVol.length() > 0) {
                                         atualizaBarraProgress(volumeBfj.toString());//barra de progresso
+                                    } else {
+                                        outputBfj.delete(0, outputBfj.length());//limpa buffer
                                     }
                                 } catch (NullPointerException e) {
                                     System.out.println("nullpointer");
@@ -633,32 +635,32 @@ public class PrincipalController implements Initializable {
     }
 
     public void atualizaBarraProgress(String txtEfetivo) {
-        if (txtEfetivo != null && txtEfetivo.length() > 0) {
+        System.out.println("txtEfetivo: " + txtEfetivo);
+        if (txtEfetivo.isEmpty()) {
+            System.out.println("String Empty");
+            txtEfetivo = "0";
+        }
+        if (txtEfetivo != null && txtEfetivo.length() > 0 && txtEfetivo != "") {
             try {
                 try {
                     progressBarEstoque[idEstoqueTh].setProgress(0);
                     //Efetivo
-                    BigDecimal volEfetivoUm = new BigDecimal(txtEfetivo);
-                    volEfetivoUm = volEfetivoUm.setScale(2, BigDecimal.ROUND_DOWN);
-                    double volEfetivo = Double.parseDouble(volEfetivoUm.toString());
+                    double volEfetivo = Double.parseDouble(txtEfetivo);
 
                     //total
                     double volTotal = volumeTotal[idEstoqueTh]; //Total
 
-                    //Porcentagem
-                    double porcentagem = (volEfetivo / volTotal);
-
-                    System.out.println("volTotal: " + volTotal + " - volEfetivo: " + volEfetivoUm + " - porcentagem: " + porcentagem);
+                    System.out.println("volTotal: " + volTotal + " - volEfetivo: " + volEfetivo );
                     //progressBar[idEstoqueTh].setProgress(porcentagem);
                     progressBarEstoque[idEstoqueTh].setProgress(volEfetivo / volTotal);
-                } catch (IndexOutOfBoundsException | NumberFormatException e) {
+                }catch (IndexOutOfBoundsException | NumberFormatException e) {
                     System.out.println("saber como validar");
+                    //e.printStackTrace();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        //---------------fim progress bar
     }
 
     private void enviarStringPlaca(EzattaEstoque dado) throws IOException {
@@ -1191,16 +1193,16 @@ public class PrincipalController implements Initializable {
 
         CharSequence ponto = ".";
         if (vol.contains(ponto)) {
-            
+
             String parts[] = vol.trim().split("\\.");//04-03
             String part1 = parts[0]; // 04
             valida = true;
-            
+
             if (part1.length() > 2) {
                 valida = false;
                 System.out.println("part1: " + part1);
             }
-            
+
         }
 
         return valida;
@@ -1238,7 +1240,7 @@ public class PrincipalController implements Initializable {
             //junta as duas strings com ponto
             vol = part1.concat(".").concat(part2);
             System.out.println("Volume = " + vol);
-        }else{
+        } else {
             vol = "0" + vol + "00";
             System.out.println("Volume = " + vol);
         }

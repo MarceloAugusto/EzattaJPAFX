@@ -200,8 +200,8 @@ public class LoginController implements Initializable {
         manager.clear();
 
         // abre porta serial 
-        defaultPort = "COM4";
-        //defaultPort = "/dev/ttyACM0";
+        //defaultPort = "COM4";
+        defaultPort = "/dev/ttyACM0";
         System.out.println("Abrindo porta serial ttyACM0");
 
         portList = gnu.io.CommPortIdentifier.getPortIdentifiers();
