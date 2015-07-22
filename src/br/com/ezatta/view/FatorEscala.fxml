@@ -88,7 +88,7 @@
                            <children>
                             <AnchorPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <GridPane prefHeight="192.0" prefWidth="427.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                    <GridPane prefHeight="192.0" prefWidth="554.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0">
                                        <children>
                                           <Label text="Nome" GridPane.rowIndex="1" />
                                           <Label text="Endereço" GridPane.rowIndex="2" />
@@ -109,8 +109,8 @@
                                           </Button>
                                        </children>
                                        <columnConstraints>
-                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="176.0" minWidth="10.0" prefWidth="76.0" />
-                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="354.0" minWidth="10.0" prefWidth="354.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="176.0" minWidth="10.0" prefWidth="78.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="484.0" minWidth="10.0" prefWidth="476.0" />
                                        </columnConstraints>
                                        <rowConstraints>
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -130,10 +130,10 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: lightgray;">
                            <children>
-                              <GridPane layoutX="14.0" layoutY="14.0" prefHeight="71.0" prefWidth="419.0">
+                              <GridPane layoutX="14.0" layoutY="14.0" prefHeight="71.0" prefWidth="484.0">
                                 <columnConstraints>
-                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="235.0" minWidth="10.0" prefWidth="190.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="296.0" minWidth="10.0" prefWidth="294.0" />
                                 </columnConstraints>
                                 <rowConstraints>
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -141,8 +141,8 @@
                                 </rowConstraints>
                                  <children>
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Informe o volume envasado:" />
-                                    <TextField GridPane.columnIndex="1" />
-                                    <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="98.0" text="Calibrar" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <TextField fx:id="txtVolumeInformado" GridPane.columnIndex="1" />
+                                    <Button mnemonicParsing="false" onAction="#calcularCalibrar" prefHeight="30.0" prefWidth="98.0" text="Calibrar" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                        <graphic>
                                           <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
@@ -150,6 +150,18 @@
                                              </image>
                                           </ImageView>
                                        </graphic>
+                                    </Button>
+                                    <Button minHeight="30.0" minWidth="115.0" mnemonicParsing="false" onAction="#cancelarVolumePlaca" prefHeight="30.0" prefWidth="100.0" text="Cancelar" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                       <graphic>
+                                          <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@images/paperminus32.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                       <GridPane.margin>
+                                          <Insets left="110.0" />
+                                       </GridPane.margin>
                                     </Button>
                                  </children>
                               </GridPane>

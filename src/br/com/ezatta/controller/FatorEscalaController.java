@@ -5,16 +5,23 @@
  */
 package br.com.ezatta.controller;
 
+import static br.com.ezatta.controller.LoginController.portFound;
+import static br.com.ezatta.controller.LoginController.saida;
+import static br.com.ezatta.controller.LoginController.serialPort;
 import br.com.ezatta.dao.BicosDAO;
 import br.com.ezatta.dao.ProdutoDAO;
 import br.com.ezatta.model.EzattaBico;
+import br.com.ezatta.model.EzattaEstoque;
 import br.com.ezatta.model.EzattaProduto;
 import br.com.ezatta.util.GenericTable;
 import br.com.ezatta.util.ValidationFields;
 import br.com.ezatta.view.FXDialog;
+import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -38,7 +45,7 @@ import javafx.scene.input.MouseEvent;
  */
 public class FatorEscalaController implements Initializable {
 
-private ObservableList<EzattaBico> dados = FXCollections.observableArrayList();
+    private ObservableList<EzattaBico> dados = FXCollections.observableArrayList();
     private ObservableList<EzattaProduto> dadosProduto = FXCollections.observableArrayList();
     private int Operacao;
     private ProdutoDAO produtoCtr = new ProdutoDAO();
@@ -98,14 +105,80 @@ private ObservableList<EzattaBico> dados = FXCollections.observableArrayList();
 
     @FXML
     void enviarQuatroLitros(ActionEvent event) {
-
+        try {
+            setarFatorEscala(100);
+            salvarFatorBanco(100);
+            enviarQuatroLitros();
+            tabTela.getSelectionModel().select(2);
+        } catch (IOException | InterruptedException ex) {
+            Logger.getLogger(FatorEscalaController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @FXML
     void enviarQuatroLitrosFinais(ActionEvent event) {
-
+        enviarQuatroLitros();
+        tabTela.getSelectionModel().select(0);
+        txtVolumeInformado.setText("");
     }
-    
+
+    @FXML
+    void cancelarVolumePlaca(ActionEvent event) {
+        try {
+            saida = serialPort.getOutputStream();
+            System.out.println("FLUXO OK!");
+        } catch (Exception e) {
+            System.out.println("Erro.STATUS: " + e);
+        }
+
+        try {
+
+            String vo = "00.00";
+            String enviar = "00.00";
+            enviar = enviar.replace(".", "");
+
+            Integer volume_inteiro = Integer.parseInt(enviar); // Volume total como inteiro
+            String volumeLSB = vo.substring(3, 5);
+
+            int volumeMSBL = (volume_inteiro) & 255;
+            int volumeLSBL = ((volume_inteiro & 65280) / 256);
+            //mostrar parte alta e baixa do inteiro
+            System.out.println("String: " + (String.valueOf(volumeMSBL)) + " " + (String.valueOf(volumeLSBL)));
+
+            //EzattaEstoque ezattaEstoqueCancelar = estoqueCtr.getEstoque(idEstoqueTh);
+            //EzattaBico bico = ezattaEstoqueCancelar.getBico();
+            EzattaBico bico = ezattaBico;
+            System.out.println("bico: " + bico.getNome());
+
+            long crc = 0xff - 0x11 - Long.parseLong(bico.getEndereco().substring(0, 2), 16) - Long.parseLong(bico.getEndereco().substring(2, 4), 16) - Long.parseLong(bico.getEndereco().substring(4, 6), 16) - Long.parseLong(bico.getEndereco().substring(6, 8), 16) - Long.parseLong(bico.getEndereco().substring(8, 10), 16) - Long.parseLong(bico.getEndereco().substring(10, 12), 16) - Long.parseLong(bico.getEndereco().substring(12, 14), 16) - Long.parseLong(bico.getEndereco().substring(14, 16), 16)
+                    - 0xFF - 0xFE - 0x57 - 0x4D - 0x01 - (volumeLSBL) - (volumeMSBL) - 0x0D;
+
+            String FinalrCrc = Long.toHexString(crc).substring(14, 16);
+
+            byte[] uartout = new byte[]{
+                (byte) 0x7E, (byte) 0x00, (byte) 0x14, (byte) 0x10, (byte) 0x01,
+                (byte) (Long.parseLong(bico.getEndereco().substring(0, 2), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(2, 4), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(4, 6), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(6, 8), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(8, 10), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(10, 12), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(12, 14), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(14, 16), 16)),
+                (byte) 0xFF, (byte) 0xFE, (byte) 0x00, (byte) 0x00, (byte) 0x57, (byte) 0x4D, (byte) 0x01,
+                (byte) volumeLSBL, (byte) volumeMSBL, (byte) 0x0D, (byte) crc};
+            try {
+                saida.write(uartout);
+                new FXDialog(FXDialog.Type.INFO, "Cancelado").showDialog();
+                Thread.sleep(1000);
+                tabTela.getSelectionModel().select(0);
+                txtVolumeInformado.setText("");
+            } catch (IOException ex) {
+                System.out.println("erro");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            serialPort.close();
+        }
+        if (!portFound) {
+            serialPort.close();
+        }
+    }
+
 //--------------------------------------------------------------------------------
     @FXML
     void cancelar(ActionEvent event) {
@@ -212,7 +285,7 @@ private ObservableList<EzattaBico> dados = FXCollections.observableArrayList();
             switch (getOperacao()) {
                 case 0:
                     //EzattaBico bico = new EzattaBico(txtNome.getText(),txtEndereco.getText(), cbProduto.getSelectionModel().getSelectedItem());
-                    EzattaBico bico = new EzattaBico(txtNome.getText(),txtEndereco.getText(), "208", cbProduto.getSelectionModel().getSelectedItem());
+                    EzattaBico bico = new EzattaBico(txtNome.getText(), txtEndereco.getText(), "208", cbProduto.getSelectionModel().getSelectedItem());
                     bicoCtr.addBico(bico);
                     popularDados();
                     new FXDialog(FXDialog.Type.INFO, "Registro inserido com sucesso!").showDialog();
@@ -220,7 +293,7 @@ private ObservableList<EzattaBico> dados = FXCollections.observableArrayList();
                     break;
                 case 1:
                     Integer id = Integer.parseInt(txtId.getText());
-                    EzattaBico bicos = new EzattaBico(id, txtNome.getText(),txtEndereco.getText(), cbProduto.getSelectionModel().getSelectedItem());
+                    EzattaBico bicos = new EzattaBico(id, txtNome.getText(), txtEndereco.getText(), cbProduto.getSelectionModel().getSelectedItem());
                     bicoCtr.updateBico(bicos);
                     new FXDialog(FXDialog.Type.INFO, "Registro atualizado com sucesso!").showDialog();
                     tabTela.getSelectionModel().select(0);
@@ -236,12 +309,11 @@ private ObservableList<EzattaBico> dados = FXCollections.observableArrayList();
             new FXDialog(FXDialog.Type.WARNING, "Favor preencher o nome!").showDialog();
             txtNome.requestFocus();
             ok = false;
-        }else if (txtEndereco.getText().isEmpty()) {
+        } else if (txtEndereco.getText().isEmpty()) {
             new FXDialog(FXDialog.Type.WARNING, "Favor preencher o endereço físico!").showDialog();
             txtEndereco.requestFocus();
             ok = false;
         }
-
 
         return ok;
     }
@@ -270,21 +342,20 @@ private ObservableList<EzattaBico> dados = FXCollections.observableArrayList();
                     setEzattaBico(tb.getSelectionModel().getSelectedItem());
                     SetValoresComponentes(getEzattaBico());
                 }
-                
+
                 if (event.getClickCount() > 0) {
-                    try{
-                    setOperacao(1);
-                    setEzattaBico(tb.getSelectionModel().getSelectedItem());
-                    SetValoresComponentes(getEzattaBico());
-                    }catch(NullPointerException e){
-                        
+                    try {
+                        setOperacao(1);
+                        setEzattaBico(tb.getSelectionModel().getSelectedItem());
+                        SetValoresComponentes(getEzattaBico());
+                    } catch (NullPointerException e) {
+
                     }
                 }
             }
 
         });
-        
-        
+
     }
 
     private void SetValoresComponentes(EzattaBico ezatta) {
@@ -324,6 +395,123 @@ private ObservableList<EzattaBico> dados = FXCollections.observableArrayList();
     public void setEzattaBico(EzattaBico ezattaBico) {
         this.ezattaBico = ezattaBico;
     }
-  
-    
+
+    private void setarFatorEscala(long volume) throws IOException, InterruptedException {
+        try {
+            saida = serialPort.getOutputStream();
+            System.out.println("FLUXO OK!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Erro.STATUS: " + e);
+        }
+
+        EzattaBico bico = ezattaBico;
+        System.out.println("Fator escala atual: " + bico.getFatorescala());
+
+        //long volume = Long.parseLong(bico.getFatorescala());
+        //long volume = 200;
+        long crc = 0xff - 0x11 - Long.parseLong(bico.getEndereco().substring(0, 2), 16) - Long.parseLong(bico.getEndereco().substring(2, 4), 16) - Long.parseLong(bico.getEndereco().substring(4, 6), 16) - Long.parseLong(bico.getEndereco().substring(6, 8), 16) - Long.parseLong(bico.getEndereco().substring(8, 10), 16) - Long.parseLong(bico.getEndereco().substring(10, 12), 16) - Long.parseLong(bico.getEndereco().substring(12, 14), 16) - Long.parseLong(bico.getEndereco().substring(14, 16), 16)
+                - 0xFF - 0xFE - 0x57 - 0x4D - 0x18 - 0x00 - (volume) - 0x0D;
+        String FinalrCrc = Long.toHexString(crc).substring(14, 16);
+        System.out.println("CRC: " + FinalrCrc);
+        System.out.println("primeiro: " + volume);
+
+        byte[] uartout = new byte[]{
+            (byte) 0x7E, (byte) 0x00, (byte) 0x14, (byte) 0x10, (byte) 0x01,
+            (byte) (Long.parseLong(bico.getEndereco().substring(0, 2), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(2, 4), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(4, 6), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(6, 8), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(8, 10), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(10, 12), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(12, 14), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(14, 16), 16)),
+            (byte) 0xFF, (byte) 0xFE, (byte) 0x00, (byte) 0x00,
+            (byte) 0x57, (byte) 0x4D, (byte) 0x18,
+            (byte) 0x00, (byte) volume, (byte) 0x0D, (byte) crc};
+
+        saida.write(uartout);
+        Thread.sleep(900);  // ??  
+        saida.flush();  // ??  
+    }
+
+    private void enviarQuatroLitros() {
+        try {
+            saida = serialPort.getOutputStream();
+            System.out.println("FLUXO OK!");
+        } catch (Exception e) {
+            System.out.println("Erro.STATUS: " + e);
+        }
+
+        try {
+
+            String vo = "04.00";
+            String enviar = "04.00";
+            enviar = enviar.replace(".", "");
+
+            Integer volume_inteiro = Integer.parseInt(enviar); // Volume total como inteiro
+            String volumeLSB = vo.substring(3, 5);
+
+            int volumeMSBL = (volume_inteiro) & 255;
+            int volumeLSBL = ((volume_inteiro & 65280) / 256);
+            //mostrar parte alta e baixa do inteiro
+            System.out.println("String: " + (String.valueOf(volumeMSBL)) + " " + (String.valueOf(volumeLSBL)));
+
+            //EzattaEstoque ezattaEstoqueCancelar = estoqueCtr.getEstoque(idEstoqueTh);
+            //EzattaBico bico = ezattaEstoqueCancelar.getBico();
+            EzattaBico bico = ezattaBico;
+            System.out.println("bico: " + bico.getNome());
+
+            long crc = 0xff - 0x11 - Long.parseLong(bico.getEndereco().substring(0, 2), 16) - Long.parseLong(bico.getEndereco().substring(2, 4), 16) - Long.parseLong(bico.getEndereco().substring(4, 6), 16) - Long.parseLong(bico.getEndereco().substring(6, 8), 16) - Long.parseLong(bico.getEndereco().substring(8, 10), 16) - Long.parseLong(bico.getEndereco().substring(10, 12), 16) - Long.parseLong(bico.getEndereco().substring(12, 14), 16) - Long.parseLong(bico.getEndereco().substring(14, 16), 16)
+                    - 0xFF - 0xFE - 0x57 - 0x4D - 0x01 - (volumeLSBL) - (volumeMSBL) - 0x0D;
+
+            String FinalrCrc = Long.toHexString(crc).substring(14, 16);
+
+            byte[] uartout = new byte[]{
+                (byte) 0x7E, (byte) 0x00, (byte) 0x14, (byte) 0x10, (byte) 0x01,
+                (byte) (Long.parseLong(bico.getEndereco().substring(0, 2), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(2, 4), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(4, 6), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(6, 8), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(8, 10), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(10, 12), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(12, 14), 16)), (byte) (Long.parseLong(bico.getEndereco().substring(14, 16), 16)),
+                (byte) 0xFF, (byte) 0xFE, (byte) 0x00, (byte) 0x00, (byte) 0x57, (byte) 0x4D, (byte) 0x01,
+                (byte) volumeLSBL, (byte) volumeMSBL, (byte) 0x0D, (byte) crc};
+            try {
+                saida.write(uartout);
+                new FXDialog(FXDialog.Type.INFO, "Enviado para a placa").showDialog();
+                Thread.sleep(1000);
+
+            } catch (IOException ex) {
+                System.out.println("erro");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            serialPort.close();
+        }
+        if (!portFound) {
+            serialPort.close();
+        }
+    }
+
+    private void salvarFatorBanco(long i) {
+        ezattaBico.setFatorescala(String.valueOf(i));
+        bicoCtr.updateBico(ezattaBico);
+    }
+
+    @FXML
+    private TextField txtVolumeInformado;
+
+    @FXML
+    void calcularCalibrar(ActionEvent event) throws InterruptedException, IOException {
+
+        //validar
+        String enviar = txtVolumeInformado.getText();
+        //substitui a virgula por ponto
+        if (enviar.contains(",")) {
+            enviar = enviar.replace(",", ".");
+        }
+
+        double vol = Double.parseDouble(enviar);
+        double fator = 100 * vol / 4;
+        fator = Math.ceil(fator);
+
+        System.out.println("fator escala: " + fator);
+        setarFatorEscala((long) fator);
+        salvarFatorBanco((long) fator);
+
+        new FXDialog(FXDialog.Type.INFO, "Calibrado").showDialog();
+        Thread.sleep(1000);
+        tabTela.getSelectionModel().select(3);
+    }
+
 }
