@@ -88,19 +88,7 @@
                            <children>
                             <AnchorPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <AnchorPane prefHeight="30.0" style="-fx-background-color: lightgray;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                       <effect>
-                                          <DropShadow />
-                                       </effect>
-                                       <children>
-                                          <Text layoutX="24.0" layoutY="21.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Adicionar / Alterar / Excluir">
-                                             <font>
-                                                <Font name="System Bold" size="14.0" />
-                                             </font>
-                                          </Text>
-                                       </children>
-                                    </AnchorPane>
-                                    <GridPane prefHeight="192.0" prefWidth="427.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="32.0">
+                                    <GridPane prefHeight="192.0" prefWidth="427.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0">
                                        <children>
                                           <Label text="Nome" GridPane.rowIndex="1" />
                                           <Label text="Endereço" GridPane.rowIndex="2" />
@@ -173,7 +161,7 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: lightgray;">
                            <children>
-                              <Button fx:id="btnEnviarQuatroLitros1" minHeight="30.0" mnemonicParsing="false" onAction="#enviarQuatroLitros" text="Enviar 4 litros para o ponto de abastecimento \n Verifique a quantidade envasada." AnchorPane.leftAnchor="6.0" AnchorPane.topAnchor="6.0">
+                              <Button fx:id="btnEnviarQuatroLitros1" minHeight="30.0" mnemonicParsing="false" onAction="#enviarQuatroLitrosFinais" text="Enviar 4 litros para o ponto de abastecimento \n Verifique a quantidade envasada." AnchorPane.leftAnchor="6.0" AnchorPane.topAnchor="6.0">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
