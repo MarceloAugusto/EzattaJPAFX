@@ -502,7 +502,8 @@ public class FatorEscalaController implements Initializable {
         }
 
         double vol = Double.parseDouble(enviar);
-        double fator = 100 * vol / 4;
+        //double fator = 100 * vol / 4;
+        double fator = 400/vol;
         fator = Math.ceil(fator);
 
         System.out.println("fator escala: " + fator);

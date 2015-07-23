@@ -187,7 +187,7 @@ public class LoginController implements Initializable {
         System.out.println("Fechou");
         JPAUtil.closeManager(JPAUtil.getEntityManager());
 
-        //fechar aplica;'ao
+        //fechar aplicaçao
         Platform.exit();
         System.exit(0);
         EzattaMain.stage.close();
@@ -219,8 +219,22 @@ public class LoginController implements Initializable {
                     } catch (PortInUseException e) {
                         System.out.println("Port in use.");
                         serialPort.close();
-                        continue;
-//mensagem avisando que a porta esta em uso                        
+                        new FXDialog(FXDialog.Type.ERROR, "Porta serial COM4 em uso...").showDialog();
+                        //continue;
+                        //------------------------------rever
+                        System.out.println("port " + defaultPort + " not found.");
+                        serialPort.close();
+                        System.out.println("Porta fechada...");
+
+                        //fechar conexao
+                        System.out.println("Fechou");
+                        JPAUtil.closeManager(JPAUtil.getEntityManager());
+
+                        //fechar aplicaçao
+                        Platform.exit();
+                        System.exit(0);
+                        EzattaMain.stage.close();
+                        //mensagem avisando que a porta esta em uso                        
                     }
                     //Abre a porta para utilizar-la
                     try {
