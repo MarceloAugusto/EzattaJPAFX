@@ -17,4 +17,15 @@
       <property name="hibernate.hbm2ddl.auto" value="update"/>
     </properties>
   </persistence-unit>
+  <persistence-unit name="EzattaH2DBJPAFXPUMysql" transaction-type="RESOURCE_LOCAL">
+    <provider>org.hibernate.ejb.HibernatePersistence</provider>
+    <class>br.com.ezatta.chamado.model.ChaChamado</class>
+    <properties>
+      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://mysql03.redehost.com.br:41890/ezatta?zeroDateTimeBehavior=convertToNull"/>
+      <property name="javax.persistence.jdbc.user" value="ezatta1"/>
+      <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+      <property name="javax.persistence.jdbc.password" value="Uberaba@123"/>
+      <property name="hibernate.cache.provider_class" value="org.hibernate.cache.NoCacheProvider"/>
+    </properties>
+  </persistence-unit>
 </persistence>

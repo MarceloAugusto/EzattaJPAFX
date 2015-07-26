@@ -1,11 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.web.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.ezatta.view.AjudaSuporteController">
-    
+<AnchorPane id="AnchorPane" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="br.com.ezatta.controller.AjudaSuporteController">
+     <children>
+      <BorderPane layoutX="10.0" layoutY="10.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <top>
+            <AnchorPane prefHeight="31.0" style="-fx-background-color: lightgray;">
+               <effect>
+                  <DropShadow />
+               </effect>
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Ajuda &gt; Chamado" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="36.0" AnchorPane.topAnchor="5.0">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </Text>
+                  <ImageView fitHeight="21.0" fitWidth="21.0" layoutX="-86.0" layoutY="-61.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="3.0" AnchorPane.topAnchor="3.0">
+                     <image>
+                        <Image url="@images/Tools.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </AnchorPane>
+         </top>
+         <center>
+            <TabPane fx:id="tabTela" prefWidth="500.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+               <tabs>
+                  <Tab fx:id="tabConsulta" text="Entre em contato">
+                     <content>
+                        <AnchorPane prefHeight="425.0" prefWidth="800.0" style="-fx-background-color: lightgray;" />
+                     </content>
+                  </Tab>
+                  <Tab fx:id="tabCadastro" text="Abrir Chamado">
+                     <content>
+                        <AnchorPane style="-fx-background-color: lightgray;">
+                           <children>
+                              <HTMLEditor htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;Descreva a situação&lt;/body&gt;&lt;/html&gt;" layoutX="14.0" layoutY="14.0" prefHeight="392.0" prefWidth="652.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="6.0" AnchorPane.topAnchor="45.0" />
+                              <Text layoutX="14.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Assunto:" />
+                              <TextField layoutX="80.0" layoutY="9.0" prefHeight="25.0" prefWidth="464.0" promptText="Informe o assunto do chamado" />
+                              <Button layoutX="731.0" layoutY="438.0" mnemonicParsing="false" text="Abrir chamado" AnchorPane.bottomAnchor="4.0" AnchorPane.rightAnchor="6.0" />
+                           </children>
+                        </AnchorPane>
+                     </content>
+                  </Tab>
+               </tabs>
+               <BorderPane.margin>
+                  <Insets />
+               </BorderPane.margin>
+            </TabPane>
+         </center>
+      </BorderPane>
+   </children>
 </AnchorPane>

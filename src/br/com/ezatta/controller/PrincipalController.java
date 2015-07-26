@@ -650,10 +650,10 @@ public class PrincipalController implements Initializable {
                     //total
                     double volTotal = volumeTotal[idEstoqueTh]; //Total
 
-                    System.out.println("volTotal: " + volTotal + " - volEfetivo: " + volEfetivo );
+                    System.out.println("volTotal: " + volTotal + " - volEfetivo: " + volEfetivo);
                     //progressBar[idEstoqueTh].setProgress(porcentagem);
                     progressBarEstoque[idEstoqueTh].setProgress(volEfetivo / volTotal);
-                }catch (IndexOutOfBoundsException | NumberFormatException e) {
+                } catch (IndexOutOfBoundsException | NumberFormatException e) {
                     System.out.println("saber como validar");
                     //e.printStackTrace();
                 }
@@ -932,9 +932,12 @@ public class PrincipalController implements Initializable {
 
     @FXML
     void fechar(ActionEvent event) {
-        //fechar conex'ao
-        System.out.println("Fechou");
+        //fechar conex'ao H2DB
+        System.out.println("Fechou H2DB");
         JPAUtil.closeManager(JPAUtil.getEntityManager());
+        //fechar conexao Mysql
+//        System.out.println("Fechou Mysql");
+//        JPAUtilChamado.closeManager(JPAUtilChamado.getEntityManager());
         //fecha aporta
         System.out.println("port " + defaultPort + " not found.");
         serialPort.close();
@@ -994,14 +997,14 @@ public class PrincipalController implements Initializable {
     void ajuda(ActionEvent event) {
         try {
             stack.getChildren().clear();
-            stack.getChildren().add(getNode("/br/com/ezatta/view/AjudaSuporte.fxml"));
+            stack.getChildren().add(getNode("/br/com/ezatta/view/AjudaChamado.fxml"));
         } catch (Exception e) {
-            new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
+            new FXDialog(FXDialog.Type.ERROR, "É necessário estar conectado a internet \nTentar novamente").showDialog();
             System.out.println("Erro ao carregar a tela de bicos");
             e.printStackTrace();
         }
     }
-    
+
     @FXML
     void cadUsuario(ActionEvent event) {
         try {
@@ -1100,8 +1103,10 @@ public class PrincipalController implements Initializable {
     }
 
     void start(Stage stage) throws IOException {
+
         Parent parent = FXMLLoader.load(getClass().getResource("Principal.fxml"));
         Scene scene = new Scene(parent);
+        
         //icone
         Image icon = new Image(getClass().getResourceAsStream("icone.png"));
         stage.getIcons().add(icon);
@@ -1115,6 +1120,7 @@ public class PrincipalController implements Initializable {
         stage.setHeight(bounds.getHeight());
         stage.setScene(scene);
         stage.show();
+        
 
     }
 

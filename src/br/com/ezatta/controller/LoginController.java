@@ -25,8 +25,6 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -195,9 +193,13 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // inicializa o Hibernate
+        // inicializa o Hibernate H2DB
         EntityManager manager = JPAUtil.getEntityManager();
         manager.clear();
+        
+        //inicializar Hibernate Mysql
+//        EntityManager managerMysql = JPAUtilChamado.getEntityManager();
+//        managerMysql.clear();
 
         // abre porta serial 
         //defaultPort = "COM4";
@@ -226,9 +228,13 @@ public class LoginController implements Initializable {
                         serialPort.close();
                         System.out.println("Porta fechada...");
 
-                        //fechar conexao
-                        System.out.println("Fechou");
+                        //fechar conexao H2DB
+                        System.out.println("Fechou H2DB");
                         JPAUtil.closeManager(JPAUtil.getEntityManager());
+                        
+                        //fechar conexao Mysql
+//                        System.out.println("Fechou Mysql");
+//                        JPAUtilChamado.closeManager(JPAUtilChamado.getEntityManager());
 
                         //fechar aplicaçao
                         Platform.exit();
