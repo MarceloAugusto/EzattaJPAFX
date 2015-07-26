@@ -5,19 +5,27 @@
  */
 package br.com.ezatta.controller;
 
+import br.com.ezatta.mail.TesteEmail;
+import br.com.ezatta.view.FXDialog;
 import java.net.URL;
+import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.web.HTMLEditor;
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 /**
  * FXML Controller class
@@ -27,92 +35,55 @@ import javafx.scene.control.ToggleGroup;
 public class AjudaSuporteController implements Initializable {
 
     @FXML
-    private Tab tabConsulta;
+    private TextField txtEmail;
 
     @FXML
-    private TextField txtQuantidade;
+    private HTMLEditor txtMensagem;
 
     @FXML
-    private ComboBox<?> cbCor;
+    private TextField txtTitulo;
 
     @FXML
-    private TextField txtNome;
+    void envarMensagem(ActionEvent event) throws MessagingException {
+        final String username = "marceloaugusto16@gmail.com";
+        final String senha = "ObrigadoSenhor33";
 
-    @FXML
-    private Tab tabCadastro;
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
 
-    @FXML
-    private TextField txtMinimo;
+        Session session = Session.getInstance(props, new Authenticator() {
 
-    @FXML
-    private TextField qtdRedefinir;
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, senha); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
 
-    @FXML
-    private TextField txtBuscar;
+        Message message = new MimeMessage(session);
+        try {
+            message.setFrom(new InternetAddress("marceloaugusto16@gmail.com"));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("marceloaugusto16@gmail.com"));
+            message.setSubject(txtTitulo.getText());
+            message.setContent(txtMensagem.getHtmlText(), "text/html");
+            //message.setText(txtMensagem.getHtmlText().concat(txtEmail.getText()));
+            Transport.send(message);
+            
+            new FXDialog(FXDialog.Type.INFO, "Mensagem enviada com sucesso").showDialog();
+            txtEmail.setText("");
+            txtTitulo.setText("");
+            txtMensagem.setHtmlText("Obrigado por entrar em contato. <br> Em breve retornaremos <br><br><hr> Att. Ezatta Equipamentos");
 
-    @FXML
-    private Button btnRedefinirConsulta;
-
-    @FXML
-    private TableView<?> tb;
-
-    @FXML
-    private TextField txtId;
-
-    @FXML
-    private Button btnImprimirRegistros;
-
-    @FXML
-    private RadioButton rbNome;
-
-    @FXML
-    private ToggleGroup buscarPor;
-
-    @FXML
-    private ComboBox<?> cbEmpresa;
-
-    @FXML
-    private TabPane tabTela;
-
-    @FXML
-    private Button btnBuscar;
-
-    @FXML
-    private TextField txtEstoqueMaximo;
-
-    @FXML
-    void btnBuscar(ActionEvent event) {
-
+        } catch (AddressException ex) {
+            Logger.getLogger(TesteEmail.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    @FXML
-    void btnImprimir(ActionEvent event) {
-
-    }
-
-    @FXML
-    void redefinirConsulta(ActionEvent event) {
-
-    }
-
-    @FXML
-    void adicionarTanque(ActionEvent event) {
-
-    }
-
-    @FXML
-    void removerTanque(ActionEvent event) {
-
-    }
-
-    @FXML
-    void vazioTanque(ActionEvent event) {
-
-    }
-    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-    }    
-    
+    }
+
 }

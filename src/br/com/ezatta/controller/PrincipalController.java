@@ -11,6 +11,7 @@ import br.com.ezatta.dao.BicosDAO;
 import br.com.ezatta.dao.EstoqueDAO;
 import br.com.ezatta.dao.OperadorDAO;
 import br.com.ezatta.dao.ProdutoDAO;
+import br.com.ezatta.mail.TesteEmail;
 import br.com.ezatta.model.EzattaBico;
 import br.com.ezatta.model.EzattaEstoque;
 import br.com.ezatta.model.EzattaOperador;
@@ -27,6 +28,7 @@ import java.math.RoundingMode;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,6 +70,15 @@ import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 /**
  * FXML Controller class
@@ -1047,6 +1058,18 @@ public class PrincipalController implements Initializable {
     }
 
     @FXML
+    void suporte(ActionEvent event) {
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/AjudaSuporte.fxml"));
+        } catch (Exception e) {
+            new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
+            System.out.println("Erro ao carregar a tela de bicos");
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
     void envase(ActionEvent event) {
         //---------------------------------------------------fim
         limpar();
@@ -1065,8 +1088,8 @@ public class PrincipalController implements Initializable {
     }
 
     @FXML
-    void cancelamento(ActionEvent event) {
-
+    void cancelamento(ActionEvent event){
+        
     }
 
     public PrincipalController() {
@@ -1106,7 +1129,7 @@ public class PrincipalController implements Initializable {
 
         Parent parent = FXMLLoader.load(getClass().getResource("Principal.fxml"));
         Scene scene = new Scene(parent);
-        
+
         //icone
         Image icon = new Image(getClass().getResourceAsStream("icone.png"));
         stage.getIcons().add(icon);
@@ -1120,7 +1143,6 @@ public class PrincipalController implements Initializable {
         stage.setHeight(bounds.getHeight());
         stage.setScene(scene);
         stage.show();
-        
 
     }
 
@@ -1461,4 +1483,5 @@ public class PrincipalController implements Initializable {
             }
         });
     }
+
 }
