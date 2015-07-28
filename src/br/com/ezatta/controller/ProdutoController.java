@@ -10,13 +10,18 @@ import br.com.ezatta.dao.ProdutoDAO;
 import br.com.ezatta.model.EzattaEmpresa;
 import br.com.ezatta.model.EzattaProduto;
 import br.com.ezatta.util.GenericTable;
+import br.com.ezatta.util.JPAUtil;
 import br.com.ezatta.util.ValidationFields;
 import br.com.ezatta.view.FXDialog;
 import br.com.ezatta.view.FXDialog.Type;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -33,6 +38,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javax.persistence.EntityManager;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
+import org.hibernate.Session;
 
 /**
  * FXML Controller class
@@ -206,7 +217,23 @@ public class ProdutoController implements Initializable {
 
     @FXML
     void btnImprimir(ActionEvent event) {
-
+        String path = JPAUtil.getConfRelatorio();
+        EntityManager em = new JPAUtil().getEntityManager();
+        em.getTransaction().begin();
+        Session hibernateSession = em.unwrap(Session.class);
+        hibernateSession.doWork(new org.hibernate.jdbc.Work() {
+            @Override
+            public void execute(Connection con) throws SQLException {
+                try {
+                    HashMap map = new HashMap();
+                    JasperPrint rel = JasperFillManager.fillReport(path + "Produto.jasper", map, con);
+                    JasperViewer jrviewer = new JasperViewer(rel, false);
+                    jrviewer.show();
+                } catch (JRException ex) {
+                    Logger.getLogger(RelatorioController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
     }
 
     @FXML
@@ -298,8 +325,8 @@ public class ProdutoController implements Initializable {
                     setOperacao(1);
                     setEzattaProduto(tb.getSelectionModel().getSelectedItem());
                     SetValoresComponentes(getEzattaProduto());
-                    
-                    if(txtQuantidade.getText() != "" || txtQuantidade.getText() != null ){
+
+                    if (txtQuantidade.getText() != "" || txtQuantidade.getText() != null) {
                         txtQuantidade.setDisable(true);
                     }
                 }
