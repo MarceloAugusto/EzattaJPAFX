@@ -32,16 +32,9 @@
                   </items>
                 </Menu>
                   <Menu mnemonicParsing="false" text="Relatorios">
-                    <items>
-                      <MenuItem fx:id="miRGeral" mnemonicParsing="false" text="Geral" />
-                        <MenuItem fx:id="miRProduto" mnemonicParsing="false" text="Produto" />
-                        <MenuItem fx:id="miRBico" mnemonicParsing="false" text="Bico" />
-                        <MenuItem fx:id="miRPlaca" mnemonicParsing="false" text="Placa" />
-                        <MenuItem fx:id="miRAplicador" mnemonicParsing="false" text="Aplicador" />
-                        <MenuItem fx:id="miRLiberabor" mnemonicParsing="false" text="Liberador" />
-                        <MenuItem fx:id="miRLog" mnemonicParsing="false" text="Logs" />
-                    </items>
-                  </Menu>
+                     <items>
+                        <MenuItem mnemonicParsing="false" onAction="#gerarRelatorio" text="Gerar Relatorios" />
+                     </items></Menu>
                   <Menu mnemonicParsing="false" text="Configuraçao">
                     <items>
                         <MenuItem fx:id="miBackUp" mnemonicParsing="false" onAction="#backup" text="Back up" />

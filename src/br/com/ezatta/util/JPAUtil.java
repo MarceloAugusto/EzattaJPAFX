@@ -40,4 +40,9 @@ public class JPAUtil {
         prop.put("hibernate.connection.url", "jdbc:h2:" + rais);
         return prop;
     }
+    
+    public static String getConfRelatorio() {
+        String rais = Path.workingDir + "/relatorio/";
+        return rais;
+    }
 }

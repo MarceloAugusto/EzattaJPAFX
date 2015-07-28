@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.4.final using JasperReports Library version 6.0.4  -->
+<!-- 2015-07-28T11:21:13 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BarCode" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0f73327b-c85b-4ffb-93e7-67ad1051bbda">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
@@ -215,13 +217,13 @@ from
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="73" splitType="Stretch">
+		<band height="75" splitType="Stretch">
 			<rectangle>
 				<reportElement x="0" y="1" width="555" height="70" forecolor="#009933" backcolor="#009933" uuid="42f0d5ce-6de7-4511-b6a2-cbc3a2c2ae98"/>
 			</rectangle>
 			<image>
-				<reportElement x="3" y="3" width="235" height="64" uuid="adbfe7d4-5143-452f-ae91-f86493782f30"/>
-				<imageExpression><![CDATA["C:\\relatorio\\logo.png"]]></imageExpression>
+				<reportElement x="8" y="10" width="222" height="50" uuid="487e9c7d-9263-4676-b8c4-1d624ee479f7"/>
+				<imageExpression><![CDATA["logo.png"]]></imageExpression>
 			</image>
 		</band>
 	</title>

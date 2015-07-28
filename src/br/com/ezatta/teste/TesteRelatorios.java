@@ -6,7 +6,6 @@
 package br.com.ezatta.teste;
 
 import br.com.ezatta.model.EzattaEmpresa;
-import br.com.ezatta.relatorios.Relatorio;
 import br.com.ezatta.util.JPAUtil;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -22,11 +21,6 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 import org.hibernate.Session;
 
-//import org.hibernate.Session;
-//import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
-//import org.hibernate.engine.spi.SessionFactoryImplementor;
-//import org.hibernate.connection.ConnectionProvider;
-//import org.hibernate.engine.SessionFactoryImplementor;
 /**
  *
  * @author marcelo
@@ -38,7 +32,7 @@ public class TesteRelatorios {
      */
     public static void main(String[] args) {
 
-        String path = "/home/marcelo/relatorios/";
+        String path = JPAUtil.getConfRelatorio();
 
         JasperPrint relat;
 
