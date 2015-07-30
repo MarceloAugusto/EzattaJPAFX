@@ -5,6 +5,8 @@
  */
 package br.com.ezatta.controller;
 
+import br.com.ezatta.backup.Backup;
+import br.com.ezatta.backup.dao.BackupDao;
 import br.com.ezatta.dao.EmpresaDAO;
 import br.com.ezatta.dao.UsuarioDAO;
 import br.com.ezatta.model.EzattaEmpresa;
@@ -18,13 +20,18 @@ import br.com.ezatta.view.FormFX;
 import gnu.io.PortInUseException;
 import gnu.io.UnsupportedCommOperationException;
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -193,18 +200,18 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+
         // inicializa o Hibernate H2DB
         EntityManager manager = JPAUtil.getEntityManager();
         manager.clear();
-        
+
         //inicializar Hibernate Mysql
 //        EntityManager managerMysql = JPAUtilChamado.getEntityManager();
 //        managerMysql.clear();
-
         // abre porta serial 
         //defaultPort = "COM4";
         defaultPort = "/dev/ttyACM0";
-        System.out.println("Abrindo porta serial ttyACM0");
+        System.out.println("Abrindo porta serial: " + defaultPort);
 
         portList = gnu.io.CommPortIdentifier.getPortIdentifiers();
         while (portList.hasMoreElements()) {
@@ -231,11 +238,10 @@ public class LoginController implements Initializable {
                         //fechar conexao H2DB
                         System.out.println("Fechou H2DB");
                         JPAUtil.closeManager(JPAUtil.getEntityManager());
-                        
+
                         //fechar conexao Mysql
 //                        System.out.println("Fechou Mysql");
 //                        JPAUtilChamado.closeManager(JPAUtilChamado.getEntityManager());
-
                         //fechar aplicaçao
                         Platform.exit();
                         System.exit(0);
@@ -281,6 +287,30 @@ public class LoginController implements Initializable {
         /*---------------------------------------inicio thread leitura da porta--------------------------------------*/
 
         //new Thread(task).start();
+        //------------------------------------------------inicio bkp--------------------------------------------------
+        try {
+            try {
+                BackupDao bkpDao = new BackupDao();
+                if (bkpDao.getValueBackup() > 0) {//add
+                    Backup bkp = new Backup();
+                    bkp = bkpDao.getBackup(1);
+                    if (bkp.isBkp()) {
+                        System.out.println(": " + bkp.isBkp());
+                        //aqui fazer bkp
+                        //criar diretorio kkp
+                        
+                        System.out.println("bkp: " + bkp.getData());
+                    } else {
+                        System.out.println(": " + bkp.isBkp());
+                    }
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (NullPointerException ex) {
+            Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        //------------------------------------------------fim bkp-----------------------------------------------------
     }
 
 //    //thread leitura porta serial-----------------------------------------------------------------------

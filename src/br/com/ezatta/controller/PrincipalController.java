@@ -1016,7 +1016,14 @@ public class PrincipalController implements Initializable {
 
     @FXML
     void backup(ActionEvent event) {
-
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/BackUp.fxml"));
+        } catch (Exception e) {
+            new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
+            System.out.println("Erro ao carregar a tela de backup");
+            e.printStackTrace();
+        }
     }
 
     @FXML

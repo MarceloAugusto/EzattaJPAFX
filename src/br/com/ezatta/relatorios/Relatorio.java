@@ -22,10 +22,12 @@ public class Relatorio {
     private JasperPrint rel = null;
 
     public Relatorio() {
+        
     }
 
     public void gerar() throws SQLException {
         String path = JPAUtil.getConfRelatorio();
+        System.out.println("End relat: "+path);
         EntityManager em = new JPAUtil().getEntityManager();
         em.getTransaction().begin();
         Session hibernateSession = em.unwrap(Session.class);
