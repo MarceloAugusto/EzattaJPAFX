@@ -6,13 +6,17 @@
 package br.com.ezatta.controller;
 
 import br.com.ezatta.backup.Backup;
+import br.com.ezatta.backup.DatabaseBackup;
+import br.com.ezatta.backup.H2DatabaseBackup;
 import br.com.ezatta.backup.dao.BackupDao;
 import br.com.ezatta.dao.EmpresaDAO;
 import br.com.ezatta.dao.UsuarioDAO;
+import br.com.ezatta.mail.TesteEmail;
 import br.com.ezatta.model.EzattaEmpresa;
 import br.com.ezatta.model.EzattaProduto;
 import br.com.ezatta.model.EzattaUsuario;
 import br.com.ezatta.util.JPAUtil;
+import br.com.ezatta.util.Path;
 import br.com.ezatta.view.EzattaMain;
 import br.com.ezatta.view.FXDialog;
 import br.com.ezatta.view.FXDialog.Type;
@@ -25,10 +29,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,8 +52,25 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.Authenticator;
+import javax.mail.BodyPart;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.persistence.EntityManager;
+import org.hibernate.Session;
 
 /**
  * FXML Controller class
@@ -96,6 +125,15 @@ public class LoginController implements Initializable {
     public static int tipoBaixa = 0;
     public static boolean enchendoo;
     /*-----------------------fim vars envio java com------------------------------------------*/
+
+    /*-----------------------------inicio bkp---------------------------------------*/
+    FileChooser fileChooser = new FileChooser();
+    DatabaseBackup backup = new H2DatabaseBackup();
+    Calendar cal = Calendar.getInstance();
+    String nome;
+    private Connection conn;
+    String rais = Path.workingDir + "/bkp/";
+    /*---------------------------------fim bkp--------------------------------------*/
 
     PrincipalController principal = new PrincipalController();
     //public static EzattaEmpresa ezattaEmpresaStatic = new EzattaEmpresa();
@@ -179,6 +217,97 @@ public class LoginController implements Initializable {
 //                new FXDialog(FXDialog.Type.WARNING, "Login/Senha Inválidos!!!").showDialog();
 //                return;
 //            }
+        //------------------------------------------------inicio bkp--------------------------------------------------
+        try {
+            try {
+                BackupDao bkpDao = new BackupDao();
+                if (bkpDao.getValueBackup() > 0) {//add
+                    Backup bkp = new Backup();
+                    bkp = bkpDao.getBackup(1);
+                    if (bkp.isBkp()) {
+                        //nome do arquivo / data atual
+                        String dataAtual = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE);
+                        System.out.println("dataAtual: " + dataAtual);
+                        //listar arquivos
+
+                        File diretorio = new File(rais);
+                        File fList[] = diretorio.listFiles();
+                        int numeroArquivos = diretorio.listFiles().length;
+
+                        System.out.println("Numero de arquivos no diretorio : " + numeroArquivos);
+
+                        Arrays.sort(fList, new Comparator<File>() {
+                            public int compare(File f1, File f2) {
+                                return Long.compare(f1.lastModified(), f2.lastModified());
+                            }
+                        });
+
+                        //verifico quantidade e removo o ultimo
+                        boolean pegar = false;
+                        if (numeroArquivos >= 30) {
+                            pegar = true;
+                        }
+
+                        //lista diretorio e remove se tiver mais que 30 arquivos
+                        boolean verificaarquivo = false;
+                        for (int i = 0; i < fList.length; i++) {
+                            //verifica se tem mais de 30 itens
+                            if (pegar) {
+                                fList[i].delete();
+                                pegar = false;
+                            }
+
+                            Date d = new Date(fList[i].lastModified());
+                            Calendar calendar = dateToCalendar(d);
+                            System.out.println("---------------------------------------------------------------");
+                            String dataArquivo = calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE);
+                            System.out.println(fList[i].getName() + " - " + dataArquivo);
+
+                            //verifica a data se é igual 
+                            String nomeArquivo = fList[i].getName();
+                            String s[] = nomeArquivo.split("\\.");
+                            System.out.println("nome arquivo sem . " + s[0]);
+
+                            Calendar calAtual = Calendar.getInstance();
+                            String dataAtuals = calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE);
+                            if (s[0].equals(dataAtuals)) {
+                                System.out.println("Não enviar email e não fazer bkp");
+                                verificaarquivo = false;
+                            } else {
+                                System.out.println("Enviar email e fazer bkp");
+                                verificaarquivo = true;
+                            }
+
+                        }
+                        if (verificaarquivo) {
+                            fazerBkp();
+                        }
+                        //------------------------------------------------------------
+
+                    } else {
+                        System.out.println(": " + bkp.isBkp());
+                    }
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (NullPointerException ex) {
+            Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        //------------------------------------------------fim bkp-----------------------------------------------------
+    }
+
+    private Calendar dateToCalendar(Date date) {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar;
+
+    }
+
+    //Convert Calendar to Date
+    private Date calendarToDate(Calendar calendar) {
+        return calendar.getTime();
     }
 
     @FXML
@@ -205,9 +334,6 @@ public class LoginController implements Initializable {
         EntityManager manager = JPAUtil.getEntityManager();
         manager.clear();
 
-        //inicializar Hibernate Mysql
-//        EntityManager managerMysql = JPAUtilChamado.getEntityManager();
-//        managerMysql.clear();
         // abre porta serial 
         //defaultPort = "COM4";
         defaultPort = "/dev/ttyACM0";
@@ -287,148 +413,108 @@ public class LoginController implements Initializable {
         /*---------------------------------------inicio thread leitura da porta--------------------------------------*/
 
         //new Thread(task).start();
-        //------------------------------------------------inicio bkp--------------------------------------------------
-        try {
-            try {
-                BackupDao bkpDao = new BackupDao();
-                if (bkpDao.getValueBackup() > 0) {//add
-                    Backup bkp = new Backup();
-                    bkp = bkpDao.getBackup(1);
-                    if (bkp.isBkp()) {
-                        System.out.println(": " + bkp.isBkp());
-                        //aqui fazer bkp
-                        //criar diretorio kkp
-                        
-                        System.out.println("bkp: " + bkp.getData());
-                    } else {
-                        System.out.println(": " + bkp.isBkp());
-                    }
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } catch (NullPointerException ex) {
-            Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        //------------------------------------------------fim bkp-----------------------------------------------------
     }
 
-//    //thread leitura porta serial-----------------------------------------------------------------------
-//    Task task = new Task<Void>() {
-//        @Override
-//        public void run() {
-//            try {
-////inicio-----------------------------------------------------------------------
-//                boolean liberado = true;
-//                long numBytes = 0;
-//                byte[] readBuffer = new byte[1000];
-//                byte[] auxBuffer = new byte[1000];
-//
-//                while (execucaoWhile) {
-//                    entrada = null;
-//                    entrada = serialPort.getInputStream();
-//
-//                    //joga fora primeiras menssagens de outros pedidos    
-//                    if (entrada.available() > 0) {
-//                        entrada.read(readBuffer);
-//                    }
-//
-//                    int timeout = 0;
-//                    numBytes = 0;
-//                    while (numBytes < 24) {
-//                        while (entrada.available() > 0) {
-//                            numBytes = numBytes + entrada.read(readBuffer, (int) numBytes, 1);//recebe os bytes na leitura.
-//                            timeout = 0;
-//                        }
-//
-//                        Thread.sleep(1);
-//
-//                        timeout++;
-//                        if (timeout > 25) {
-//                            numBytes = 0;
-//                            timeout = 0;
-//                        }
-//                        if (numBytes > 0) {
-//                            System.out.println("numBytes: " + numBytes);
-//
-//                        }
-//                    }
-//
-//                    int contAux = 0;
-//                    String strCompleta = String.format("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x", readBuffer[0], readBuffer[1], readBuffer[2], readBuffer[3], readBuffer[4], readBuffer[5], readBuffer[6], readBuffer[7], readBuffer[8], readBuffer[9], readBuffer[10], readBuffer[11], readBuffer[12], readBuffer[13], readBuffer[14], readBuffer[15], readBuffer[16], readBuffer[17], readBuffer[18], readBuffer[19], readBuffer[20], readBuffer[21], readBuffer[22], readBuffer[23], readBuffer[24]);
-//                    System.out.println("string completa: " + strCompleta);
-//                    if (liberado || (readBuffer[15 + contAux] == (byte) 0x4C)) {
-//                        String volumeTratado = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[15 + contAux], readBuffer[16 + contAux], readBuffer[17 + contAux], readBuffer[18 + contAux], readBuffer[19 + contAux], readBuffer[20 + contAux], readBuffer[21 + contAux], readBuffer[22 + contAux]);
-//                        System.out.println("Liberado: " + volumeTratado);
-//                        //setTxtStatus("LIBERADO");
-//                        //txtStatus = "LIBERADO";
-//                        //txtStatus.setText("LIBERADO");
-//                        new FXDialog(FXDialog.Type.INFO, "Liberado!").showDialog();
-//                        liberado = false;
-//                    }
-//                    if (readBuffer[15 + contAux] == (byte) 0x56) {//ENCHENDO
-//                        String volumeTratado = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[15 + contAux], readBuffer[16 + contAux], readBuffer[17 + contAux], readBuffer[18 + contAux], readBuffer[19 + contAux], readBuffer[20 + contAux], readBuffer[21 + contAux], readBuffer[22 + contAux]);
-//                        outputBfj = new StringBuilder();
-//                        for (int ij = 0; ij < volumeTratado.length(); ij += 2) {
-//                            String strj = volumeTratado.substring(ij, ij + 2);
-//                            outputBfj.append((char) Integer.parseInt(strj, 16));
-//                        }
-//                        if (outputBfj.length() > 5) {
-//                            try {
-//                                txtBicoUm.setText(outputBfj.toString());
-//                                //setTxtStatus("APLICANDO");
-//                                new FXDialog(FXDialog.Type.INFO, "Aplicando!").showDialog();
-//                                System.out.println("outputBfj.toString(): " + outputBfj.toString());
-//                                outputBfj.delete(0, outputBfj.length());
-//                            } catch (NullPointerException e) {
-//                                System.out.println("nullpointer");
-//                            }
-//                        } else {
-//                            outputBfj.delete(0, outputBfj.length());
-//                        }
-//                    }
-//                    if (readBuffer[15 + contAux] == (byte) 0x46) {
-//                        try {
-//                            String volumeTratado = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[15 + contAux], readBuffer[16 + contAux], readBuffer[17 + contAux], readBuffer[18 + contAux], readBuffer[19 + contAux], readBuffer[20 + contAux], readBuffer[21 + contAux], readBuffer[22 + contAux]);
-//                            System.out.println("FIM: " + volumeTratado);
-//                            txtBicoUm.setText("FIM");
-//                            new FXDialog(FXDialog.Type.INFO, "FIM!").showDialog();
-//                            //setTxtEfetivo("VOL " + txtVolume.getText());
-//                            execucaoWhile = false;
-//                            outputBfj.delete(0, outputBfj.length());
-//                        } catch (NullPointerException e) {
-//                            System.out.println("nullpointer");
-//                        }
-//                    }
-//
-//                    if (readBuffer[15 + contAux] == (byte) 0x50) {
-//                        try {
-//                            String volumeTratado = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[15], readBuffer[16], readBuffer[17], readBuffer[18], readBuffer[19], readBuffer[20], readBuffer[21], readBuffer[22]);
-//                            txtBicoUm.setText("PARADO");
-//                            new FXDialog(FXDialog.Type.INFO, "Parado!").showDialog();
-//                            //setTxtEfetivo("VOL " + txtVolume.getText());
-//                            execucaoWhile = false;
-//                            outputBfj.delete(0, outputBfj.length());
-//                        } catch (NullPointerException e) {
-//                            System.out.println("nullpointer");
-//                        }
-//                    }
-//                }
-//            } catch (InterruptedException ex) {
-//                System.out.println("InterruptedException");
-//            } catch (IOException ex) {
-//                System.out.println("IOException");
-//            } catch (java.lang.NullPointerException e) {
-//                System.out.println("NullPointerException: ");
-//                e.printStackTrace();
-//            }
-////fim------------------------------------------------------------------------------
-//        }
-//
-//        @Override
-//
-//        protected Void call() throws Exception {
-//            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//        }
-//    };
+    private void fazerBkp() {
+
+        File diretorio = new File(rais); // ajfilho é uma pasta!  
+        if (!diretorio.exists()) {
+            diretorio.mkdirs(); //mkdir() cria somente um diretório, mkdirs() cria diretórios e subdiretórios.  
+            System.out.println("criou");
+        } else {
+            System.out.println("Diretório já existente");
+        }
+
+        //Set extension filter
+        fileChooser.setTitle("Save backup");
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("ZIPpd backups", "*.zip");
+        fileChooser.setInitialDirectory(diretorio);
+        fileChooser.setInitialFileName(cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE) + ".zip");
+        fileChooser.getExtensionFilters().add(extFilter);
+        nome = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE) + ".zip";
+        File file = new File(rais, nome);
+
+        EntityManager em = new JPAUtil().getEntityManager();
+        em.getTransaction().begin();
+        Session hibernateSession = em.unwrap(Session.class);
+        hibernateSession.doWork(new org.hibernate.jdbc.Work() {
+            @Override
+            public void execute(Connection con) throws SQLException {
+                conn = con;
+            }
+        });
+
+        if (file != null) {
+            try {
+                backup.backupDatabase(conn, file.getAbsolutePath());
+            } catch (Throwable t) {
+            }
+
+        }
+        try {
+            String endMoreName = rais.concat(nome);
+            enviarBkpEmail(endMoreName);
+        } catch (MessagingException ex) {
+            Logger.getLogger(BackUpController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void enviarBkpEmail(String nome) throws MessagingException {
+
+        final String username = "marceloaugusto16@gmail.com";
+        final String senha = "ObrigadoSenhor33";
+        String titulo = ezattaUsuarioStatic.getEmpresa().getNome();//nome da empresa
+        String dataCorpoMensagem = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE) + ".zip";
+        String mensagem = dataCorpoMensagem; // personalizar com a data
+        String endArquivoUpload = "";
+
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+
+        javax.mail.Session session = javax.mail.Session.getInstance(props, new Authenticator() {
+
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, senha); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
+
+        Message message = new MimeMessage(session);
+        try {
+            message.setFrom(new InternetAddress("marceloaugusto16@gmail.com"));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("marceloaugusto16@gmail.com"));
+            message.setSubject(titulo);
+            message.setContent(mensagem, "text/html");
+
+            //--------------------------inicio anexo------------------------------------------
+            BodyPart messageBodyPart = new MimeBodyPart();
+            messageBodyPart.setContent(mensagem, "text/html");
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(messageBodyPart);
+            messageBodyPart = new MimeBodyPart();
+
+            String filename = "";
+            //if (!endArquivoUpload.isEmpty()) {
+            System.out.println("Inicio envio email");
+            System.out.println("endereço arquvio: " + nome);
+            filename = nome;
+            DataSource source = new FileDataSource(filename);
+            messageBodyPart.setDataHandler(new DataHandler(source));
+            messageBodyPart.setFileName(filename);
+            multipart.addBodyPart(messageBodyPart);
+            message.setContent(multipart);
+            //}
+
+            Transport.send(message);
+            //----------------------------fim anexo-----------------------------------------
+
+            //new FXDialog(FXDialog.Type.INFO, "").showDialog();
+        } catch (AddressException ex) {
+            Logger.getLogger(TesteEmail.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
 }

@@ -231,6 +231,7 @@ public class PrincipalController implements Initializable {
 
     @FXML
     private AnchorPane anchorContainer;
+    
 
     public StackPane getStack() {
         return stack;

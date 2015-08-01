@@ -9,9 +9,12 @@ import br.com.ezatta.backup.Backup;
 import br.com.ezatta.backup.DatabaseBackup;
 import br.com.ezatta.backup.H2DatabaseBackup;
 import br.com.ezatta.backup.dao.BackupDao;
+import static br.com.ezatta.controller.LoginController.ezattaUsuarioStatic;
+import br.com.ezatta.mail.TesteEmail;
 import br.com.ezatta.util.JPAUtil;
 import br.com.ezatta.util.Path;
 import br.com.ezatta.view.EzattaMain;
+import br.com.ezatta.view.FXDialog;
 import java.io.File;
 import java.net.URL;
 import java.sql.Connection;
@@ -19,6 +22,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,6 +31,21 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.stage.FileChooser;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.Authenticator;
+import javax.mail.BodyPart;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.persistence.EntityManager;
 import org.hibernate.Session;
 
@@ -53,7 +72,7 @@ public class BackUpController implements Initializable {
         //Set extension filter
         fileChooser.setTitle("Save backup");
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("ZIPpd backups", "*.zip");
-        fileChooser.setInitialFileName("backup-" + cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE) + "-" + cal.get(Calendar.HOUR_OF_DAY) + cal.get(Calendar.MINUTE) + ".zip");
+        fileChooser.setInitialFileName(cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE) + "-" + cal.get(Calendar.HOUR_OF_DAY) + ".zip");
         fileChooser.getExtensionFilters().add(extFilter);
         //Show save file dialog
         File file = fileChooser.showSaveDialog(EzattaMain.stage);
@@ -115,6 +134,7 @@ public class BackUpController implements Initializable {
         System.out.println("atualizou " + chAtivar.selectedProperty().getValue());
 
     }
+    String nome;
 
     private void fazerBkp() {
         String rais = Path.workingDir + "/bkp/";
@@ -130,15 +150,10 @@ public class BackUpController implements Initializable {
         fileChooser.setTitle("Save backup");
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("ZIPpd backups", "*.zip");
         fileChooser.setInitialDirectory(diretorio);
-        fileChooser.setInitialFileName(cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE) + "-" + cal.get(Calendar.HOUR_OF_DAY) + ".zip");
+        fileChooser.setInitialFileName(cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE) + ".zip");
         fileChooser.getExtensionFilters().add(extFilter);
-        //Show save file dialog
-        String nome = "backup-" + cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE) + "-" + cal.get(Calendar.HOUR_OF_DAY) + cal.get(Calendar.MINUTE) + ".zip";
-        File file = new File(rais,nome);
-//        File file = fileChooser.showSaveDialog(EzattaMain.stage);
-        
-        //File file = new File(rais);
-        
+        nome = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE)  + ".zip";
+        File file = new File(rais, nome);
 
         EntityManager em = new JPAUtil().getEntityManager();
         em.getTransaction().begin();
@@ -156,6 +171,70 @@ public class BackUpController implements Initializable {
             } catch (Throwable t) {
             }
 
+        }
+        try {
+            String endMoreName = rais.concat(nome);
+            enviarBkpEmail(endMoreName);
+        } catch (MessagingException ex) {
+            Logger.getLogger(BackUpController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void enviarBkpEmail(String nome) throws MessagingException {
+        final String username = "marceloaugusto16@gmail.com";
+        final String senha = "ObrigadoSenhor33";
+        String titulo = ezattaUsuarioStatic.getEmpresa().getNome();//nome da empresa
+        String dataCorpoMensagem = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE) +".zip";
+        String mensagem = dataCorpoMensagem; // personalizar com a data
+        String endArquivoUpload = "";
+
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+
+        javax.mail.Session session = javax.mail.Session.getInstance(props, new Authenticator() {
+
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, senha); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
+
+        Message message = new MimeMessage(session);
+        try {
+            message.setFrom(new InternetAddress("marceloaugusto16@gmail.com"));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("marceloaugusto16@gmail.com"));
+            message.setSubject(titulo);
+            message.setContent(mensagem, "text/html");
+
+            //--------------------------inicio anexo------------------------------------------
+            BodyPart messageBodyPart = new MimeBodyPart();
+            messageBodyPart.setContent(mensagem, "text/html");
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(messageBodyPart);
+            messageBodyPart = new MimeBodyPart();
+
+            String filename = "";
+            //if (!endArquivoUpload.isEmpty()) {
+            System.out.println("Inicio envio email");
+            System.out.println("endereço arquvio: "+nome);
+            filename = nome;
+            DataSource source = new FileDataSource(filename);
+            messageBodyPart.setDataHandler(new DataHandler(source));
+            messageBodyPart.setFileName(filename);
+            multipart.addBodyPart(messageBodyPart);
+            message.setContent(multipart);
+            //}
+
+            Transport.send(message);
+            //----------------------------fim anexo-----------------------------------------
+
+            //new FXDialog(FXDialog.Type.INFO, "").showDialog();
+
+        } catch (AddressException ex) {
+            Logger.getLogger(TesteEmail.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
