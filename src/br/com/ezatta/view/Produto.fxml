@@ -192,7 +192,7 @@
                                     <CheckBox fx:id="chAtivar" mnemonicParsing="false" text="Ativar" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                                     <TextField fx:id="txtEmail" promptText="Informe email para notificação" GridPane.columnIndex="1" GridPane.rowIndex="7">
                                        <GridPane.margin>
-                                          <Insets left="70.0" />
+                                          <Insets />
                                        </GridPane.margin>
                                     </TextField>
                                  </children>

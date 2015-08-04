@@ -346,6 +346,7 @@ public class ProdutoController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        chAtivar.setVisible(false);
         ValidationFields.checkEmptyFields(txtNome, txtQuantidade, txtEstoqueMaximo, txtMinimo, cbEmpresa, cbCor);
         tb.getColumns().addAll(new GenericTable<EzattaProduto>().tableColunas(EzattaProduto.class));
         popularDados();
