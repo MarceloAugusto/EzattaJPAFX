@@ -5,17 +5,21 @@
  */
 package br.com.ezatta.view;
 
+import static br.com.ezatta.controller.LoginController.defaultPort;
+import static br.com.ezatta.controller.LoginController.serialPort;
 import br.com.ezatta.util.JPAUtil;
 import br.com.ezattaloaderfx.EzattaLoaderFx;
 import com.sun.javafx.application.LauncherImpl;
 import java.io.IOException;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
 /**
@@ -33,13 +37,34 @@ public class EzattaMain extends Application {
         Image icon = new Image(getClass().getResourceAsStream("icone.png"));
         stage.getIcons().add(icon);
         stage.setScene(scene);
+
+        //stage.initStyle(StageStyle.UNDECORATED);
+        //stage.setTitle("Ezatta");
+
+        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(final WindowEvent event) {
+                System.out.println("Fechouuuuuuuuuuu");
+            }
+        });
+            
+
         stage.show();
         EzattaMain.stage = stage;
+
+        //stage
+//        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+//            
+//    @Override
+//    public void handle(WindowEvent arg0) {
+//        Platform.exit();
+//    }
+//    
+//});
     }
 
     public static void main(String[] args) {
         launch(args);
-        //LauncherImpl.launchApplication(args);
     }
 
     @Override
@@ -49,9 +74,14 @@ public class EzattaMain extends Application {
         Platform.exit();
 
         //fecha aporta
-//        System.out.println("port " + defaultPort + " not found.");
-//        serialPort.close();
-//        System.out.println("Porta fechada...");
+        System.out.println("port " + defaultPort + " not found.");
+        serialPort.close();
+        System.out.println("Porta fechada...");
+        
+        //fechar tudo
+        Platform.exit();
+        System.exit(0);
+
     }
 
     public void handle(WindowEvent event) {

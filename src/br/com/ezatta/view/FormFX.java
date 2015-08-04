@@ -38,9 +38,7 @@ public class FormFX<T> {
         this.root = border;
         this.controller = loader.<T>getController();
         this.formulario = form;
-        
 
-        
         Scene scene = new Scene(this.root);
         this.formulario.setResizable(max);
 
@@ -61,15 +59,17 @@ public class FormFX<T> {
         if (!max) {
             this.formulario.showAndWait();
         } else {
-                    //inicio
-        formulario.centerOnScreen();
-        Screen screen = Screen.getPrimary();
-        Rectangle2D bounds = screen.getVisualBounds();
-        formulario.setX(bounds.getMinX());
-        formulario.setY(bounds.getMinY());
-        formulario.setWidth(bounds.getWidth());
-        formulario.setHeight(bounds.getHeight());
-        //fim
+
+//inicio
+            formulario.centerOnScreen();
+            Screen screen = Screen.getPrimary();
+            Rectangle2D bounds = screen.getVisualBounds();
+            formulario.setX(bounds.getMinX());
+            formulario.setY(bounds.getMinY());
+            formulario.setWidth(bounds.getWidth());
+            formulario.setHeight(bounds.getHeight());
+//fim
+            
             this.formulario.show();
         }
     }

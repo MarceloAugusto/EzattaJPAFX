@@ -54,6 +54,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
@@ -187,7 +188,9 @@ public class LoginController implements Initializable {
         if (validUsuario) {
             try {
                 Stage telaPrincipal = new Stage();
-                new FormFX<PrincipalController>("Principal.fxml", telaPrincipal, "Ezatta Inteligent Oil Supply", true);
+                //telaPrincipal.initStyle(StageStyle.UNDECORATED);
+                
+                new FormFX<PrincipalController>("Principal.fxml", telaPrincipal, "Ezatta Inteligent Oil Supply", false);
             } catch (Exception e) {
                 new FXDialog(Type.ERROR, "Erro ao carregar a tela -> Principal").showDialog();
             }
@@ -195,6 +198,7 @@ public class LoginController implements Initializable {
         } else {
             new FXDialog(Type.ERROR, "Usuário ou senha incorreto...").showDialog();
         }
+        
 //------------------------------------------------------------------------------
 
 //            if (validaLoginSistema) {
@@ -337,7 +341,7 @@ public class LoginController implements Initializable {
         //defaultPort = "COM4";
         defaultPort = "/dev/ttyACM0";
         System.out.println("Abrindo porta serial: " + defaultPort);
-
+        
         portList = gnu.io.CommPortIdentifier.getPortIdentifiers();
         while (portList.hasMoreElements()) {
             portId = (gnu.io.CommPortIdentifier) portList.nextElement();

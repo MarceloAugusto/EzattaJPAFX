@@ -1570,12 +1570,12 @@ public class PrincipalController implements Initializable {
 
             Transport.send(message);
             //----------------------------fim anexo-----------------------------------------
-
             //new FXDialog(FXDialog.Type.INFO, "Enviou Email").showDialog();
-
         } catch (AddressException ex) {
             Logger.getLogger(TesteEmail.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+ 
 
 }
