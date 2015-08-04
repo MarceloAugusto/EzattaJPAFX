@@ -5,6 +5,7 @@
  */
 package br.com.ezatta.model;
 
+import br.com.ezatta.chamado.model.Status;
 import br.com.ezatta.util.Colunas;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -13,6 +14,8 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -41,6 +44,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "EzattaProduto.findByEstoqueMinimo", query = "SELECT e FROM EzattaProduto e WHERE e.estoqueMinimo = :estoqueMinimo"),
     @NamedQuery(name = "EzattaProduto.findByCor", query = "SELECT e FROM EzattaProduto e WHERE e.cor = :cor")})
 public class EzattaProduto implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,7 +68,14 @@ public class EzattaProduto implements Serializable {
     @Column(name = "cor", length = 255)
     @Colunas(nome = "Cor", size = 100)
     private String cor;
-    
+
+    @Column(name = "notificacao", length = 50)
+    private boolean notificacaoEstoqueEmail;
+
+    @Colunas(nome = "Email", size = 100)
+    @Column(name = "email", length = 255)
+    private String email;
+
     @Colunas(nome = "Empresa", size = 100)
     @JoinColumn(name = "empresa", referencedColumnName = "id")
     @ManyToOne
@@ -100,7 +111,7 @@ public class EzattaProduto implements Serializable {
         this.id = id;
     }
 
-   public EzattaProduto(Integer id, String nome, BigDecimal estoqueMaximo, BigDecimal estoqueMinimo, String cor, EzattaEmpresa empresa) {
+    public EzattaProduto(Integer id, String nome, BigDecimal estoqueMaximo, BigDecimal estoqueMinimo, String cor, EzattaEmpresa empresa) {
         this.id = id;
         this.nome = nome;
         this.estoqueMaximo = estoqueMaximo;
@@ -115,6 +126,22 @@ public class EzattaProduto implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public boolean isNotificacaoEstoqueEmail() {
+        return notificacaoEstoqueEmail;
+    }
+
+    public void setNotificacaoEstoqueEmail(boolean notificacaoEstoqueEmail) {
+        this.notificacaoEstoqueEmail = notificacaoEstoqueEmail;
     }
 
     public String getNome() {
@@ -132,11 +159,11 @@ public class EzattaProduto implements Serializable {
     public void setQuantidade(BigDecimal quantidade) {
         this.quantidade = quantidade;
     }
-    
+
     public void addQuantidade(BigDecimal quantidade) {
         this.quantidade.add(quantidade);
     }
-    
+
     public void removQuantidade(BigDecimal quantidade) {
         this.quantidade.subtract(quantidade);
     }
@@ -216,8 +243,4 @@ public class EzattaProduto implements Serializable {
         return getNome();
     }
 
-    
-    
-    
-    
 }

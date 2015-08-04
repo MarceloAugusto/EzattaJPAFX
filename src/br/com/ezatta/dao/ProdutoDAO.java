@@ -73,4 +73,10 @@ public class ProdutoDAO extends GenericDAO {
         }
         return em.createNativeQuery(qry, EzattaProduto.class).getResultList();
     }
+    
+//    public long getValueProduto(){
+//        Query query = em.createQuery("Select count(p) from EzattaProduto p");
+//        long count = (long) query.getSingleResult(); 
+//        return count;
+//    }
 }

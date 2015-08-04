@@ -6,6 +6,8 @@
 package br.com.ezatta.view;
 
 import br.com.ezatta.util.JPAUtil;
+import br.com.ezattaloaderfx.EzattaLoaderFx;
+import com.sun.javafx.application.LauncherImpl;
 import java.io.IOException;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -37,6 +39,7 @@ public class EzattaMain extends Application {
 
     public static void main(String[] args) {
         launch(args);
+        //LauncherImpl.launchApplication(args);
     }
 
     @Override

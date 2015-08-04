@@ -29,6 +29,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tab;
@@ -133,6 +134,12 @@ public class ProdutoController implements Initializable {
 
     @FXML
     private Button btnNovo;
+
+    @FXML
+    private CheckBox chAtivar;
+
+    @FXML
+    private TextField txtEmail;
 
     @FXML
     void cancelar(ActionEvent event) {
@@ -250,6 +257,8 @@ public class ProdutoController implements Initializable {
         cbCor.getSelectionModel().select(null);
         cbEmpresa.getSelectionModel().select(null);
         txtQuantidade.setDisable(false);
+        txtEmail.setText("");
+        chAtivar.setSelected(false);
     }
 
     @FXML
@@ -257,7 +266,17 @@ public class ProdutoController implements Initializable {
         if (isValidaTela()) {
             switch (getOperacao()) {
                 case 0:
-                    EzattaProduto produto = new EzattaProduto(txtNome.getText(), new BigDecimal(txtQuantidade.getText()), new BigDecimal(txtEstoqueMaximo.getText()), new BigDecimal(txtMinimo.getText()), cbCor.getSelectionModel().getSelectedItem(), cbEmpresa.getSelectionModel().getSelectedItem());
+                    EzattaProduto produto = new EzattaProduto();
+
+                    produto.setNome(txtNome.getText());
+                    produto.setQuantidade(new BigDecimal(txtQuantidade.getText()));
+                    produto.setEstoqueMaximo(new BigDecimal(txtEstoqueMaximo.getText()));
+                    produto.setEstoqueMinimo(new BigDecimal(txtMinimo.getText()));
+                    produto.setEmpresa(cbEmpresa.getSelectionModel().getSelectedItem());
+                    produto.setCor(cbCor.getSelectionModel().getSelectedItem());
+                    produto.setNotificacaoEstoqueEmail(chAtivar.selectedProperty().getValue());
+                    produto.setEmail(txtEmail.getText());
+
                     produtoCtr.addProduto(produto);
                     popularDados();
                     new FXDialog(Type.INFO, "Registro inserido com sucesso!").showDialog();
@@ -265,8 +284,19 @@ public class ProdutoController implements Initializable {
                     break;
                 case 1:
                     Integer id = Integer.parseInt(txtId.getText());
-                    EzattaProduto produtos = new EzattaProduto(id, txtNome.getText(), new BigDecimal(txtQuantidade.getText()), new BigDecimal(txtEstoqueMaximo.getText()), new BigDecimal(txtMinimo.getText()), cbCor.getSelectionModel().getSelectedItem(), cbEmpresa.getSelectionModel().getSelectedItem());
-                    //EzattaProduto produtos = new EzattaProduto(id, txtNome.getText(), new BigDecimal(txtEstoqueMaximo.getText()), new BigDecimal(txtMinimo.getText()), cbCor.getSelectionModel().getSelectedItem(), cbEmpresa.getSelectionModel().getSelectedItem());
+                    //EzattaProduto produtos = new EzattaProduto(id, txtNome.getText(), new BigDecimal(txtQuantidade.getText()), new BigDecimal(txtEstoqueMaximo.getText()), new BigDecimal(txtMinimo.getText()), cbCor.getSelectionModel().getSelectedItem(), cbEmpresa.getSelectionModel().getSelectedItem());
+                    EzattaProduto produtos = new EzattaProduto();
+
+                    produtos.setId(id);
+                    produtos.setNome(txtNome.getText());
+                    produtos.setQuantidade(new BigDecimal(txtQuantidade.getText()));
+                    produtos.setEstoqueMaximo(new BigDecimal(txtEstoqueMaximo.getText()));
+                    produtos.setEstoqueMinimo(new BigDecimal(txtMinimo.getText()));
+                    produtos.setEmpresa(cbEmpresa.getSelectionModel().getSelectedItem());
+                    produtos.setCor(cbCor.getSelectionModel().getSelectedItem());
+                    produtos.setNotificacaoEstoqueEmail(chAtivar.selectedProperty().getValue());
+                    produtos.setEmail(txtEmail.getText());
+                    
                     produtoCtr.updateProduto(produtos);
                     new FXDialog(Type.INFO, "Registro atualizado com sucesso!").showDialog();
                     tabTela.getSelectionModel().select(0);
@@ -310,6 +340,8 @@ public class ProdutoController implements Initializable {
         cbCor.getSelectionModel().select(null);
         cbEmpresa.getSelectionModel().select(null);
         txtQuantidade.setDisable(false);
+        txtEmail.setText("");
+        chAtivar.setSelected(false);
     }
 
     @Override
@@ -321,6 +353,7 @@ public class ProdutoController implements Initializable {
             @Override
             public void handle(MouseEvent event) {
                 if (event.getClickCount() > 1) {
+                   
                     tabTela.getSelectionModel().select(1);
                     setOperacao(1);
                     setEzattaProduto(tb.getSelectionModel().getSelectedItem());
@@ -353,6 +386,9 @@ public class ProdutoController implements Initializable {
         txtMinimo.setText(ezattaProduto.getEstoqueMinimo().toString());
         cbEmpresa.getSelectionModel().select(ezattaProduto.getEmpresa());
         cbCor.getSelectionModel().select(ezattaProduto.getCor());
+        txtEmail.setText(ezattaProduto.getEmail());
+        chAtivar.setSelected(ezattaProduto.isNotificacaoEstoqueEmail());
+        
     }
 
     private void popularDados() {

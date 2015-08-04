@@ -277,7 +277,6 @@ public class LoginController implements Initializable {
                                 System.out.println("Enviar email e fazer bkp");
                                 verificaarquivo = true;
                             }
-
                         }
                         if (verificaarquivo) {
                             fazerBkp();

@@ -11,6 +11,7 @@ import br.com.ezatta.dao.BicosDAO;
 import br.com.ezatta.dao.EstoqueDAO;
 import br.com.ezatta.dao.OperadorDAO;
 import br.com.ezatta.dao.ProdutoDAO;
+import br.com.ezatta.mail.TesteEmail;
 import br.com.ezatta.model.EzattaBico;
 import br.com.ezatta.model.EzattaEstoque;
 import br.com.ezatta.model.EzattaOperador;
@@ -27,6 +28,7 @@ import java.math.RoundingMode;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,6 +70,23 @@ import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.Address;
+import javax.mail.Authenticator;
+import javax.mail.BodyPart;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 /**
  * FXML Controller class
@@ -171,7 +190,6 @@ public class PrincipalController implements Initializable {
     @FXML
     private MenuItem miCBico;
 
-
     @FXML
     private MenuItem miManual;
 
@@ -231,7 +249,6 @@ public class PrincipalController implements Initializable {
 
     @FXML
     private AnchorPane anchorContainer;
-    
 
     public StackPane getStack() {
         return stack;
@@ -342,7 +359,7 @@ public class PrincipalController implements Initializable {
             Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         //ocultar progress bar bico
@@ -437,9 +454,9 @@ public class PrincipalController implements Initializable {
     void estoquePrincipal(ActionEvent event) {
 
     }
-    
+
     @FXML
-    void carregarProdutoTela(ActionEvent event){
+    void carregarProdutoTela(ActionEvent event) {
         popularProdutos();
     }
 
@@ -1070,8 +1087,8 @@ public class PrincipalController implements Initializable {
     }
 
     @FXML
-    void cancelamento(ActionEvent event){
-        
+    void cancelamento(ActionEvent event) {
+
     }
 
     public PrincipalController() {
@@ -1168,8 +1185,21 @@ public class PrincipalController implements Initializable {
     @FXML
     void enviarPPlaca(ActionEvent event) {
         if (isValidaTela()) {
-            salvarNoBanco();
-            cancelar(event);
+            BigDecimal quantidade = ezattaProdutoStatic.getQuantidade();
+            BigDecimal minimo = ezattaProdutoStatic.getEstoqueMinimo();
+            System.out.println("quantidade: " + quantidade + " - minimo: " + minimo);
+            if (minimo.compareTo(quantidade) == 1) {
+                System.out.println("Entrou");
+                new FXDialog(FXDialog.Type.WARNING, "Envio Bloqueado, volume minimo foi atingido!").showDialog();
+                try {
+                    enviarEmailBloqueio();
+                } catch (MessagingException ex) {
+                    Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                salvarNoBanco();
+                cancelar(event);
+            }
         }
     }
 
@@ -1465,16 +1495,86 @@ public class PrincipalController implements Initializable {
             }
         });
     }
-    
+
     @FXML
     void gerarRelatorio(ActionEvent event) {
-         try {
+        try {
             stack.getChildren().clear();
             stack.getChildren().add(getNode("/br/com/ezatta/view/Relatorio.fxml"));
         } catch (Exception e) {
             new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
             System.out.println("Erro ao carregar a tela de bicos");
             e.printStackTrace();
+        }
+    }
+
+    String endArquivoUpload = "";
+
+    private void enviarEmailBloqueio() throws MessagingException {
+        //
+        final String username = "marceloaugusto16@gmail.com";
+        final String senha = "ObrigadoSenhor33";
+
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+
+        Session session = Session.getInstance(props, new Authenticator() {
+
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, senha); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
+
+        Message message = new MimeMessage(session);
+        try {
+            String corpoEmail = "O sistema <b> Ezatta </b> de troca de óleo atingil o estoque minimo favor reabastecer o produto: "
+                    + ezattaProdutoStatic.getNome() + " quantidade atual: " + ezattaProdutoStatic.getQuantidade();
+            message.setFrom(new InternetAddress("marceloaugusto16@gmail.com"));
+
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("marceloaugusto16@gmail.com"));
+            
+            if (ezattaProdutoStatic.getEmail() != null) {
+                System.out.println("ezattaProdutoStatic.getEmail(): "+ezattaProdutoStatic.getEmail());
+                message.addRecipients(Message.RecipientType.CC, InternetAddress.parse(ezattaProdutoStatic.getEmail()));
+            }
+            
+            if(ezattaUsuarioStatic.getEmpresa().getEmail()!= null){
+                System.out.println("ezattaUsuarioStatic.getEmpresa().getEmail(): "+ezattaUsuarioStatic.getEmpresa().getEmail());
+                message.addRecipients(Message.RecipientType.CC, InternetAddress.parse(ezattaUsuarioStatic.getEmpresa().getEmail()));
+            }
+            message.setSubject("Sistema Ezatta - Alerta - "+ezattaUsuarioStatic.getEmpresa().getNome());
+            message.setContent(corpoEmail, "text/html");
+
+            //--------------------------inicio anexo------------------------------------------
+            BodyPart messageBodyPart = new MimeBodyPart();
+            messageBodyPart.setContent(corpoEmail, "text/html");
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(messageBodyPart);
+            messageBodyPart = new MimeBodyPart();
+
+            String filename = "";
+            if (!endArquivoUpload.isEmpty()) {
+                System.out.println("Entrou ------------------- Erro-------------------");
+                //String filename = "/home/marcelo/Imagens/Erro.png";
+                filename = endArquivoUpload;
+                DataSource source = new FileDataSource(filename);
+                messageBodyPart.setDataHandler(new DataHandler(source));
+                messageBodyPart.setFileName(filename);
+                multipart.addBodyPart(messageBodyPart);
+                message.setContent(multipart);
+            }
+
+            Transport.send(message);
+            //----------------------------fim anexo-----------------------------------------
+
+            new FXDialog(FXDialog.Type.INFO, "Enviou Email").showDialog();
+
+        } catch (AddressException ex) {
+            Logger.getLogger(TesteEmail.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
