@@ -11,6 +11,7 @@ import java.util.Calendar;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 /**
@@ -110,6 +111,12 @@ public class EmpresaDAO {
             qry = qry.concat(parametros);
         }
         return em.createNativeQuery(qry, EzattaEmpresa.class).getResultList();
+    }
+    
+    public long getValueEmpresa(){
+        Query query = em.createQuery("SELECT count(e) from EzattaEmpresa e");
+        long count = (long) query.getSingleResult(); 
+        return count;
     }
 
 }

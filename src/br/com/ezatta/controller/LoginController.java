@@ -81,19 +81,34 @@ import org.hibernate.Session;
 public class LoginController implements Initializable {
 
     @FXML
+    private TextField txtLogin;
+
+    @FXML
     private PasswordField txtSenha;
+
+    @FXML
+    private AnchorPane anchorNovaEmpresa;
+
+    @FXML
+    private AnchorPane anchor;
 
     @FXML
     private Button btnCancelar;
 
     @FXML
+    private TextField txtNome;
+
+    @FXML
+    private PasswordField txtSenhac;
+
+    @FXML
+    private TextField txtEmail;
+
+    @FXML
     private TextField txtUsuario;
 
     @FXML
-    private Button btnEntrar;
-
-    @FXML
-    private AnchorPane anchor;
+    private Button btnEntrar;    
 
     /*----------------------inicio vars envio java com----------------------------------------*/
     public static Enumeration portList;
@@ -147,157 +162,149 @@ public class LoginController implements Initializable {
     @FXML
     void entrar(ActionEvent event) throws IOException, SQLException, Exception {
 
-        //Empresa recupera usuario e senha informado pelo usuario
-        ezattaEmpresaStatic.setLogin(txtUsuario.getText());
-        ezattaEmpresaStatic.setSenha(txtSenha.getText());
+        long qtd = empresadao.getValueEmpresa();
 
-        //Usuario recupera usuario e senha informado pelo usuario
-        ezattaUsuarioStatic.setLogin(txtUsuario.getText());
-        ezattaUsuarioStatic.setSenha(txtSenha.getText());
+        if (txtUsuario.getText().equals("") && txtSenha.getText().equals("") && qtd == 0) {
+            System.out.println("entrou sem dados");
+            System.out.println("qtd: " + qtd);
 
-        boolean validaLoginSistema = empresadao.getLogAndPasswordSistema(txtUsuario.getText(), txtSenha.getText());
-        boolean validEmpresa = empresadao.isValidUserAndPassowrd(ezattaEmpresaStatic);
-        boolean validUsuario = usuariodao.isValidUserAndPassowrd(ezattaUsuarioStatic);
+            anchorNovaEmpresa.setVisible(true);
 
-        try {
-            ezattaEmpresaStatic = empresadao.listUserAndPassowrd(ezattaEmpresaStatic);
-        } catch (NullPointerException e) {
-        }
-        try {
-            ezattaUsuarioStatic = usuariodao.getUserByLogAndPassword(ezattaUsuarioStatic);
-        } catch (NullPointerException e) {
-        }
-
-        System.out.println("EmpresaLogada: " + ezattaEmpresaStatic.getNome());
-        System.out.println("UsuarioLogada: " + ezattaUsuarioStatic.getNome());
-        System.out.println("validEmpresa: " + validEmpresa);
-
-//        Stage telaPrincipal = new Stage();
-//        new FormFX<PrincipalController>("Principal.fxml", telaPrincipal, "Ezatta Inteligent Oil Supply", true);
-//---------------------------------------------------descomentar valida Empresa
-//        if (validEmpresa) {
-//            Stage telaPrincipal = new Stage();
-//            try {
-//                new FormFX<PrincipalController>("Principal.fxml", telaPrincipal, "Ezatta Inteligent Oil Supply", true);
-//            } catch (Exception e) {
-//                new FXDialog(Type.ERROR, "Erro ao carregar a tela -> Principal").showDialog();
-//            }
-//            EzattaMain.stage.close();
-//        } else 
-//------------------------------------------------------------------------------
-        if (validUsuario) {
-            try {
-                Stage telaPrincipal = new Stage();
-                //telaPrincipal.initStyle(StageStyle.UNDECORATED);
-                
-                new FormFX<PrincipalController>("Principal.fxml", telaPrincipal, "Ezatta Inteligent Oil Supply", false);
-            } catch (Exception e) {
-                new FXDialog(Type.ERROR, "Erro ao carregar a tela -> Principal").showDialog();
-            }
-            EzattaMain.stage.close();
         } else {
-            new FXDialog(Type.ERROR, "Usuário ou senha incorreto...").showDialog();
-        }
-        
-//------------------------------------------------------------------------------
 
-//            if (validaLoginSistema) {
-//                //principal.frmEmpresa();
-//                //new FrmSis(new javax.swing.JFrame(), true, this).setVisible(true);
-//            } else 
-//                if (validEmpresa) {
-//                anchor.setVisible(false);
-//                System.out.println("validEmpresa: " + validEmpresa);
+            //Empresa recupera usuario e senha informado pelo usuario
+            ezattaEmpresaStatic.setLogin(txtUsuario.getText());
+            ezattaEmpresaStatic.setSenha(txtSenha.getText());
+
+            //Usuario recupera usuario e senha informado pelo usuario
+            ezattaUsuarioStatic.setLogin(txtUsuario.getText());
+            ezattaUsuarioStatic.setSenha(txtSenha.getText());
+
+//            boolean validaLoginSistema = empresadao.getLogAndPasswordSistema(txtUsuario.getText(), txtSenha.getText());
+            boolean validEmpresa = empresadao.isValidUserAndPassowrd(ezattaEmpresaStatic);
+            boolean validUsuario = usuariodao.isValidUserAndPassowrd(ezattaUsuarioStatic);
+
+           
+            
+//            if (empresadao.listUserAndPassowrd(ezattaEmpresaStatic) != null) {
+//                System.out.println("entour no valida empresa");
 //                ezattaEmpresaStatic = empresadao.listUserAndPassowrd(ezattaEmpresaStatic);
-//                new LogadoEmpresa().start(new Stage());
-//                EzattaMain.stage.close();
-//            } else if (validUsuario) {
-//                anchor.setVisible(false);
-//                System.out.println("entrou usuario");
-//                EzattaUsuario usuario = usuariodao.getUserByLogAndPassword(ezattaUsuarioStatic);
-//                new LogadoEmpresa().start(new Stage());
-//                EzattaMain.stage.close();
-//            } else {
-//                new FXDialog(FXDialog.Type.WARNING, "Login/Senha Inválidos!!!").showDialog();
-//                return;
+//                System.out.println("ezattaEmpresaStatic: " + ezattaEmpresaStatic.getNome());
+//            }else if (usuariodao.getUserByLogAndPassword(ezattaUsuarioStatic) != null) {
+//                System.out.println("Entou no valida usuario");
+//                ezattaUsuarioStatic = usuariodao.getUserByLogAndPassword(ezattaUsuarioStatic);
+//                System.out.println("ezattaUsuarioStatic: " + ezattaUsuarioStatic.getNome());
+//                System.out.println("ezattaUsuarioStatic.getEmpresa().getId(): "+ezattaUsuarioStatic.getEmpresa().getId());
+//                ezattaEmpresaStatic = empresadao.getEmpresa(ezattaUsuarioStatic.getEmpresa().getId());
+//                System.out.println("ezattaEmpresaStatic --: "+ezattaEmpresaStatic.getNome());
+//            }else{
+//                System.out.println("validar: "+usuariodao.getUserByLogAndPassword(ezattaUsuarioStatic));
 //            }
-        //------------------------------------------------inicio bkp--------------------------------------------------
-        try {
-            try {
-                BackupDao bkpDao = new BackupDao();
-                if (bkpDao.getValueBackup() > 0) {//add
-                    Backup bkp = new Backup();
-                    bkp = bkpDao.getBackup(1);
-                    if (bkp.isBkp()) {
-                        //nome do arquivo / data atual
-                        String dataAtual = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE);
-                        System.out.println("dataAtual: " + dataAtual);
-                        //listar arquivos
 
-                        File diretorio = new File(rais);
-                        File fList[] = diretorio.listFiles();
-                        int numeroArquivos = diretorio.listFiles().length;
 
-                        System.out.println("Numero de arquivos no diretorio : " + numeroArquivos);
-
-                        Arrays.sort(fList, new Comparator<File>() {
-                            public int compare(File f1, File f2) {
-                                return Long.compare(f1.lastModified(), f2.lastModified());
-                            }
-                        });
-
-                        //verifico quantidade e removo o ultimo
-                        boolean pegar = false;
-                        if (numeroArquivos >= 30) {
-                            pegar = true;
-                        }
-
-                        //lista diretorio e remove se tiver mais que 30 arquivos
-                        boolean verificaarquivo = false;
-                        for (int i = 0; i < fList.length; i++) {
-                            //verifica se tem mais de 30 itens
-                            if (pegar) {
-                                fList[i].delete();
-                                pegar = false;
-                            }
-
-                            Date d = new Date(fList[i].lastModified());
-                            Calendar calendar = dateToCalendar(d);
-                            System.out.println("---------------------------------------------------------------");
-                            String dataArquivo = calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE);
-                            System.out.println(fList[i].getName() + " - " + dataArquivo);
-
-                            //verifica a data se é igual 
-                            String nomeArquivo = fList[i].getName();
-                            String s[] = nomeArquivo.split("\\.");
-                            System.out.println("nome arquivo sem . " + s[0]);
-
-                            Calendar calAtual = Calendar.getInstance();
-                            String dataAtuals = calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE);
-                            if (s[0].equals(dataAtuals)) {
-                                System.out.println("Não enviar email e não fazer bkp");
-                                verificaarquivo = false;
-                            } else {
-                                System.out.println("Enviar email e fazer bkp");
-                                verificaarquivo = true;
-                            }
-                        }
-                        if (verificaarquivo) {
-                            fazerBkp();
-                        }
-                        //------------------------------------------------------------
-
-                    } else {
-                        System.out.println(": " + bkp.isBkp());
-                    }
+            if (validEmpresa) {
+                Stage telaPrincipal = new Stage();
+                try {
+                    ezattaEmpresaStatic = empresadao.listUserAndPassowrd(ezattaEmpresaStatic);
+                    System.out.println("ezattaEmpresaStatic: "+ ezattaEmpresaStatic);
+                    new FormFX<PrincipalController>("Principal.fxml", telaPrincipal, "Ezatta Inteligent Oil Supply", false);
+                } catch (Exception e) {
+                    new FXDialog(Type.ERROR, "Erro ao carregar a tela -> Principal").showDialog();
                 }
-            } catch (SQLException ex) {
+                EzattaMain.stage.close();
+            } else if (validUsuario) {
+                try {
+                    ezattaUsuarioStatic = usuariodao.getUserByLogAndPassword(ezattaUsuarioStatic);
+                    Stage telaPrincipal = new Stage();
+                    new FormFX<PrincipalController>("PrincipalUsuario.fxml", telaPrincipal, "Ezatta Inteligent Oil Supply", false);
+                } catch (Exception e) {
+                    new FXDialog(Type.ERROR, "Erro ao carregar a tela -> Principal").showDialog();
+                }
+                EzattaMain.stage.close();
+            } else {
+                new FXDialog(Type.ERROR, "Usuário ou senha incorreto...").showDialog();
+            }
+
+
+            //------------------------------------------------inicio bkp--------------------------------------------------
+            try {
+                try {
+                    BackupDao bkpDao = new BackupDao();
+                    if (bkpDao.getValueBackup() > 0) {//add
+                        Backup bkp = new Backup();
+                        bkp = bkpDao.getBackup(1);
+                        if (bkp.isBkp()) {
+                            //nome do arquivo / data atual
+                            String dataAtual = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE);
+                            System.out.println("dataAtual: " + dataAtual);
+                            //listar arquivos
+
+                            File diretorio = new File(rais);
+                            File fList[] = diretorio.listFiles();
+                            int numeroArquivos = diretorio.listFiles().length;
+
+                            System.out.println("Numero de arquivos no diretorio : " + numeroArquivos);
+
+                            Arrays.sort(fList, new Comparator<File>() {
+                                public int compare(File f1, File f2) {
+                                    return Long.compare(f1.lastModified(), f2.lastModified());
+                                }
+                            });
+
+                            //verifico quantidade e removo o ultimo
+                            boolean pegar = false;
+                            if (numeroArquivos >= 30) {
+                                pegar = true;
+                            }
+
+                            //lista diretorio e remove se tiver mais que 30 arquivos
+                            boolean verificaarquivo = false;
+                            for (int i = 0; i < fList.length; i++) {
+                                //verifica se tem mais de 30 itens
+                                if (pegar) {
+                                    fList[i].delete();
+                                    pegar = false;
+                                }
+
+                                Date d = new Date(fList[i].lastModified());
+                                Calendar calendar = dateToCalendar(d);
+                                System.out.println("---------------------------------------------------------------");
+                                String dataArquivo = calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE);
+                                System.out.println(fList[i].getName() + " - " + dataArquivo);
+
+                                //verifica a data se é igual 
+                                String nomeArquivo = fList[i].getName();
+                                String s[] = nomeArquivo.split("\\.");
+                                System.out.println("nome arquivo sem . " + s[0]);
+
+                                Calendar calAtual = Calendar.getInstance();
+                                String dataAtuals = calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE);
+                                if (s[0].equals(dataAtuals)) {
+                                    System.out.println("Não enviar email e não fazer bkp");
+                                    verificaarquivo = false;
+                                } else {
+                                    System.out.println("Enviar email e fazer bkp");
+                                    verificaarquivo = true;
+                                }
+                            }
+                            if (verificaarquivo) {
+                                fazerBkp();
+                            }
+                            //------------------------------------------------------------
+
+                        } else {
+                            System.out.println(": " + bkp.isBkp());
+                        }
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } catch (NullPointerException ex) {
                 Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (NullPointerException ex) {
-            Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+            //------------------------------------------------fim bkp-----------------------------------------------------
+
         }
-        //------------------------------------------------fim bkp-----------------------------------------------------
     }
 
     private Calendar dateToCalendar(Date date) {
@@ -333,6 +340,8 @@ public class LoginController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
+        anchorNovaEmpresa.setVisible(false);
+
         // inicializa o Hibernate H2DB
         EntityManager manager = JPAUtil.getEntityManager();
         manager.clear();
@@ -341,7 +350,7 @@ public class LoginController implements Initializable {
         //defaultPort = "COM4";
         defaultPort = "/dev/ttyACM0";
         System.out.println("Abrindo porta serial: " + defaultPort);
-        
+
         portList = gnu.io.CommPortIdentifier.getPortIdentifiers();
         while (portList.hasMoreElements()) {
             portId = (gnu.io.CommPortIdentifier) portList.nextElement();
@@ -518,6 +527,48 @@ public class LoginController implements Initializable {
         } catch (AddressException ex) {
             Logger.getLogger(TesteEmail.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    @FXML
+    void SalvarNovaEmpresa(ActionEvent event) {
+        if (isValidaTela()) {
+            try {
+                EzattaEmpresa empresa = new EzattaEmpresa(txtNome.getText(), txtLogin.getText(), txtSenhac.getText(), txtEmail.getText());
+                empresadao.addEmpresa(empresa);
+                anchorNovaEmpresa.setVisible(false);
+                new FXDialog(Type.INFO, "Registro inserido com sucesso!").showDialog();
+            } catch (SQLException e) {
+                new FXDialog(Type.ERROR, "Não foi possivel cadastrar, entre em contato com suporte").showDialog();
+            }
+        }
+    }
+
+    @FXML
+    void fecharCadastro(ActionEvent event) {
+        anchorNovaEmpresa.setVisible(false);
+    }
+
+    private boolean isValidaTela() {
+        boolean ok = true;
+        if (txtNome.getText().isEmpty()) {
+            new FXDialog(Type.WARNING, "Favor preencher o nome!").showDialog();
+            txtNome.requestFocus();
+            ok = false;
+        } else if (txtLogin.getText().isEmpty()) {
+            new FXDialog(Type.WARNING, "Favor preencher o login!").showDialog();
+            txtLogin.requestFocus();
+            ok = false;
+        } else if (txtSenhac.getText().isEmpty()) {
+            new FXDialog(Type.WARNING, "Favor preencher o Senha!").showDialog();
+            txtSenhac.requestFocus();
+            ok = false;
+        } else if (txtEmail.getText().isEmpty()) {
+            new FXDialog(Type.WARNING, "Favor preencher o email!").showDialog();
+            txtEmail.requestFocus();
+            ok = false;
+        }
+
+        return ok;
     }
 
 }

@@ -9,19 +9,17 @@ import br.com.ezatta.backup.Backup;
 import br.com.ezatta.backup.DatabaseBackup;
 import br.com.ezatta.backup.H2DatabaseBackup;
 import br.com.ezatta.backup.dao.BackupDao;
-import static br.com.ezatta.controller.LoginController.ezattaUsuarioStatic;
+import static br.com.ezatta.controller.LoginController.ezattaEmpresaStatic;
 import br.com.ezatta.mail.TesteEmail;
 import br.com.ezatta.util.JPAUtil;
 import br.com.ezatta.util.Path;
 import br.com.ezatta.view.EzattaMain;
-import br.com.ezatta.view.FXDialog;
 import java.io.File;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -183,7 +181,8 @@ public class BackUpController implements Initializable {
     private void enviarBkpEmail(String nome) throws MessagingException {
         final String username = "marceloaugusto16@gmail.com";
         final String senha = "ObrigadoSenhor33";
-        String titulo = ezattaUsuarioStatic.getEmpresa().getNome();//nome da empresa
+        String titulo =  ezattaEmpresaStatic.getLogin();
+        //String titulo = ezattaUsuarioStatic.getEmpresa().getNome();//nome da empresa
         String dataCorpoMensagem = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE) +".zip";
         String mensagem = dataCorpoMensagem; // personalizar com a data
         String endArquivoUpload = "";

@@ -17,7 +17,7 @@
          <children>
             <MenuBar BorderPane.alignment="CENTER">
               <menus>
-                <Menu mnemonicParsing="false" text="Arquivo">
+                <Menu mnemonicParsing="false" text="Principal">
                   <items>
                     <MenuItem fx:id="miFechar" mnemonicParsing="false" onAction="#fechar" text="Fechar" />
                   </items>
@@ -51,18 +51,6 @@
                 </Menu>
               </menus>
             </MenuBar>
-            <ToolBar prefHeight="40.0" prefWidth="200.0">
-              <items>
-                  <Button fx:id="btnEnvase" mnemonicParsing="false" onAction="#envase" text="Envase" />
-                <Button fx:id="btnEstoque" mnemonicParsing="false" onAction="#estoquePrincipal" text="Estoque" />
-                  <Button fx:id="btnOperacoes" mnemonicParsing="false" onAction="#operacoes" text="Operaçoes" />
-                  <Button fx:id="btnCancelamento" mnemonicParsing="false" onAction="#cancelamento" text="Cancelamento" />
-                  <Text fx:id="txtNomeEmpresa" nodeOrientation="RIGHT_TO_LEFT" strokeType="OUTSIDE" strokeWidth="0.0">
-                     <font>
-                        <Font size="14.0" />
-                     </font></Text>
-              </items>
-            </ToolBar>
          </children>
          <effect>
             <DropShadow />
@@ -72,7 +60,7 @@
    <center>
       <AnchorPane fx:id="AnchorPanePrincipal">
          <children>
-            <SplitPane dividerPositions="0.7731829573934837" prefHeight="481.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <SplitPane dividerPositions="0.9960861056751468" prefHeight="481.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                      <children>
@@ -234,11 +222,6 @@
                                     </AnchorPane>
                               </content>
                             </TitledPane>
-                              <TitledPane fx:id="acCancelarEnvasePrincipal" animated="false" text="Cancelamento">
-                                <content>
-                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                                </content>
-                              </TitledPane>
                           </panes>
                         </Accordion>
                      </children></AnchorPane>

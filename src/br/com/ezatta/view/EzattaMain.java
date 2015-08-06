@@ -38,7 +38,7 @@ public class EzattaMain extends Application {
         stage.getIcons().add(icon);
         stage.setScene(scene);
 
-        //stage.initStyle(StageStyle.UNDECORATED);
+        stage.initStyle(StageStyle.UNDECORATED);
         //stage.setTitle("Ezatta");
 
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {

@@ -65,7 +65,7 @@ public class PrincipalListStatusProdutoController implements Initializable {
         idProduto = dado.getId();
         hbProduto[idProduto] = new HBox();
         strContainer[idProduto] = new Label();
-        hbProduto[idProduto].setSpacing(5.0);
+        hbProduto[idProduto].setSpacing(1.0);
         hbProduto[idProduto].setPadding(new Insets(10, 10, 10, 10));
         Separator separatorProduto = new Separator();
         separatorProduto.setMinHeight(5);

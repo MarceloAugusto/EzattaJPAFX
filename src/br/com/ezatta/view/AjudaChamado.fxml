@@ -56,15 +56,6 @@
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                  </columnResizePolicy>
                               </TableView>
-                              <Button fx:id="btnImprimirRegistros" layoutX="668.0" layoutY="9.0" mnemonicParsing="false" onAction="#btnImprimir" prefHeight="30.0" prefWidth="121.0" text="Imprimir">
-                                 <graphic>
-                                    <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                       <image>
-                                          <Image url="@images/printer32.png" />
-                                       </image>
-                                    </ImageView>
-                                 </graphic>
-                              </Button>
                               <Button fx:id="btnRedefinirConsulta" layoutX="499.0" layoutY="9.0" mnemonicParsing="false" onAction="#redefinirConsulta" text="Redefinir consulta">
                                  <graphic>
                                     <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">

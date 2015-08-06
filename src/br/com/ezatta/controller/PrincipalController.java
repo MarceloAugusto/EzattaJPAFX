@@ -140,9 +140,6 @@ public class PrincipalController implements Initializable {
     private MenuItem miEncherTank;
 
     @FXML
-    private Button btnOperacoes;
-
-    @FXML
     private MenuItem miBico;
 
     @FXML
@@ -159,9 +156,6 @@ public class PrincipalController implements Initializable {
 
     @FXML
     private MenuItem miEmpresa;
-
-    @FXML
-    private Button btnCancelamento;
 
     @FXML
     private StackPane stackContainer;
@@ -181,8 +175,8 @@ public class PrincipalController implements Initializable {
     @FXML
     public static VBox estoqueAtual;
 
-    @FXML
-    private Text txtNomeEmpresa;
+//    @FXML
+//    private Text txtNomeEmpresa;
 
     @FXML
     private MenuItem miProduto;
@@ -197,16 +191,10 @@ public class PrincipalController implements Initializable {
     private MenuItem miUsuario;
 
     @FXML
-    private Button btnEstoque;
-
-    @FXML
     public VBox vbList;
 
     @FXML
     public AnchorPane AnchorPanePrincipal;
-
-    @FXML
-    private TitledPane acCancelarEnvasePrincipal;
 
     @FXML
     private BorderPane borderPanePrincipal;
@@ -285,9 +273,9 @@ public class PrincipalController implements Initializable {
             System.out.println("endBico: " + endBico[idEstoqueTh]);
 
             atualizaFatorEscala(dado);
-            Thread.sleep(1000);
+            //Thread.sleep(1000);
             enviarStringPlaca(dado);
-            Thread.sleep(1000);
+            //Thread.sleep(1000);
             enviarVolume(dado);
 
             t[idEstoqueTh] = new Thread(taskLeituraEnvase);
@@ -340,14 +328,14 @@ public class PrincipalController implements Initializable {
             Float quantidadeEfetiva = new Float(efetivo[idEstoqueTh].getText());
             ezattaEstoqueSalvar.setQtdEstoque(quantidadeEfetiva);
             ezattaEstoqueSalvar.setStatus(4);
-            Thread.sleep(100);
+            //Thread.sleep(100);
             estoqueCtr.updateEstoque(ezattaEstoqueSalvar);
 
             //Parar Thread
             execucaoWhile[idEstoqueTh] = false;
 
             //um segundos
-            Thread.sleep(1000);
+            Thread.sleep(100);
 
             //Cancelar Placa
             cancelarPlaca(idEstoqueTh);
@@ -368,10 +356,10 @@ public class PrincipalController implements Initializable {
         acPrincipal.setExpandedPane(acEstoqueAtual);
 
         //mostra tela produtos e oculta bicos
-        paneProduto.setVisible(true);
+        paneProduto.setVisible(false);
         paneBico.setVisible(false);
 
-        txtNomeEmpresa.setText("Seja bem vindo: " + ezattaUsuarioStatic.getEmpresa().getNome());
+        //txtNomeEmpresa.setText("Seja bem vindo: " + ezattaUsuarioStatic.getEmpresa().getNome());
         EzattaMain.stage.close();
 
         //carrega produtos tela principal
@@ -450,18 +438,10 @@ public class PrincipalController implements Initializable {
     }
 
     //fim popula lista Produtos ==================================================================================
-    @FXML
-    void estoquePrincipal(ActionEvent event) {
-
-    }
-
+    
     @FXML
     void carregarProdutoTela(ActionEvent event) {
         popularProdutos();
-    }
-
-    @FXML
-    void operacoes(ActionEvent event) {
     }
 
     Task taskLeituraEnvase = new Task() {
@@ -576,7 +556,7 @@ public class PrincipalController implements Initializable {
                             //mensagem de fim
                             efetivo[idEstoqueTh].setText("FIM");
                             execucaoWhile[idEstoqueTh] = false;
-                            Thread.sleep(1000);
+                            Thread.sleep(100);
 
                             removerRegistroTela(idEstoqueTh);
 
@@ -706,11 +686,11 @@ public class PrincipalController implements Initializable {
                 (byte) (int) Long.parseLong(bico.getEndereco().substring(14, 16), 16), -1, -2, 0, 0, 87, 77, (byte) label19, 0, (byte) stringConvertidaemInt, 13,
                 (byte) (int) crc};
             saida.write(uartout);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException ex) {
+//                Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
+//            }
         }
 
         int stringConvertidaemInt = 32;
@@ -919,7 +899,7 @@ public class PrincipalController implements Initializable {
             try {
                 saida.write(uartout);
                 System.out.println("Foi...");
-                Thread.sleep(3000);
+                //Thread.sleep(3000);
             } catch (IOException ex) {
                 System.out.println("Erro na comunicação");
             }
@@ -1066,29 +1046,6 @@ public class PrincipalController implements Initializable {
             System.out.println("Erro ao carregar a tela de bicos");
             e.printStackTrace();
         }
-    }
-
-    @FXML
-    void envase(ActionEvent event) {
-        //---------------------------------------------------fim
-        limpar();
-        limparComponentesBicoEnvase();
-        try {
-            stack.getChildren().clear();
-            stack.getChildren().add(paneProduto);
-            stack.getChildren().add(paneBico);
-            paneProduto.setVisible(true);
-            paneBico.setVisible(false);
-        } catch (Exception e) {
-            new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
-            System.out.println("Erro ao carregar a tela de bicos");
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    void cancelamento(ActionEvent event) {
-
     }
 
     public PrincipalController() {
@@ -1323,6 +1280,7 @@ public class PrincipalController implements Initializable {
         ezattaProdutoStatic.setQuantidade(quantidadecalculada);
         produtoCtr.updateProduto(ezattaProdutoStatic);
 
+        System.out.println("estoque: "+estoque);
         //new FXDialog(FXDialog.Type.INFO, "ezattaProdutoStatic: "+ezattaProdutoStatic.getNome()+" - id: "+ezattaProdutoStatic.getId()+ " qtd: "+ezattaProdutoStatic.getQuantidade()).showDialog();
         estoqueCtr.addEstoque(estoque);
 
@@ -1439,7 +1397,7 @@ public class PrincipalController implements Initializable {
         btnSalvarEstoque[idEstoqueTh].setMinWidth(75);
         btnSalvarEstoque[idEstoqueTh].setDisable(true);
         sp.setContent(hb[idEstoqueTh]);
-        hb[idEstoqueTh].setSpacing(15.0);
+        hb[idEstoqueTh].setSpacing(5.0);
 
         //gridPane
         gridpane[idEstoqueTh].setPadding(new Insets(5));
@@ -1573,6 +1531,24 @@ public class PrincipalController implements Initializable {
             //new FXDialog(FXDialog.Type.INFO, "Enviou Email").showDialog();
         } catch (AddressException ex) {
             Logger.getLogger(TesteEmail.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    @FXML
+    void btnEnvasar(ActionEvent event) {
+        //---------------------------------------------------fim
+        limpar();
+        limparComponentesBicoEnvase();
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(paneProduto);
+            stack.getChildren().add(paneBico);
+            paneProduto.setVisible(true);
+            paneBico.setVisible(false);
+        } catch (Exception e) {
+            new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
+            System.out.println("Erro ao carregar a tela de bicos");
+            e.printStackTrace();
         }
     }
     

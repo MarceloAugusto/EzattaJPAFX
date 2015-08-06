@@ -7,11 +7,10 @@ package br.com.ezatta.controller;
 
 import br.com.ezatta.chamado.dao.ChaChamadoDAO;
 import br.com.ezatta.chamado.dao.ChaInteracoesDAO;
-import br.com.ezatta.chamado.dao.ClienteSisDAO;
 import br.com.ezatta.chamado.model.ChaChamado;
 import br.com.ezatta.chamado.model.ChaInteracoes;
 import br.com.ezatta.chamado.model.Status;
-import static br.com.ezatta.controller.LoginController.ezattaUsuarioStatic;
+import static br.com.ezatta.controller.LoginController.ezattaEmpresaStatic;
 import br.com.ezatta.model.EzattaEmpresa;
 import br.com.ezatta.util.GenericTable;
 import br.com.ezatta.util.JPAUtilChamado;
@@ -30,7 +29,6 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -40,7 +38,6 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.HTMLEditor;
 import javafx.scene.web.WebView;
@@ -183,7 +180,7 @@ public class AjudaChamadoController implements Initializable {
             Timestamp dataDeHoje = new Timestamp(System.currentTimeMillis());
             switch (getOperacao()) {
                 case 0:
-                    ChaChamado chamado = new ChaChamado(txtTitulo.getText(), Status.ABERTO, ezattaUsuarioStatic.getEmpresa().getId(), dataDeHoje);
+                    ChaChamado chamado = new ChaChamado(txtTitulo.getText(), Status.ABERTO, ezattaEmpresaStatic.getId(), dataDeHoje);
                     chamadoCtr.addChaChamado(chamado);
 
                     ChaInteracoes interacoes = new ChaInteracoes();
@@ -339,7 +336,7 @@ public class AjudaChamadoController implements Initializable {
                         // vboxInteracoes[idInteracao].setStyle("-fx-background-color: lightgray");
                     }
                     if (admInteracao == 0) {
-                        adm = " - " + ezattaUsuarioStatic.getEmpresa().getNome();
+                        adm = " - " + ezattaEmpresaStatic.getNome();
                     }
 
                     dataHora[idInteracao] = new Label();
@@ -374,7 +371,7 @@ public class AjudaChamadoController implements Initializable {
         tb.getItems().clear();
         try {
 
-            EzattaEmpresa emp = ezattaUsuarioStatic.getEmpresa();
+            EzattaEmpresa emp = ezattaEmpresaStatic;
             dados.addAll(chamadoCtr.getAllByEmpresa(emp));
 
         } catch (Exception e) {

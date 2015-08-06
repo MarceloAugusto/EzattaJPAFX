@@ -64,7 +64,7 @@ public class EzattaEmpresa implements Serializable {
     private List<EzattaUsuario> ezattaUsuarioList;
     @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL)
     private List<EzattaProduto> ezattaProdutoList;
-
+    
     public EzattaEmpresa() {
     }
 
