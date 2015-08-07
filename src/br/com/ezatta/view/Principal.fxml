@@ -182,6 +182,7 @@
                                     </AnchorPane>
                                  </top>
                               </BorderPane>
+                              <AnchorPane style="-fx-background-color: lightgray;" />
                            </children>
                         </StackPane>
                      </children>
@@ -250,7 +251,7 @@
                         <Insets left="10.0" />
                      </GridPane.margin>
                   </ImageView>
-                  <Text strokeWidth="0.0" text="Ezatta Inteligente | Intelligent Oil Supply" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+                  <Text strokeWidth="0.0" text="Ezatta Inteligente | Intelligent Oil Supply P" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER">
                      <font>
                         <Font size="14.0" />
                      </font>
