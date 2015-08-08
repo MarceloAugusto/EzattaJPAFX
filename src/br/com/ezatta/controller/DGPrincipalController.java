@@ -27,26 +27,22 @@ import javafx.scene.layout.StackPane;
  */
 public class DGPrincipalController implements Initializable {
 
-    
-    
-    
-    
     //-----------------------------------dgPrincipal
     @FXML
     private AnchorPane dgUltimosRegistros;
 
     @FXML
     private AnchorPane dgRelatorioProduto;
-    
+
     @FXML
     private StackPane stack;
-    
+
     PrincipalController p = PrincipalController.principal;
     //private StackPane stack = PrincipalController.stack;
 
     @FXML
     void dgRelatorio(ActionEvent event) {
-        
+
         try {
             stack.getChildren().clear();
             stack.getChildren().add(getNode("/br/com/ezatta/view/Relatorio.fxml"));
@@ -54,7 +50,7 @@ public class DGPrincipalController implements Initializable {
         } catch (Exception e) {
         }
     }
-    
+
     public Node getNode(String node) {
         Node no = null;
         try {
@@ -130,7 +126,7 @@ public class DGPrincipalController implements Initializable {
         //fechar conex'ao H2DB
         System.out.println("Fechou H2DB");
         JPAUtil.closeManager(JPAUtil.getEntityManager());
- 
+
         //fecha aporta
         System.out.println("port " + defaultPort + " not found.");
         serialPort.close();
@@ -139,12 +135,34 @@ public class DGPrincipalController implements Initializable {
         Platform.exit();
         System.exit(0);
     }
-    
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-    }    
-        
-    
-    
+    }
+
+    @FXML
+    void dgMovimentacoes(ActionEvent event) {
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/Movimentacoes_Estoque.fxml"));
+        } catch (Exception e) {
+            new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
+            System.out.println("Erro ao carregar a tela de bicos");
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void dgHistorico(ActionEvent event) {
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/AjudaSuporte.fxml"));
+        } catch (Exception e) {
+            new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
+            System.out.println("Erro ao carregar a tela de bicos");
+            e.printStackTrace();
+        }
+    }
+
 }

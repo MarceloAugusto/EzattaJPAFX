@@ -2,7 +2,9 @@ package br.com.ezatta.controller;
 
 import br.com.ezatta.dao.EmpresaDAO;
 import br.com.ezatta.dao.ProdutoDAO;
+import br.com.ezatta.dao.EstoqueProdutoDAO;
 import br.com.ezatta.model.EzattaEmpresa;
+import br.com.ezatta.model.EzattaEstoqueProduto;
 import br.com.ezatta.model.EzattaProduto;
 import br.com.ezatta.util.GenericTable;
 import br.com.ezatta.util.ValidationFields;
@@ -11,6 +13,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URL;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -235,54 +238,106 @@ public class EncherTanqueController implements Initializable {
 
     //--------------------------novos btns adicionar - remover - limpar
     BigDecimal qtd;
+
     @FXML
-    void adicionarTanque(ActionEvent event) {     
+    void adicionarTanque(ActionEvent event) throws SQLException {
         qtd = new BigDecimal(BigInteger.ONE);
         qtd = ezattaProduto.getQuantidade();
-        
+
         String qtdRedefinirStr = qtdRedefinir.getText();
         qtdRedefinirStr = qtdRedefinirStr.replace(",", ".");
         qtd = qtd.add(new BigDecimal(qtdRedefinirStr));
-        
+
         ezattaProduto.setQuantidade(qtd);
         produtoCtr.updateProduto(ezattaProduto);
+
+        //adiciona estoque produto inicio
+        EstoqueProdutoDAO produtoEstoqueDAO = new EstoqueProdutoDAO();
+        EzattaEstoqueProduto estoque = new EzattaEstoqueProduto();
+
+        Timestamp data = new Timestamp(System.currentTimeMillis());
+        estoque.setDataoperacao(data);
+        estoque.setEmpresa(cbEmpresa.getSelectionModel().getSelectedItem());
+        estoque.setQuantidade(Float.parseFloat(qtdRedefinirStr));
+        estoque.setOperacao("+");
+        estoque.setProduto(ezattaProduto);
+
+        System.out.println("Estoque: " + estoque);
+        produtoEstoqueDAO.addPEstoque(estoque);
+        System.out.println("adicionou no estoque");
+        //adiciona estoque produto fim
+
         new FXDialog(FXDialog.Type.INFO, "Volume adicionado ao tanque.").showDialog();
         tabTela.getSelectionModel().select(0);
         redefinirConsulta(event);
     }
 
     @FXML
-    void removerTanque(ActionEvent event) {
+    void removerTanque(ActionEvent event) throws SQLException {
         qtd = new BigDecimal(0);
         qtd = ezattaProduto.getQuantidade();
-        
+
         String qtdRedefinirStr = qtdRedefinir.getText();
         qtdRedefinirStr = qtdRedefinirStr.replace(",", ".");
         qtd = qtd.subtract(new BigDecimal(qtdRedefinirStr));
-        
+
 //        String qtdStr = qtdRedefinir.getText();
 //        BigDecimal qtdN = new BigDecimal(qtdStr);
 //        qtd = qtd.subtract(qtdN);
-//        
         ezattaProduto.setQuantidade(qtd);
         produtoCtr.updateProduto(ezattaProduto);
-        System.out.println("qtd: "+qtd);
+        System.out.println("qtd: " + qtd);
+
+        //adiciona estoque produto inicio
+        EstoqueProdutoDAO produtoEstoqueDAO = new EstoqueProdutoDAO();
+        EzattaEstoqueProduto estoque = new EzattaEstoqueProduto();
+
+        Timestamp data = new Timestamp(System.currentTimeMillis());
+        estoque.setDataoperacao(data);
+        estoque.setEmpresa(cbEmpresa.getSelectionModel().getSelectedItem());
+        estoque.setQuantidade(Float.parseFloat(qtdRedefinirStr));
+        //estoque.setQuantidade(qtd.floatValue());
+        estoque.setOperacao("-");
+        estoque.setProduto(ezattaProduto);
+
+        System.out.println("Estoque: " + estoque);
+        produtoEstoqueDAO.addPEstoque(estoque);
+        System.out.println("adicionou no estoque");
+        //adiciona estoque produto fim
+
         new FXDialog(FXDialog.Type.INFO, "Volume removido do tanque.").showDialog();
         tabTela.getSelectionModel().select(0);
         redefinirConsulta(event);
     }
 
     @FXML
-    void vazioTanque(ActionEvent event) {
+    void vazioTanque(ActionEvent event) throws SQLException {
         qtd = new BigDecimal(0);
         ezattaProduto.setQuantidade(qtd);
         produtoCtr.updateProduto(ezattaProduto);
-        System.out.println("qtd: "+qtd);
+        System.out.println("qtd: " + qtd);
+
+        //adiciona estoque produto inicio
+        EstoqueProdutoDAO produtoEstoqueDAO = new EstoqueProdutoDAO();
+        EzattaEstoqueProduto estoque = new EzattaEstoqueProduto();
+
+        Timestamp data = new Timestamp(System.currentTimeMillis());
+        estoque.setDataoperacao(data);
+        estoque.setEmpresa(cbEmpresa.getSelectionModel().getSelectedItem());
+        estoque.setQuantidade(new Float(0));
+        estoque.setOperacao("zerando tanque");
+        estoque.setProduto(ezattaProduto);
+
+        System.out.println("Estoque: " + estoque);
+        produtoEstoqueDAO.addPEstoque(estoque);
+        System.out.println("adicionou no estoque");
+        //adiciona estoque produto fim
+
         new FXDialog(FXDialog.Type.INFO, "Tanque vazio.").showDialog();
         tabTela.getSelectionModel().select(0);
         redefinirConsulta(event);
     }
-    
+
     //---------------------------------------navega;'ao telas
     @FXML
     private Button btnVoltar;

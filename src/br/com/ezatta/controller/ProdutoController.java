@@ -7,7 +7,9 @@ package br.com.ezatta.controller;
 
 import br.com.ezatta.dao.EmpresaDAO;
 import br.com.ezatta.dao.ProdutoDAO;
+import br.com.ezatta.dao.EstoqueProdutoDAO;
 import br.com.ezatta.model.EzattaEmpresa;
+import br.com.ezatta.model.EzattaEstoqueProduto;
 import br.com.ezatta.model.EzattaProduto;
 import br.com.ezatta.util.GenericTable;
 import br.com.ezatta.util.JPAUtil;
@@ -18,6 +20,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -265,7 +268,7 @@ public class ProdutoController implements Initializable {
     }
 
     @FXML
-    void btnSalvar(ActionEvent event) {
+    void btnSalvar(ActionEvent event) throws SQLException {
         if (isValidaTela()) {
             switch (getOperacao()) {
                 case 0:
@@ -281,6 +284,25 @@ public class ProdutoController implements Initializable {
                     produto.setEmail(txtEmail.getText());
 
                     produtoCtr.addProduto(produto);
+                    EzattaProduto pNovo = produtoCtr.getProdutoByNome(produto.getNome());
+                    System.out.println("produto inserido: "+pNovo.getNome()+" id: "+pNovo.getId());
+                    
+                    //adiciona estoque produto inicio
+                    EstoqueProdutoDAO produtoEstoqueDAO = new EstoqueProdutoDAO();
+                    EzattaEstoqueProduto estoque = new EzattaEstoqueProduto();
+                    
+                    Timestamp data = new Timestamp(System.currentTimeMillis());
+                    estoque.setDataoperacao(data);
+                    estoque.setEmpresa(cbEmpresa.getSelectionModel().getSelectedItem());
+                    estoque.setQuantidade(new Float(txtQuantidade.getText()));
+                    estoque.setOperacao("Cadastro");
+                    estoque.setProduto(pNovo);
+                    
+                    System.out.println("Estoque: "+estoque);
+                    produtoEstoqueDAO.addPEstoque(estoque);
+                    System.out.println("adicionou no estoque");
+                    //adiciona estoque produto fim
+                    
                     popularDados();
                     new FXDialog(Type.INFO, "Registro inserido com sucesso!").showDialog();
                     tabTela.getSelectionModel().select(0);

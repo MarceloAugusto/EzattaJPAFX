@@ -11,7 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-public class ProdutoDAO extends GenericDAO {
+public class ProdutoDAO {
 
     private static final long serialVersionUID = 1L;
 

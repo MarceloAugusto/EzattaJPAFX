@@ -27,8 +27,8 @@ import static br.com.ezatta.controller.LoginController.ezattaUsuarioStatic;
 import static br.com.ezatta.controller.LoginController.portFound;
 import static br.com.ezatta.controller.LoginController.saida;
 import static br.com.ezatta.controller.LoginController.serialPort;
-import br.com.ezatta.dao.EstoqueDAO;
-import br.com.ezatta.model.EzattaEstoque;
+import br.com.ezatta.dao.MovimentacoesDAO;
+import br.com.ezatta.model.EzattaMovimentacoes;
 import br.com.ezatta.util.MaskTextField;
 import br.com.ezatta.util.ValidationFields;
 import java.io.BufferedInputStream;
@@ -64,9 +64,9 @@ public class EnvaseBicoController implements Initializable {
     private int Operacao;
     private OperadorDAO operadorCtr = new OperadorDAO();
     private BicosDAO bicoCtr = new BicosDAO();
-    private EstoqueDAO estoqueCtr = new EstoqueDAO();
+    private MovimentacoesDAO estoqueCtr = new MovimentacoesDAO();
     private MaskTextField maskTextField = new MaskTextField();
-    private EzattaEstoque estoque = new EzattaEstoque();
+    private EzattaMovimentacoes estoque = new EzattaMovimentacoes();
 
     static StringBuilder outputBfj;
     static StringBuilder volumeBfj;

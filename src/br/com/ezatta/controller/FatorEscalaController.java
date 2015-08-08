@@ -11,7 +11,7 @@ import static br.com.ezatta.controller.LoginController.serialPort;
 import br.com.ezatta.dao.BicosDAO;
 import br.com.ezatta.dao.ProdutoDAO;
 import br.com.ezatta.model.EzattaBico;
-import br.com.ezatta.model.EzattaEstoque;
+import br.com.ezatta.model.EzattaMovimentacoes;
 import br.com.ezatta.model.EzattaProduto;
 import br.com.ezatta.util.GenericTable;
 import br.com.ezatta.util.ValidationFields;

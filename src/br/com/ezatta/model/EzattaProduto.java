@@ -81,7 +81,7 @@ public class EzattaProduto implements Serializable {
     @ManyToOne
     private EzattaEmpresa empresa;
     @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL)
-    private List<EzattaEstoque> ezattaEstoqueList;
+    private List<EzattaMovimentacoes> ezattaEstoqueList;
     @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL)
     private List<EzattaBico> ezattaBicoList;
 
@@ -201,11 +201,11 @@ public class EzattaProduto implements Serializable {
     }
 
     @XmlTransient
-    public List<EzattaEstoque> getEzattaEstoqueList() {
+    public List<EzattaMovimentacoes> getEzattaEstoqueList() {
         return ezattaEstoqueList;
     }
 
-    public void setEzattaEstoqueList(List<EzattaEstoque> ezattaEstoqueList) {
+    public void setEzattaEstoqueList(List<EzattaMovimentacoes> ezattaEstoqueList) {
         this.ezattaEstoqueList = ezattaEstoqueList;
     }
 

@@ -247,6 +247,7 @@ public class BicoController implements Initializable {
                 case 0:
                     //EzattaBico bico = new EzattaBico(txtNome.getText(),txtEndereco.getText(), cbProduto.getSelectionModel().getSelectedItem());
                     EzattaBico bico = new EzattaBico(txtNome.getText(),txtEndereco.getText(), "208", cbProduto.getSelectionModel().getSelectedItem());
+                    System.out.println("Bico fator escala: "+bico.getFatorescala());
                     bicoCtr.addBico(bico);
                     popularDados();
                     new FXDialog(Type.INFO, "Registro inserido com sucesso!").showDialog();

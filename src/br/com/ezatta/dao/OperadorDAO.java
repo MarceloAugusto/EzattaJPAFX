@@ -8,7 +8,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-public class OperadorDAO extends GenericDAO {
+public class OperadorDAO {
 
     private static final long serialVersionUID = 1L;
 

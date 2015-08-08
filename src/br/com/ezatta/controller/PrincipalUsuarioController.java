@@ -8,12 +8,14 @@ import static br.com.ezatta.controller.LoginController.portFound;
 import static br.com.ezatta.controller.LoginController.saida;
 import static br.com.ezatta.controller.LoginController.serialPort;
 import br.com.ezatta.dao.BicosDAO;
-import br.com.ezatta.dao.EstoqueDAO;
+import br.com.ezatta.dao.MovimentacoesDAO;
 import br.com.ezatta.dao.OperadorDAO;
 import br.com.ezatta.dao.ProdutoDAO;
+import br.com.ezatta.dao.EstoqueProdutoDAO;
 import br.com.ezatta.mail.TesteEmail;
 import br.com.ezatta.model.EzattaBico;
-import br.com.ezatta.model.EzattaEstoque;
+import br.com.ezatta.model.EzattaEstoqueProduto;
+import br.com.ezatta.model.EzattaMovimentacoes;
 import br.com.ezatta.model.EzattaOperador;
 import br.com.ezatta.model.EzattaProduto;
 import br.com.ezatta.util.JPAUtil;
@@ -97,8 +99,8 @@ public class PrincipalUsuarioController implements Initializable {
 
     public static PrincipalUsuarioController principal = new PrincipalUsuarioController();
 
-    private ObservableList<EzattaEstoque> dadosParaEnvase = FXCollections.observableArrayList();
-    private EstoqueDAO EstoqueCtr = new EstoqueDAO();
+    private ObservableList<EzattaMovimentacoes> dadosParaEnvase = FXCollections.observableArrayList();
+    private MovimentacoesDAO EstoqueCtr = new MovimentacoesDAO();
     static StringBuilder outputBfj;
     static StringBuilder volumeBfj;
     static BufferedInputStream bufferedinputStream;
@@ -109,9 +111,9 @@ public class PrincipalUsuarioController implements Initializable {
     private ObservableList<EzattaOperador> dadosOperador = FXCollections.observableArrayList();
     private OperadorDAO operadorCtr = new OperadorDAO();
     private BicosDAO bicoCtr = new BicosDAO();
-    private EstoqueDAO estoqueCtr = new EstoqueDAO();
+    private MovimentacoesDAO estoqueCtr = new MovimentacoesDAO();
     private MaskTextField maskTextField = new MaskTextField();
-    private EzattaEstoque estoque;
+    private EzattaMovimentacoes estoque;
     //---------------------------------------fim vars bicos-------------------
     //--------------------------------------inicio var componentes envase
     private HBox[] hb = new HBox[10000];
@@ -131,7 +133,7 @@ public class PrincipalUsuarioController implements Initializable {
     //--------------------------------------fim var componentes envase
     
     @FXML
-    private ListView<EzattaEstoque> lvEstoque;
+    private ListView<EzattaMovimentacoes> lvEstoque;
 
     @FXML
     private StackPane stack;
@@ -252,7 +254,7 @@ public class PrincipalUsuarioController implements Initializable {
             dadosParaEnvase.clear();
             dadosParaEnvase.addAll(EstoqueCtr.getEstoqueByStatus(0));
 
-            for (EzattaEstoque dado : dadosParaEnvase) {
+            for (EzattaMovimentacoes dado : dadosParaEnvase) {
                 adicionarVbList(dado);
             }
         } catch (Exception e) {
@@ -262,7 +264,7 @@ public class PrincipalUsuarioController implements Initializable {
 
     private void enviarVolumePlaca(Integer idEstoqueTh) {
         try {
-            EzattaEstoque dado = estoqueCtr.getEstoque(idEstoqueTh);
+            EzattaMovimentacoes dado = estoqueCtr.getEstoque(idEstoqueTh);
 
             volumeTotal[idEstoqueTh] = dado.getQtdEstoque();
             endBico[idEstoqueTh] = dado.getBico().getEndereco();
@@ -282,7 +284,7 @@ public class PrincipalUsuarioController implements Initializable {
             t[idEstoqueTh].start();
 
             //atualiza banco
-            EzattaEstoque est = EstoqueCtr.getEstoque(idEstoqueTh);
+            EzattaMovimentacoes est = EstoqueCtr.getEstoque(idEstoqueTh);
             est.setStatus(1);
             EstoqueCtr.updateEstoque(est);
 
@@ -298,6 +300,7 @@ public class PrincipalUsuarioController implements Initializable {
     }
 
     private void cancelarVolumePlaca(Integer idEstoqueTh) {
+        
         vbList.getChildren().remove(gridpane[idEstoqueTh]);
         vbList.getChildren().remove(separator[idEstoqueTh]);
         //cancela no banco de dados
@@ -307,7 +310,7 @@ public class PrincipalUsuarioController implements Initializable {
 
     public void completarTanque(int idEstoqueTh) {
         try {
-            EzattaEstoque ezattaEstoqueSalvar = estoqueCtr.getEstoque(idEstoqueTh);
+            EzattaMovimentacoes ezattaEstoqueSalvar = estoqueCtr.getEstoque(idEstoqueTh);
 
             //Atualizar qtd Tbl_Produto-------------------------------------------------------------------
             EzattaProduto ezattaProdutoSalvar = produtoCtr.getProduto(ezattaEstoqueSalvar.getProduto().getId());//busca produto 
@@ -563,7 +566,7 @@ public class PrincipalUsuarioController implements Initializable {
                             //cancela thread
                             taskLeituraEnvase.cancel();
                             //--------------------------atualizar status
-                            EzattaEstoque e = EstoqueCtr.getEstoque(idEstoqueTh);
+                            EzattaMovimentacoes e = EstoqueCtr.getEstoque(idEstoqueTh);
                             e.setStatus(2);
                             EstoqueCtr.updateEstoque(e);
 
@@ -646,7 +649,7 @@ public class PrincipalUsuarioController implements Initializable {
         }
     }
 
-    private void enviarStringPlaca(EzattaEstoque dado) throws IOException {
+    private void enviarStringPlaca(EzattaMovimentacoes dado) throws IOException {
 
         try {
             saida = serialPort.getOutputStream();
@@ -794,7 +797,7 @@ public class PrincipalUsuarioController implements Initializable {
         /*--fechar---------------------------------------------------------*/
     }
 
-    private void atualizaFatorEscala(EzattaEstoque dado) throws InterruptedException, IOException {
+    private void atualizaFatorEscala(EzattaMovimentacoes dado) throws InterruptedException, IOException {
         try {
             System.out.println("dados: "+dado);
             saida = serialPort.getOutputStream();
@@ -827,7 +830,7 @@ public class PrincipalUsuarioController implements Initializable {
         //saida.flush();  // ??  
     }
 
-    private void enviarVolume(EzattaEstoque dado) {
+    private void enviarVolume(EzattaMovimentacoes dado) {
 
         try {
             saida = serialPort.getOutputStream();
@@ -1118,10 +1121,10 @@ public class PrincipalUsuarioController implements Initializable {
     }
 
     public void verEstoque() {
-        EzattaEstoque estoque = new EzattaEstoque();
-        EstoqueDAO estoquedao = new EstoqueDAO();
-        List<EzattaEstoque> lista = estoquedao.getAllEstoque();
-        for (EzattaEstoque lista1 : lista) {
+        EzattaMovimentacoes estoque = new EzattaMovimentacoes();
+        MovimentacoesDAO estoquedao = new MovimentacoesDAO();
+        List<EzattaMovimentacoes> lista = estoquedao.getAllEstoque();
+        for (EzattaMovimentacoes lista1 : lista) {
             System.out.println(lista1);
         }
     }
@@ -1227,7 +1230,7 @@ public class PrincipalUsuarioController implements Initializable {
 
     private void salvarNoBanco() {
 
-        estoque = new EzattaEstoque();
+        estoque = new EzattaMovimentacoes();
         String vol = txtVolume.getText();
         System.out.println("Salva no banco 1");
         if (vol.contains(",")) {
@@ -1283,11 +1286,28 @@ public class PrincipalUsuarioController implements Initializable {
 
         //new FXDialog(FXDialog.Type.INFO, "ezattaProdutoStatic: "+ezattaProdutoStatic.getNome()+" - id: "+ezattaProdutoStatic.getId()+ " qtd: "+ezattaProdutoStatic.getQuantidade()).showDialog();
         estoqueCtr.addEstoque(estoque);
+        
+        //adiciona estoque produto inicio------------------------------------
+        EstoqueProdutoDAO produtoEstoqueDAO = new EstoqueProdutoDAO();
+        EzattaEstoqueProduto estoque = new EzattaEstoqueProduto();
+
+        Timestamp datas = new Timestamp(System.currentTimeMillis());
+        estoque.setDataoperacao(datas);
+        estoque.setEmpresa(ezattaUsuarioStatic.getEmpresa());
+        estoque.setUsuario(ezattaUsuarioStatic);
+        estoque.setQuantidade(Float.parseFloat(vol));
+        estoque.setOperacao("-");
+        estoque.setProduto(ezattaProdutoStatic);
+
+        System.out.println("Estoque: " + estoque);
+        produtoEstoqueDAO.addPEstoque(estoque);
+        System.out.println("adicionou no estoque");
+        //adiciona estoque produto fim------------------------------------------------
 
         System.out.println("=================================inicio===================================================");
-        List<EzattaEstoque> list = estoqueCtr.getUltimoEstoque();
-        EzattaEstoque itemPassado = new EzattaEstoque();
-        for (EzattaEstoque list1 : list) {
+        List<EzattaMovimentacoes> list = estoqueCtr.getUltimoEstoque();
+        EzattaMovimentacoes itemPassado = new EzattaMovimentacoes();
+        for (EzattaMovimentacoes list1 : list) {
             System.out.println("list1: " + list1);
             itemPassado = list1;
             System.out.println("itemPassado: " + itemPassado);
@@ -1299,7 +1319,7 @@ public class PrincipalUsuarioController implements Initializable {
     }
 
     private void cancelarNoBanco(Integer idEstoqueTh) {
-        EzattaEstoque e = EstoqueCtr.getEstoque(idEstoqueTh);
+        EzattaMovimentacoes e = EstoqueCtr.getEstoque(idEstoqueTh);
         e.setStatus(3);
         EstoqueCtr.updateEstoque(e);
         //atualizar Quantidade do produto
@@ -1311,6 +1331,26 @@ public class PrincipalUsuarioController implements Initializable {
         BigDecimal quantidadecalculada = quantidadeProduto.add(quantidadeEstoque).setScale(2, RoundingMode.FLOOR);
         prod.setQuantidade(quantidadecalculada);
         produtoCtr.updateProduto(prod);
+        
+        //adiciona estoque produto inicio------------------------------------
+        System.out.println("ezattaUsuarioStatic: "+ezattaUsuarioStatic);
+        System.out.println("ezattaUsuarioStatic.getEmpresa(): "+ezattaUsuarioStatic.getEmpresa());
+        System.out.println("ezattaProdutoStatic: "+ezattaProdutoStatic);
+        
+        EstoqueProdutoDAO produtoEstoqueDAO = new EstoqueProdutoDAO();
+        EzattaEstoqueProduto estoque = new EzattaEstoqueProduto();
+        Timestamp datas = new Timestamp(System.currentTimeMillis());
+        estoque.setDataoperacao(datas);
+        estoque.setUsuario(ezattaUsuarioStatic);
+        estoque.setEmpresa(ezattaUsuarioStatic.getEmpresa());
+        estoque.setQuantidade(quantidadeEstoque.floatValue());
+        estoque.setOperacao("Cancelada");
+        estoque.setProduto(ezattaProdutoStatic);
+
+        System.out.println("Estoque: " + estoque);
+        produtoEstoqueDAO.addPEstoque(estoque);
+        System.out.println("adicionou no estoque");
+        //adiciona estoque produto fim------------------------------------------------
     }
 
     private void cancelarPlaca(int idEstoqueTh) {
@@ -1336,7 +1376,7 @@ public class PrincipalUsuarioController implements Initializable {
             //mostrar parte alta e baixa do inteiro
             System.out.println("String: " + (String.valueOf(volumeMSBL)) + " " + (String.valueOf(volumeLSBL)));
 
-            EzattaEstoque ezattaEstoqueCancelar = estoqueCtr.getEstoque(idEstoqueTh);
+            EzattaMovimentacoes ezattaEstoqueCancelar = estoqueCtr.getEstoque(idEstoqueTh);
             EzattaBico bico = ezattaEstoqueCancelar.getBico();
             System.out.println("bico: " + bico.getNome());
 
@@ -1368,7 +1408,7 @@ public class PrincipalUsuarioController implements Initializable {
     }
 
     //----------------------------------------------------fim novos metodos
-    private void adicionarVbList(EzattaEstoque dado) {
+    private void adicionarVbList(EzattaMovimentacoes dado) {
         idEstoqueTh = dado.getId(); //id estoque -> identificado
         //instanciar componentes vetores
         hb[idEstoqueTh] = new HBox();

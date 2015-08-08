@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.effect.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane fx:id="stack" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.ezatta.controller.Movimentacoes_EstoqueController">
+    <children>
+      <AnchorPane id="AnchorPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" style="-fx-background-color: lightgray;">
+         <children>
+            <BorderPane layoutX="10.0" layoutY="10.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <top>
+                  <AnchorPane prefHeight="40.0" style="-fx-background-color: lightgray;">
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                     <children>
+                        <Text layoutX="14.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Configurações &gt; Estoque" AnchorPane.leftAnchor="55.0" AnchorPane.topAnchor="10.0">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Text>
+                        <Button fx:id="btnVoltar" mnemonicParsing="false" onAction="#btnVoltarTela" prefHeight="30.0" prefWidth="30.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="2.0">
+                           <graphic>
+                              <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/circleleft32.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <tooltip>
+                              <Tooltip text="Tela inicial" />
+                           </tooltip>
+                        </Button>
+                     </children>
+                  </AnchorPane>
+               </top>
+               <center>
+                  <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                     <children>
+                        <AnchorPane prefHeight="425.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <TextField fx:id="txtBuscar" layoutX="13.0" layoutY="37.0" maxHeight="20.0" prefHeight="25.0" prefWidth="382.0" promptText="Buscar pelo volume..." AnchorPane.topAnchor="11.0" />
+                              <Button fx:id="btnBuscar" layoutX="400.0" layoutY="35.0" mnemonicParsing="false" onAction="#btnBuscar" prefHeight="25.0" prefWidth="89.0" text="Buscar" AnchorPane.topAnchor="11.0">
+                                 <graphic>
+                                    <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@images/search32.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
+                              <TableView fx:id="tb" layoutX="6.0" layoutY="69.0" prefHeight="304.0" prefWidth="788.0" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="6.0" AnchorPane.topAnchor="48.0">
+                                 <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
+                              </TableView>
+                              <Button fx:id="btnImprimirRegistros" layoutX="668.0" layoutY="35.0" mnemonicParsing="false" onAction="#btnImprimir" prefHeight="30.0" prefWidth="121.0" text="Imprimir" AnchorPane.topAnchor="11.0">
+                                 <graphic>
+                                    <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@images/printer32.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
+                              <Button fx:id="btnRedefinirConsulta" layoutX="499.0" layoutY="35.0" mnemonicParsing="false" onAction="#redefinirConsulta" text="Redefinir consulta" AnchorPane.topAnchor="11.0">
+                                 <graphic>
+                                    <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@images/exchange32.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </AnchorPane>
+               </center>
+            </BorderPane>
+         </children>
+      </AnchorPane>
+   </children>
+</StackPane>

@@ -10,7 +10,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-public class BicosDAO extends GenericDAO {
+public class BicosDAO {
 
     private static final long serialVersionUID = 1L;
 

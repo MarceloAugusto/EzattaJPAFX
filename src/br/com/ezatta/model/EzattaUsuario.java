@@ -63,7 +63,7 @@ public class EzattaUsuario implements Serializable {
     @Colunas(nome="Empresa", size =100)
     private EzattaEmpresa empresa;
     @OneToMany(mappedBy = "usuario")
-    private List<EzattaEstoque> ezattaEstoqueList;
+    private List<EzattaMovimentacoes> ezattaEstoqueList;
 
     public EzattaUsuario() {
     }
@@ -135,11 +135,11 @@ public class EzattaUsuario implements Serializable {
     }
 
     @XmlTransient
-    public List<EzattaEstoque> getEzattaEstoqueList() {
+    public List<EzattaMovimentacoes> getEzattaEstoqueList() {
         return ezattaEstoqueList;
     }
 
-    public void setEzattaEstoqueList(List<EzattaEstoque> ezattaEstoqueList) {
+    public void setEzattaEstoqueList(List<EzattaMovimentacoes> ezattaEstoqueList) {
         this.ezattaEstoqueList = ezattaEstoqueList;
     }
 

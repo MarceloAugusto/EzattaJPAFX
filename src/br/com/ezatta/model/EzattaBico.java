@@ -58,7 +58,7 @@ public class EzattaBico implements Serializable {
     @Column(name = "FATORESCALA", length = 255)
     private String fatorescala;
     @OneToMany(mappedBy = "bico")
-    private List<EzattaEstoque> ezattaEstoqueList;
+    private List<EzattaMovimentacoes> ezattaEstoqueList;
     @JoinColumn(name = "PRODUTO", referencedColumnName = "id")
     @ManyToOne
     @Colunas(nome = "Produto", size = 100)
@@ -134,11 +134,11 @@ public class EzattaBico implements Serializable {
     }
 
     @XmlTransient
-    public List<EzattaEstoque> getEzattaEstoqueList() {
+    public List<EzattaMovimentacoes> getEzattaEstoqueList() {
         return ezattaEstoqueList;
     }
 
-    public void setEzattaEstoqueList(List<EzattaEstoque> ezattaEstoqueList) {
+    public void setEzattaEstoqueList(List<EzattaMovimentacoes> ezattaEstoqueList) {
         this.ezattaEstoqueList = ezattaEstoqueList;
     }
 
