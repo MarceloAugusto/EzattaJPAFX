@@ -5,6 +5,7 @@
  */
 package br.com.ezatta.controller;
 
+import static br.com.ezatta.controller.PrincipalController.principal;
 import br.com.ezatta.dao.EmpresaDAO;
 import br.com.ezatta.model.EzattaEmpresa;
 import br.com.ezatta.util.GenericTable;
@@ -13,6 +14,7 @@ import br.com.ezatta.util.Path;
 import br.com.ezatta.util.ValidationFields;
 import br.com.ezatta.view.FXDialog;
 import br.com.ezatta.view.FXDialog.Type;
+import br.com.ezatta.view.FormFX;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -26,7 +28,9 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
@@ -37,6 +41,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 import javax.persistence.EntityManager;
 
 import net.sf.jasperreports.engine.JRException;
@@ -143,11 +149,11 @@ public class EmpresaController implements Initializable {
     void btnBuscar(ActionEvent event) throws SQLException {
         if (isValidConsulta()) {
             dados.clear();
-            if (rbNome.isSelected()) {
-                dados.addAll(EmpresaCtr.findAll("select c.* from ezatta_empresa c", " where c.nome like  '%" + txtBuscar.getText() + "%'"));
-            } else if (rbEmail.isSelected()) {
-                dados.addAll(EmpresaCtr.findAll("select c.* from ezatta_empresa c", " where c.email like  '%" + txtBuscar.getText() + "%'"));
-            }
+            //if (rbNome.isSelected()) {
+            dados.addAll(EmpresaCtr.findAll("select c.* from ezatta_empresa c", " where c.nome like  '%" + txtBuscar.getText() + "%'"));
+//            } else if (rbEmail.isSelected()) {
+//                dados.addAll(EmpresaCtr.findAll("select c.* from ezatta_empresa c", " where c.email like  '%" + txtBuscar.getText() + "%'"));
+//            }
             tbEmpresa.setItems(dados);
         } else {
             new FXDialog(Type.WARNING, "Escolha pelo menos uma das opções para consulta!").showDialog();
@@ -217,7 +223,7 @@ public class EmpresaController implements Initializable {
     }
 
     private boolean isValidConsulta() {
-        boolean ok = rbNome.isSelected() || rbEmail.isSelected();
+        boolean ok = true;
         if (ok) {
             ok = !txtBuscar.getText().isEmpty();
         }
@@ -226,7 +232,7 @@ public class EmpresaController implements Initializable {
 
     @FXML
     void btnImprimir(ActionEvent event) {
-               
+
         String path = JPAUtil.getConfRelatorio();
         EntityManager em = new JPAUtil().getEntityManager();
         em.getTransaction().begin();
@@ -244,7 +250,7 @@ public class EmpresaController implements Initializable {
                 }
             }
         });
-        
+
     }
 
     @FXML
@@ -299,15 +305,15 @@ public class EmpresaController implements Initializable {
             new FXDialog(Type.WARNING, "Favor preencher o nome!").showDialog();
             txtNome.requestFocus();
             ok = false;
-        }else if (txtLogin.getText().isEmpty()) {
+        } else if (txtLogin.getText().isEmpty()) {
             new FXDialog(Type.WARNING, "Favor preencher o login!").showDialog();
             txtLogin.requestFocus();
             ok = false;
-        }else if (txtSenha.getText().isEmpty()) {
+        } else if (txtSenha.getText().isEmpty()) {
             new FXDialog(Type.WARNING, "Favor preencher o Senha!").showDialog();
             txtSenha.requestFocus();
             ok = false;
-        }else if (txtEmail.getText().isEmpty()) {
+        } else if (txtEmail.getText().isEmpty()) {
             new FXDialog(Type.WARNING, "Favor preencher o email!").showDialog();
             txtEmail.requestFocus();
             ok = false;
@@ -329,7 +335,7 @@ public class EmpresaController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        ValidationFields.checkEmptyFields(txtNome,txtLogin,txtSenha,txtEmail);
+        ValidationFields.checkEmptyFields(txtNome, txtLogin, txtSenha, txtEmail);
         tbEmpresa.getColumns().addAll(new GenericTable<EzattaEmpresa>().tableColunas(EzattaEmpresa.class));
         popularDados();
         tbEmpresa.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -388,6 +394,33 @@ public class EmpresaController implements Initializable {
 
     public void setEzattaEmpresa(EzattaEmpresa ezattaEmpresa) {
         this.ezattaEmpresa = ezattaEmpresa;
+    }
+
+    @FXML
+    private Button btnVoltar;
+
+    @FXML
+    private StackPane stack;
+
+    PrincipalController p = PrincipalController.principal;
+
+    @FXML
+    void btnVoltar(ActionEvent event) {
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/DGPrincipal.fxml"));
+        } catch (Exception e) {
+        }
+    }
+    
+    public Node getNode(String node) {
+        Node no = null;
+        try {
+            no = FXMLLoader.load(getClass().getResource(node));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return no;
     }
 
 }

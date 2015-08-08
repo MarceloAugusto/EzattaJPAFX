@@ -27,7 +27,9 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -39,6 +41,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
 import javax.persistence.EntityManager;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -151,9 +154,9 @@ public class ProdutoController implements Initializable {
     void btnBuscar(ActionEvent event) throws SQLException {
         if (isValidConsulta()) {
             dados.clear();
-            if (rbNome.isSelected()) {
+            //if (rbNome.isSelected()) {
                 dados.addAll(produtoCtr.findAll("select c.* from ezatta_produto c", " where c.nome like  '%" + txtBuscar.getText() + "%'"));
-            }
+            //}
             tb.setItems(dados);
         } else {
             new FXDialog(Type.WARNING, "Escolha pelo menos uma das opções para consulta!").showDialog();
@@ -215,7 +218,7 @@ public class ProdutoController implements Initializable {
     }
 
     private boolean isValidConsulta() {
-        boolean ok = rbNome.isSelected();
+        boolean ok = true;
         if (ok) {
             ok = !txtBuscar.getText().isEmpty();
         }
@@ -423,6 +426,34 @@ public class ProdutoController implements Initializable {
 
     public void setEzattaProduto(EzattaProduto ezattaProduto) {
         this.ezattaProduto = ezattaProduto;
+    }
+    
+    @FXML
+    private Button btnVoltar;
+
+    @FXML
+    private StackPane stack;
+
+    PrincipalController p = PrincipalController.principal;
+
+    @FXML
+    void btnVoltarTela(ActionEvent event) {
+        System.out.println("entrou");
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/DGPrincipal.fxml"));
+        } catch (Exception e) {
+        }
+    }
+    
+    public Node getNode(String node) {
+        Node no = null;
+        try {
+            no = FXMLLoader.load(getClass().getResource(node));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return no;
     }
 
 }

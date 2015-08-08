@@ -134,8 +134,10 @@ public class PrincipalController implements Initializable {
     private ListView<EzattaEstoque> lvEstoque;
 
     @FXML
-    private StackPane stack;
-
+    public StackPane stack;
+    //public static StackPane stack = new StackPane();
+    // public static PrincipalController principal = new PrincipalController();
+    
     @FXML
     private MenuItem miEncherTank;
 
@@ -177,7 +179,6 @@ public class PrincipalController implements Initializable {
 
 //    @FXML
 //    private Text txtNomeEmpresa;
-
     @FXML
     private MenuItem miProduto;
 
@@ -350,6 +351,15 @@ public class PrincipalController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        //carrega dg
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/DGPrincipal.fxml"));
+        } catch (Exception e) {
+            new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
+            e.printStackTrace();
+        }
+        
         //ocultar progress bar bico
         progressBar.setVisible(false);
         //carrega aberto
@@ -438,7 +448,6 @@ public class PrincipalController implements Initializable {
     }
 
     //fim popula lista Produtos ==================================================================================
-    
     @FXML
     void carregarProdutoTela(ActionEvent event) {
         popularProdutos();
@@ -929,6 +938,22 @@ public class PrincipalController implements Initializable {
         Platform.exit();
         System.exit(0);
     }
+    
+    @FXML
+    void fecharCentro(ActionEvent event) {
+         try {
+            //stack.getChildren().clear();
+            stack.getChildren().removeAll(getNode("/br/com/ezatta/view/Empresa.fxml"));
+            //stack.getChildren().add(getNode("/br/com/ezatta/view/Empresa.fxml"));
+        } catch (Exception e) {
+            new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
+            e.printStackTrace();
+        }
+    }
+    
+    public void modificarStack(StackPane stack){
+        this.stack = stack;
+    }
 
     @FXML
     void cadEmpresa(ActionEvent event) {
@@ -1280,7 +1305,7 @@ public class PrincipalController implements Initializable {
         ezattaProdutoStatic.setQuantidade(quantidadecalculada);
         produtoCtr.updateProduto(ezattaProdutoStatic);
 
-        System.out.println("estoque: "+estoque);
+        System.out.println("estoque: " + estoque);
         //new FXDialog(FXDialog.Type.INFO, "ezattaProdutoStatic: "+ezattaProdutoStatic.getNome()+" - id: "+ezattaProdutoStatic.getId()+ " qtd: "+ezattaProdutoStatic.getQuantidade()).showDialog();
         estoqueCtr.addEstoque(estoque);
 
@@ -1494,17 +1519,17 @@ public class PrincipalController implements Initializable {
             message.setFrom(new InternetAddress("marceloaugusto16@gmail.com"));
 
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("marceloaugusto16@gmail.com"));
-            
+
             if (ezattaProdutoStatic.getEmail() != null) {
-                System.out.println("ezattaProdutoStatic.getEmail(): "+ezattaProdutoStatic.getEmail());
+                System.out.println("ezattaProdutoStatic.getEmail(): " + ezattaProdutoStatic.getEmail());
                 message.addRecipients(Message.RecipientType.CC, InternetAddress.parse(ezattaProdutoStatic.getEmail()));
             }
-            
-            if(ezattaUsuarioStatic.getEmpresa().getEmail()!= null){
-                System.out.println("ezattaUsuarioStatic.getEmpresa().getEmail(): "+ezattaUsuarioStatic.getEmpresa().getEmail());
+
+            if (ezattaUsuarioStatic.getEmpresa().getEmail() != null) {
+                System.out.println("ezattaUsuarioStatic.getEmpresa().getEmail(): " + ezattaUsuarioStatic.getEmpresa().getEmail());
                 message.addRecipients(Message.RecipientType.CC, InternetAddress.parse(ezattaUsuarioStatic.getEmpresa().getEmail()));
             }
-            message.setSubject("Sistema Ezatta - Alerta - "+ezattaUsuarioStatic.getEmpresa().getNome());
+            message.setSubject("Sistema Ezatta - Alerta - " + ezattaUsuarioStatic.getEmpresa().getNome());
             message.setContent(corpoEmail, "text/html");
 
             //--------------------------inicio anexo------------------------------------------
@@ -1533,7 +1558,7 @@ public class PrincipalController implements Initializable {
             Logger.getLogger(TesteEmail.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     @FXML
     void btnEnvasar(ActionEvent event) {
         //---------------------------------------------------fim
@@ -1551,7 +1576,99 @@ public class PrincipalController implements Initializable {
             e.printStackTrace();
         }
     }
-    
+
+    //-----------------------------------dgPrincipal
+    @FXML
+    private AnchorPane dgUltimosRegistros;
+
+    @FXML
+    private AnchorPane dgRelatorioProduto;
+
+    @FXML
+    void dgRelatorio(ActionEvent event) {
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/Relatorio.fxml"));
+        } catch (Exception e) {
+            new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
+            System.out.println("Erro ao carregar a tela de bicos");
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void dgCalibrar(ActionEvent event) {
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/FatorEscala.fxml"));
+        } catch (Exception e) {
+            new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
+            System.out.println("Erro ao carregar a tela de bicos");
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void dgAbastecer(ActionEvent event) {
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/EncherTanque.fxml"));
+        } catch (Exception e) {
+            new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
+            System.out.println("Erro ao carregar a tela de bicos");
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void dgBackup(ActionEvent event) {
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/BackUp.fxml"));
+        } catch (Exception e) {
+            new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
+            System.out.println("Erro ao carregar a tela de backup");
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void dgChamado(ActionEvent event) {
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/AjudaChamado.fxml"));
+        } catch (Exception e) {
+            new FXDialog(FXDialog.Type.ERROR, "É necessário estar conectado a internet \nTentar novamente").showDialog();
+            System.out.println("Erro ao carregar a tela de bicos");
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void dgContatos(ActionEvent event) {
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/AjudaSuporte.fxml"));
+        } catch (Exception e) {
+            new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
+            System.out.println("Erro ao carregar a tela de bicos");
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void dgFechar(ActionEvent event) {
+        //fechar conex'ao H2DB
+        System.out.println("Fechou H2DB");
+        JPAUtil.closeManager(JPAUtil.getEntityManager());
  
+        //fecha aporta
+        System.out.println("port " + defaultPort + " not found.");
+        serialPort.close();
+        System.out.println("Porta fechada...");
+
+        Platform.exit();
+        System.exit(0);
+    }
 
 }

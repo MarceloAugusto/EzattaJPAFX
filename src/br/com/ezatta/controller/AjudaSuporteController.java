@@ -19,12 +19,15 @@ import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.scene.web.HTMLEditor;
@@ -190,6 +193,34 @@ public class AjudaSuporteController implements Initializable {
         HBox hbFile = new HBox();
         hbFile.getChildren().addAll(openButton, endArquivo);
         fileUpload.getChildren().add(hbFile);
+    }
+    
+     //---------------------------------------navega;'ao telas
+    @FXML
+    private Button btnVoltar;
+
+    @FXML
+    private StackPane stack;
+
+    PrincipalController p = PrincipalController.principal;
+
+    @FXML
+    void btnVoltarTela(ActionEvent event) {
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/DGPrincipal.fxml"));
+        } catch (Exception e) {
+        }
+    }
+
+    public Node getNode(String node) {
+        Node no = null;
+        try {
+            no = FXMLLoader.load(getClass().getResource(node));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return no;
     }
 
 }

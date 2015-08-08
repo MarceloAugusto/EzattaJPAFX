@@ -25,8 +25,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -38,6 +40,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.HTMLEditor;
 import javafx.scene.web.WebView;
@@ -421,5 +424,33 @@ public class AjudaChamadoController implements Initializable {
 
         setEzattaChamado(tb.getSelectionModel().getSelectedItem());
         SetValoresComponentes(getEzattaChamado());
+    }
+    
+     //---------------------------------------navega;'ao telas
+    @FXML
+    private Button btnVoltar;
+
+    @FXML
+    private StackPane stack;
+
+    PrincipalController p = PrincipalController.principal;
+
+    @FXML
+    void btnVoltarTela(ActionEvent event) {
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/DGPrincipal.fxml"));
+        } catch (Exception e) {
+        }
+    }
+
+    public Node getNode(String node) {
+        Node no = null;
+        try {
+            no = FXMLLoader.load(getClass().getResource(node));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return no;
     }
 }

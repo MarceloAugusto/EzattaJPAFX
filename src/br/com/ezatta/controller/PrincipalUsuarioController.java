@@ -796,6 +796,7 @@ public class PrincipalUsuarioController implements Initializable {
 
     private void atualizaFatorEscala(EzattaEstoque dado) throws InterruptedException, IOException {
         try {
+            System.out.println("dados: "+dado);
             saida = serialPort.getOutputStream();
             System.out.println("FLUXO OK!");
         } catch (Exception e) {

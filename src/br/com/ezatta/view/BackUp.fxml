@@ -11,59 +11,70 @@
 <?import javafx.scene.layout.*?>
 
 
-<AnchorPane id="AnchorPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="600.0" prefWidth="800.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="br.com.ezatta.controller.BackUpController">
+<StackPane fx:id="stack" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.ezatta.controller.BackUpController">
    <children>
-      <BorderPane prefHeight="600.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <top>
-            <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="31.0" style="-fx-background-color: lightgray;" BorderPane.alignment="CENTER">
-               <children>
-                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="6.0" AnchorPane.topAnchor="6.0">
-                     <image>
-                        <Image url="@images/papercheck32.png" />
-                     </image>
-                  </ImageView>
-                  <Text layoutX="23.0" layoutY="22.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Back up" AnchorPane.leftAnchor="30.0">
-                     <font>
-                        <Font name="System Bold" size="14.0" />
-                     </font>
-                  </Text>
-               </children>
-               <effect>
-                  <DropShadow />
-               </effect>
-            </AnchorPane>
-         </top>
-         <center>
-            <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
-               <padding>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-               </padding>
-               <children>
-                  <Text layoutX="14.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Selecione o local onde deseja fazer o Back up do sistema." />
-                  <Button layoutX="21.0" layoutY="33.0" mnemonicParsing="false" onAction="#salvarArquivo" text="Selecione onde quer fazer back-up.">
-                     <graphic>
-                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@images/papercheck32.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                  </Button>
-                  <Separator layoutX="120.0" layoutY="82.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-                  <Text layoutX="14.0" layoutY="111.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Back up Automático" />
-                  <CheckBox fx:id="chAtivar" layoutX="14.0" layoutY="124.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="73.0" text="Ativar" />
-                  <Button layoutX="10.0" layoutY="167.0" mnemonicParsing="false" onAction="#salvarAutomatico" text="Salvar">
-                     <graphic>
-                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@images/papercheck32.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                  </Button>
-               </children>
-            </AnchorPane>
-         </center>
-      </BorderPane>
+      <AnchorPane id="AnchorPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="600.0" prefWidth="800.0">
+         <children>
+            <BorderPane prefHeight="600.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <top>
+                  <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="40.0" style="-fx-background-color: lightgray;" BorderPane.alignment="CENTER">
+                     <children>
+                        <Text layoutX="23.0" layoutY="22.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Back up" AnchorPane.leftAnchor="55.0" AnchorPane.topAnchor="10.0">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Text>
+                        <Button fx:id="btnVoltar" mnemonicParsing="false" onAction="#btnVoltarTela" prefHeight="30.0" prefWidth="30.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="2.0">
+                           <graphic>
+                              <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/circleleft32.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <tooltip>
+                              <Tooltip text="Tela inicial" />
+                           </tooltip>
+                        </Button>
+                     </children>
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                  </AnchorPane>
+               </top>
+               <center>
+                  <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                     <children>
+                        <Text layoutX="14.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Selecione o local onde deseja fazer o Back up do sistema." />
+                        <Button layoutX="21.0" layoutY="33.0" mnemonicParsing="false" onAction="#salvarArquivo" text="Selecione onde quer fazer back-up.">
+                           <graphic>
+                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/papercheck32.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <Separator layoutX="120.0" layoutY="82.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                        <Text layoutX="14.0" layoutY="111.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Back up Automático" />
+                        <CheckBox fx:id="chAtivar" layoutX="14.0" layoutY="124.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="73.0" text="Ativar" />
+                        <Button layoutX="10.0" layoutY="167.0" mnemonicParsing="false" onAction="#salvarAutomatico" text="Salvar">
+                           <graphic>
+                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/papercheck32.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                     </children>
+                  </AnchorPane>
+               </center>
+            </BorderPane>
+         </children>
+      </AnchorPane>
    </children>
-</AnchorPane>
+</StackPane>

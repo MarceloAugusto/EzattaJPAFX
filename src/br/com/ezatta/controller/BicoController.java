@@ -21,7 +21,9 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
@@ -32,6 +34,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
 import javax.persistence.EntityManager;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -132,11 +135,11 @@ public class BicoController implements Initializable {
     void btnBuscar(ActionEvent event) throws SQLException {
         if (isValidConsulta()) {
             dados.clear();
-            if (rbNome.isSelected()) {
+            //if (rbNome.isSelected()) {
                 dados.addAll(bicoCtr.findAll("select c.* from ezatta_bico c", " where c.nome like  '%" + txtBuscar.getText() + "%'"));
-            } else if (rbEndereco.isSelected()) {
-                dados.addAll(bicoCtr.findAll("select c.* from ezatta_bico c", " where c.endereco like  '%" + txtBuscar.getText() + "%'"));
-            }
+//            } else if (rbEndereco.isSelected()) {
+//                dados.addAll(bicoCtr.findAll("select c.* from ezatta_bico c", " where c.endereco like  '%" + txtBuscar.getText() + "%'"));
+//            }
             tb.setItems(dados);
         } else {
             new FXDialog(Type.WARNING, "Escolha pelo menos uma das opções para consulta!").showDialog();
@@ -198,7 +201,7 @@ public class BicoController implements Initializable {
     }
 
     private boolean isValidConsulta() {
-        boolean ok = rbNome.isSelected() || rbEndereco.isSelected();
+        boolean ok = true;
         if (ok) {
             ok = !txtBuscar.getText().isEmpty();
         }
@@ -354,6 +357,33 @@ public class BicoController implements Initializable {
 
     public void setEzattaBico(EzattaBico ezattaBico) {
         this.ezattaBico = ezattaBico;
+    }
+    
+    @FXML
+    private Button btnVoltar;
+
+    @FXML
+    private StackPane stack;
+
+    PrincipalController p = PrincipalController.principal;
+
+    @FXML
+    void btnVoltarTela(ActionEvent event) {
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/DGPrincipal.fxml"));
+        } catch (Exception e) {
+        }
+    }
+    
+    public Node getNode(String node) {
+        Node no = null;
+        try {
+            no = FXMLLoader.load(getClass().getResource(node));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return no;
     }
 
 }

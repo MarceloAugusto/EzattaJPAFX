@@ -26,10 +26,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.StackPane;
 
 /**
  * FXML Controller class
@@ -169,8 +173,8 @@ public class RelatorioController implements Initializable {
         java.sql.Timestamp datafim2 = getDataFormatada(data2);
         String placa = txtPlacaVeiculo.getText();
         relatorio.RelatorioDataPlaca(datafim1, datafim2, placa);
-        System.out.println("datafim1: "+datafim1+" - datafim2: "+datafim2);
-        System.out.println("placa: "+placa);
+        System.out.println("datafim1: " + datafim1 + " - datafim2: " + datafim2);
+        System.out.println("placa: " + placa);
     }
 
     @FXML
@@ -235,6 +239,34 @@ public class RelatorioController implements Initializable {
         java.util.Date parsedDate1 = fmt.parse(data1);
         java.sql.Timestamp datafim1 = new java.sql.Timestamp(parsedDate1.getTime());
         return datafim1;
+    }
+
+    //-----------------tela inicial navegacao
+    @FXML
+    private Button btnVoltar;
+
+    @FXML
+    private StackPane stack;
+
+    PrincipalController p = PrincipalController.principal;
+
+    @FXML
+    void btnVoltarTela(ActionEvent event) {
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/DGPrincipal.fxml"));
+        } catch (Exception e) {
+        }
+    }
+
+    public Node getNode(String node) {
+        Node no = null;
+        try {
+            no = FXMLLoader.load(getClass().getResource(node));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return no;
     }
 
 }

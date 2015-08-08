@@ -26,8 +26,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -150,7 +154,7 @@ public class BackUpController implements Initializable {
         fileChooser.setInitialDirectory(diretorio);
         fileChooser.setInitialFileName(cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE) + ".zip");
         fileChooser.getExtensionFilters().add(extFilter);
-        nome = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE)  + ".zip";
+        nome = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE) + ".zip";
         File file = new File(rais, nome);
 
         EntityManager em = new JPAUtil().getEntityManager();
@@ -181,9 +185,9 @@ public class BackUpController implements Initializable {
     private void enviarBkpEmail(String nome) throws MessagingException {
         final String username = "marceloaugusto16@gmail.com";
         final String senha = "ObrigadoSenhor33";
-        String titulo =  ezattaEmpresaStatic.getLogin();
+        String titulo = ezattaEmpresaStatic.getLogin();
         //String titulo = ezattaUsuarioStatic.getEmpresa().getNome();//nome da empresa
-        String dataCorpoMensagem = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE) +".zip";
+        String dataCorpoMensagem = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE) + ".zip";
         String mensagem = dataCorpoMensagem; // personalizar com a data
         String endArquivoUpload = "";
 
@@ -218,7 +222,7 @@ public class BackUpController implements Initializable {
             String filename = "";
             //if (!endArquivoUpload.isEmpty()) {
             System.out.println("Inicio envio email");
-            System.out.println("endereço arquvio: "+nome);
+            System.out.println("endereço arquvio: " + nome);
             filename = nome;
             DataSource source = new FileDataSource(filename);
             messageBodyPart.setDataHandler(new DataHandler(source));
@@ -231,10 +235,37 @@ public class BackUpController implements Initializable {
             //----------------------------fim anexo-----------------------------------------
 
             //new FXDialog(FXDialog.Type.INFO, "").showDialog();
-
         } catch (AddressException ex) {
             Logger.getLogger(TesteEmail.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    //---------------------------------------navega;'ao telas
+    @FXML
+    private Button btnVoltar;
+
+    @FXML
+    private StackPane stack;
+
+    PrincipalController p = PrincipalController.principal;
+
+    @FXML
+    void btnVoltarTela(ActionEvent event) {
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/DGPrincipal.fxml"));
+        } catch (Exception e) {
+        }
+    }
+
+    public Node getNode(String node) {
+        Node no = null;
+        try {
+            no = FXMLLoader.load(getClass().getResource(node));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return no;
     }
 
 }

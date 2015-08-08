@@ -20,6 +20,7 @@
                 <Menu mnemonicParsing="false" text="Principal">
                   <items>
                     <MenuItem fx:id="miFechar" mnemonicParsing="false" onAction="#fechar" text="Fechar" />
+                        <MenuItem mnemonicParsing="false" onAction="#fecharCentro" text="FecharCentro" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Cadastro">
@@ -39,7 +40,7 @@
                     <items>
                         <MenuItem fx:id="miBackUp" mnemonicParsing="false" onAction="#backup" text="Back up" />
                       <MenuItem fx:id="miCBico" mnemonicParsing="false" onAction="#calibrarBico" text="Calibrar" />
-                        <MenuItem fx:id="miEncherTank" mnemonicParsing="false" onAction="#encherTank" text="Encher Tanque" />
+                        <MenuItem fx:id="miEncherTank" mnemonicParsing="false" onAction="#encherTank" text="Tanque" />
                     </items>
                   </Menu>
                 <Menu mnemonicParsing="false" text="Ajuda">
@@ -251,7 +252,7 @@
                         <Insets left="10.0" />
                      </GridPane.margin>
                   </ImageView>
-                  <Text strokeWidth="0.0" text="Ezatta Inteligente | Intelligent Oil Supply P" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+                  <Text strokeWidth="0.0" text="Ezatta Inteligente | Intelligent Oil Supply " textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER">
                      <font>
                         <Font size="14.0" />
                      </font>
