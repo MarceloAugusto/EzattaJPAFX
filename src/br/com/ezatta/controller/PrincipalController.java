@@ -1682,7 +1682,14 @@ public class PrincipalController implements Initializable {
     
     @FXML
     void log(ActionEvent event) {
-
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/Log.fxml"));
+        } catch (Exception e) {
+            new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
+            System.out.println("Erro ao carregar a tela de bicos");
+            e.printStackTrace();
+        }
     }
     
     @FXML

@@ -1,10 +1,13 @@
 package br.com.ezatta.dao;
 
+import static br.com.ezatta.controller.LoginController.ezattaEmpresaStatic;
 import br.com.ezatta.model.EzattaEmpresa;
+import br.com.ezatta.model.EzattaLog;
 import br.com.ezatta.model.EzattaProduto;
 import br.com.ezatta.model.EzattaProdutoVo;
 import br.com.ezatta.util.JPAUtil;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -20,23 +23,62 @@ public class ProdutoDAO {
     public ProdutoDAO() {
     }
 
-    public void addProduto(EzattaProduto produto) {
+    public void addProduto(EzattaProduto produto) throws SQLException {
         em.getTransaction().begin();
         em.persist(produto);
         em.getTransaction().commit();
+        
+        //log-------------------------------------------------------------------
+        String acao = "Adicionar Produto: "+produto;
+        EzattaLog log = new EzattaLog();
+        Timestamp data = new Timestamp(System.currentTimeMillis());
+        log.setData(data);
+        log.setAcao(acao);
+        log.setEmpresa(ezattaEmpresaStatic);
+        LogDAO dao = new LogDAO();
+        
+        System.out.println("log: "+log);
+        dao.addLog(log);
+        //----------------------------------------------------------------------
     }
 
-    public void removeProduto(EzattaProduto produto) {
+    public void removeProduto(EzattaProduto produto) throws SQLException {
         em.getTransaction().begin();
         EzattaProduto prod = em.find(EzattaProduto.class, produto.getId());
         em.remove(prod);
         em.getTransaction().commit();
+        
+                //log-------------------------------------------------------------------
+        String acao = "Remover Produto: "+produto;
+        EzattaLog log = new EzattaLog();
+        Timestamp data = new Timestamp(System.currentTimeMillis());
+        log.setData(data);
+        log.setAcao(acao);
+        log.setEmpresa(ezattaEmpresaStatic);
+        LogDAO dao = new LogDAO();
+        
+        System.out.println("log: "+log);
+        dao.addLog(log);
+        //----------------------------------------------------------------------
     }
 
-    public void updateProduto(EzattaProduto produto) {
+    public void updateProduto(EzattaProduto produto) throws SQLException {
         em.getTransaction().begin();
         em.merge(produto);
         em.getTransaction().commit();
+        
+                //log-------------------------------------------------------------------
+        String acao = "Alterar Produto: "+produto;
+        EzattaLog log = new EzattaLog();
+        Timestamp data = new Timestamp(System.currentTimeMillis());
+        log.setData(data);
+        log.setAcao(acao);
+        log.setEmpresa(ezattaEmpresaStatic);
+        LogDAO dao = new LogDAO();
+        
+        System.out.println("log: "+log);
+        dao.addLog(log);
+        //----------------------------------------------------------------------
     }
 
     public EzattaProduto getProduto(int id) {

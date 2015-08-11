@@ -1,9 +1,12 @@
 package br.com.ezatta.dao;
 
+import static br.com.ezatta.controller.LoginController.ezattaEmpresaStatic;
 import br.com.ezatta.model.EzattaEmpresa;
+import br.com.ezatta.model.EzattaLog;
 import br.com.ezatta.model.EzattaUsuario;
 import br.com.ezatta.util.JPAUtil;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -38,23 +41,62 @@ public class UsuarioDAO {
         return toReturn;
     }
 
-    public void addUser(EzattaUsuario usuarios) {
+    public void addUser(EzattaUsuario usuarios) throws SQLException {
         em.getTransaction().begin();
         em.persist(usuarios);
         em.getTransaction().commit();
+        
+        //log-------------------------------------------------------------------
+        String acao = "Adicionar usuário: "+usuarios;
+        EzattaLog log = new EzattaLog();
+        Timestamp data = new Timestamp(System.currentTimeMillis());
+        log.setData(data);
+        log.setAcao(acao);
+        log.setEmpresa(ezattaEmpresaStatic);
+        LogDAO dao = new LogDAO();
+        
+        System.out.println("log: "+log);
+        dao.addLog(log);
+        //----------------------------------------------------------------------
     }
 
-    public void removeUser(EzattaUsuario usuario) {
+    public void removeUser(EzattaUsuario usuario) throws SQLException {
         em.getTransaction().begin();
         EzattaUsuario usuarioRemover = em.find(EzattaUsuario.class, usuario.getId());
         em.remove(usuarioRemover);
         em.getTransaction().commit();
+        
+         //log-------------------------------------------------------------------
+        String acao = "Remover usuário: "+usuario;
+        EzattaLog log = new EzattaLog();
+        Timestamp data = new Timestamp(System.currentTimeMillis());
+        log.setData(data);
+        log.setAcao(acao);
+        log.setEmpresa(ezattaEmpresaStatic);
+        LogDAO dao = new LogDAO();
+        
+        System.out.println("log: "+log);
+        dao.addLog(log);
+        //----------------------------------------------------------------------
     }
 
-    public void updateUser(EzattaUsuario usr) {
+    public void updateUser(EzattaUsuario usr) throws SQLException {
         em.getTransaction().begin();
         em.merge(usr);
         em.getTransaction().commit();
+        
+         //log-------------------------------------------------------------------
+        String acao = "Alterar usuário: "+usr;
+        EzattaLog log = new EzattaLog();
+        Timestamp data = new Timestamp(System.currentTimeMillis());
+        log.setData(data);
+        log.setAcao(acao);
+        log.setEmpresa(ezattaEmpresaStatic);
+        LogDAO dao = new LogDAO();
+        
+        System.out.println("log: "+log);
+        dao.addLog(log);
+        //----------------------------------------------------------------------
     }
 
     public EzattaUsuario getUser(int idUser) {

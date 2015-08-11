@@ -4,9 +4,12 @@
  */
 package br.com.ezatta.dao;
 
+import static br.com.ezatta.controller.LoginController.ezattaEmpresaStatic;
 import br.com.ezatta.model.EzattaEmpresa;
+import br.com.ezatta.model.EzattaLog;
 import br.com.ezatta.util.JPAUtil;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -31,6 +34,19 @@ public class EmpresaDAO {
         em.getTransaction().begin();
         em.persist(empresa);
         em.getTransaction().commit();
+        
+        //log-------------------------------------------------------------------
+        String acao = "Adicionar empresa: "+empresa;
+        EzattaLog log = new EzattaLog();
+        Timestamp data = new Timestamp(System.currentTimeMillis());
+        log.setData(data);
+        log.setAcao(acao);
+        log.setEmpresa(ezattaEmpresaStatic);
+        LogDAO dao = new LogDAO();
+        
+        System.out.println("log: "+log);
+        dao.addLog(log);
+        //----------------------------------------------------------------------
     }
 
     public void removeEmpresa(EzattaEmpresa emp) throws SQLException {
@@ -38,12 +54,34 @@ public class EmpresaDAO {
         EzattaEmpresa empresa = em.find(EzattaEmpresa.class, emp.getId());
         em.remove(empresa);
         em.getTransaction().commit();
+        
+        //log-------------------------------------------------------------------
+        String acao = "Remover empresa: "+empresa;
+        EzattaLog log = new EzattaLog();
+        Timestamp data = new Timestamp(System.currentTimeMillis());
+        log.setData(data);
+        log.setAcao(acao);
+        log.setEmpresa(ezattaEmpresaStatic);
+        LogDAO dao = new LogDAO();
+        dao.addLog(log);
+        //----------------------------------------------------------------------
     }
 
     public void updateEmpresa(EzattaEmpresa empresa) throws SQLException {
         em.getTransaction().begin();
         em.merge(empresa);
         em.getTransaction().commit();
+        
+        //log-------------------------------------------------------------------
+        String acao = "Alterou empresa: "+empresa;
+        EzattaLog log = new EzattaLog();
+        Timestamp data = new Timestamp(System.currentTimeMillis());
+        log.setData(data);
+        log.setAcao(acao);
+        log.setEmpresa(ezattaEmpresaStatic);
+        LogDAO dao = new LogDAO();
+        dao.addLog(log);
+        //----------------------------------------------------------------------
     }
 
     public EzattaEmpresa getEmpresa(int id) throws SQLException {

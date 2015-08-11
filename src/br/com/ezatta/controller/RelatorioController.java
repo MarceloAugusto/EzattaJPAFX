@@ -88,8 +88,8 @@ public class RelatorioController implements Initializable {
     @FXML
     private DatePicker dtfProduto;
 
-    @FXML
-    private DatePicker dtiLog;
+//    @FXML
+//    private DatePicker dtiLog;
 
     @FXML
     private DatePicker dtiProduto;
@@ -97,8 +97,8 @@ public class RelatorioController implements Initializable {
     @FXML
     private DatePicker dtfBico;
 
-    @FXML
-    private DatePicker dtfLog;
+//    @FXML
+//    private DatePicker dtfLog;
 
     @FXML
     private DatePicker dtfPlaca;
@@ -177,10 +177,10 @@ public class RelatorioController implements Initializable {
         System.out.println("placa: " + placa);
     }
 
-    @FXML
-    void relatorioLog(ActionEvent event) {
-
-    }
+//    @FXML
+//    void relatorioLog(ActionEvent event) {
+//
+//    }
 
     @FXML
     void relatorioGeral(ActionEvent event) throws SQLException {
@@ -198,15 +198,15 @@ public class RelatorioController implements Initializable {
         dtiOperador.setValue(LocalDate.now());
         dtiPlaca.setValue(LocalDate.now());
         dtiUsuario.setValue(LocalDate.now());
-        dtiLog.setValue(LocalDate.now());
+//        dtiLog.setValue(LocalDate.now());
 
         dtfData.setValue(LocalDate.now());
         dtfProduto.setValue(LocalDate.now());
         dtfBico.setValue(LocalDate.now());
         dtfOperador.setValue(LocalDate.now());
         dtfPlaca.setValue(LocalDate.now());
-        dtfUsuario.setValue(LocalDate.now());
-        dtfLog.setValue(LocalDate.now());
+//        dtfUsuario.setValue(LocalDate.now());
+//        dtfLog.setValue(LocalDate.now());
     }
 
     private void popularComboBox() {

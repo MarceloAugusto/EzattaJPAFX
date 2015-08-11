@@ -9,6 +9,7 @@
     <class>br.com.ezatta.model.EzattaOperador</class>
     <class>br.com.ezatta.backup.Backup</class>
     <class>br.com.ezatta.model.EzattaMovimentacoes</class>
+    <class>br.com.ezatta.model.EzattaLog</class>
     <properties>
       <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
       <property name="hibernate.connection.username" value="ezatta"/>

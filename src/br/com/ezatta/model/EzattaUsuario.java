@@ -58,10 +58,14 @@ public class EzattaUsuario implements Serializable {
     
     @Column(name = "SENHA", nullable = false, length = 40)
     private String senha;
+    
+    
     @JoinColumn(name = "empresa", referencedColumnName = "id")
     @ManyToOne
     @Colunas(nome="Empresa", size =100)
     private EzattaEmpresa empresa;
+    
+    
     @OneToMany(mappedBy = "usuario")
     private List<EzattaMovimentacoes> ezattaEstoqueList;
 

@@ -167,7 +167,7 @@ public class OperadorController implements Initializable {
     }
 
     @FXML
-    void btnExcluirFrontal(ActionEvent event) {
+    void btnExcluirFrontal(ActionEvent event) throws SQLException {
         if (tb.getSelectionModel().isEmpty()) {
             new FXDialog(Type.ERROR, "Favor selecionar o item primeiro... ").showDialog();
         } else {
@@ -187,7 +187,7 @@ public class OperadorController implements Initializable {
     }
 
     @FXML
-    void btnExcluir(ActionEvent event) {
+    void btnExcluir(ActionEvent event) throws SQLException {
         boolean ok = new FXDialog(Type.CONFIRM, "Tem Certeza que deseja excluir este registro?").showDialog();
         if ((ok) && (getOperacao() == 1)) {
             operadorCtr.removeOperador(getEzattaOperador());
@@ -244,7 +244,7 @@ public class OperadorController implements Initializable {
     }
 
     @FXML
-    void btnSalvar(ActionEvent event) {
+    void btnSalvar(ActionEvent event) throws SQLException {
         if (isValidaTela()) {
             switch (getOperacao()) {
                 case 0:

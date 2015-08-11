@@ -157,7 +157,7 @@ public class DGPrincipalController implements Initializable {
     void dgHistorico(ActionEvent event) {
         try {
             stack.getChildren().clear();
-            stack.getChildren().add(getNode("/br/com/ezatta/view/AjudaSuporte.fxml"));
+            stack.getChildren().add(getNode("/br/com/ezatta/view/EnvaseMovimentacao.fxml"));
         } catch (Exception e) {
             new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
             System.out.println("Erro ao carregar a tela de bicos");
