@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Properties;
@@ -315,7 +316,7 @@ public class PrincipalController implements Initializable {
         cancelarPlaca(idEstoqueTh);
     }
 
-    public void completarTanque(int idEstoqueTh) {
+    public void completarTanque(int idEstoqueTh) throws SQLException {
         try {
             EzattaMovimentacoes ezattaEstoqueSalvar = estoqueCtr.getEstoque(idEstoqueTh);
 
@@ -1188,7 +1189,11 @@ public class PrincipalController implements Initializable {
                     Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
-                salvarNoBanco();
+                try {
+                    salvarNoBanco();
+                } catch (SQLException ex) {
+                    Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 cancelar(event);
             }
         }
@@ -1258,7 +1263,7 @@ public class PrincipalController implements Initializable {
         return valida;
     }
 
-    private void salvarNoBanco() {
+    private void salvarNoBanco() throws SQLException {
 
         estoque = new EzattaMovimentacoes();
         String vol = txtVolume.getText();
@@ -1344,7 +1349,11 @@ public class PrincipalController implements Initializable {
         BigDecimal quantidadeEstoque = new BigDecimal(e.getQtdEstoque()).setScale(2, RoundingMode.FLOOR);
         BigDecimal quantidadecalculada = quantidadeProduto.add(quantidadeEstoque).setScale(2, RoundingMode.FLOOR);
         prod.setQuantidade(quantidadecalculada);
-        produtoCtr.updateProduto(prod);
+        try {
+            produtoCtr.updateProduto(prod);
+        } catch (SQLException ex) {
+            Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void cancelarPlaca(int idEstoqueTh) {
@@ -1483,7 +1492,11 @@ public class PrincipalController implements Initializable {
         btnSalvarEstoque[idEstoqueTh].setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                completarTanque(idEstoqueTh);
+                try {
+                    completarTanque(idEstoqueTh);
+                } catch (SQLException ex) {
+                    Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }

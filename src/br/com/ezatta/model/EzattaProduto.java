@@ -29,7 +29,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
- *
  * @author Marcelo
  */
 @Entity
@@ -43,6 +42,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "EzattaProduto.findByEstoqueMaximo", query = "SELECT e FROM EzattaProduto e WHERE e.estoqueMaximo = :estoqueMaximo"),
     @NamedQuery(name = "EzattaProduto.findByEstoqueMinimo", query = "SELECT e FROM EzattaProduto e WHERE e.estoqueMinimo = :estoqueMinimo"),
     @NamedQuery(name = "EzattaProduto.findByCor", query = "SELECT e FROM EzattaProduto e WHERE e.cor = :cor")})
+
 public class EzattaProduto implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -83,6 +83,8 @@ public class EzattaProduto implements Serializable {
     @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL)
     private List<EzattaMovimentacoes> ezattaEstoqueList;
     @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL)
+    private List<EzattaEstoqueProduto> ezattaProdutoList;
+    @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL)
     private List<EzattaBico> ezattaBicoList;
 
     public EzattaProduto() {
@@ -119,6 +121,16 @@ public class EzattaProduto implements Serializable {
         this.cor = cor;
         this.empresa = empresa;
     }
+
+    public List<EzattaEstoqueProduto> getEzattaProdutoList() {
+        return ezattaProdutoList;
+    }
+
+    public void setEzattaProdutoList(List<EzattaEstoqueProduto> ezattaProdutoList) {
+        this.ezattaProdutoList = ezattaProdutoList;
+    }
+    
+    
 
     public Integer getId() {
         return id;

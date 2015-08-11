@@ -45,6 +45,9 @@ import javafx.scene.text.Text;
 import static br.com.ezatta.controller.PrincipalController.principal;
 import br.com.ezatta.dao.ProdutoDAO;
 import br.com.ezatta.model.EzattaProduto;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.layout.VBox;
 /*------------------------------------------------------------fim importação java com --------------------*/
 
@@ -301,7 +304,11 @@ public class EnvaseBicoController implements Initializable {
         prod.removQuantidade(new BigDecimal(estoque.getQtdEstoque()));
         System.out.println("prod: " + prod.toString() + " - " + prod.getQuantidade());
         ProdutoDAO produtoCtr = new ProdutoDAO();
-        produtoCtr.updateProduto(prod);
+        try {
+            produtoCtr.updateProduto(prod);
+        } catch (SQLException ex) {
+            Logger.getLogger(EnvaseBicoController.class.getName()).log(Level.SEVERE, null, ex);
+        }
         System.out.println("prod: " + prod.toString() + " - " + prod.getQuantidade());
 
         estoque.setQtdEstoque(Float.parseFloat(txtVolume.getText()));

@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Properties;
@@ -325,7 +326,11 @@ public class PrincipalUsuarioController implements Initializable {
 
             //atualizar quantidade tblProduto
             ezattaProdutoSalvar.setQuantidade(new BigDecimal(calcularValor));
-            produtoCtr.updateProduto(ezattaProdutoSalvar);
+            try {
+                produtoCtr.updateProduto(ezattaProdutoSalvar);
+            } catch (SQLException ex) {
+                Logger.getLogger(PrincipalUsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
             //Salvar no vanco volume efetivo----------------------------------------------------------------
             Float quantidadeEfetiva = new Float(efetivo[idEstoqueTh].getText());
@@ -1282,7 +1287,11 @@ public class PrincipalUsuarioController implements Initializable {
         BigDecimal quantidadeEstoque = new BigDecimal(estoque.getQtdEstoque()).setScale(2, RoundingMode.FLOOR);
         BigDecimal quantidadecalculada = quantidadeProduto.subtract(quantidadeEstoque).setScale(2, RoundingMode.FLOOR);
         ezattaProdutoStatic.setQuantidade(quantidadecalculada);
-        produtoCtr.updateProduto(ezattaProdutoStatic);
+        try {
+            produtoCtr.updateProduto(ezattaProdutoStatic);
+        } catch (SQLException ex) {
+            Logger.getLogger(PrincipalUsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         //new FXDialog(FXDialog.Type.INFO, "ezattaProdutoStatic: "+ezattaProdutoStatic.getNome()+" - id: "+ezattaProdutoStatic.getId()+ " qtd: "+ezattaProdutoStatic.getQuantidade()).showDialog();
         estoqueCtr.addEstoque(estoque);
@@ -1330,7 +1339,11 @@ public class PrincipalUsuarioController implements Initializable {
         BigDecimal quantidadeEstoque = new BigDecimal(e.getQtdEstoque()).setScale(2, RoundingMode.FLOOR);
         BigDecimal quantidadecalculada = quantidadeProduto.add(quantidadeEstoque).setScale(2, RoundingMode.FLOOR);
         prod.setQuantidade(quantidadecalculada);
-        produtoCtr.updateProduto(prod);
+        try {
+            produtoCtr.updateProduto(prod);
+        } catch (SQLException ex) {
+            Logger.getLogger(PrincipalUsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         //adiciona estoque produto inicio------------------------------------
         System.out.println("ezattaUsuarioStatic: "+ezattaUsuarioStatic);

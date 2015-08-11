@@ -1,6 +1,7 @@
 package br.com.ezatta.dao;
 
 import static br.com.ezatta.controller.LoginController.ezattaEmpresaStatic;
+import static br.com.ezatta.controller.LoginController.ezattaUsuarioStatic;
 import br.com.ezatta.model.EzattaEmpresa;
 import br.com.ezatta.model.EzattaLog;
 import br.com.ezatta.model.EzattaProduto;
@@ -27,17 +28,17 @@ public class ProdutoDAO {
         em.getTransaction().begin();
         em.persist(produto);
         em.getTransaction().commit();
-        
+
         //log-------------------------------------------------------------------
-        String acao = "Adicionar Produto: "+produto;
+        String acao = "Adicionar Produto: " + produto;
         EzattaLog log = new EzattaLog();
         Timestamp data = new Timestamp(System.currentTimeMillis());
         log.setData(data);
         log.setAcao(acao);
         log.setEmpresa(ezattaEmpresaStatic);
         LogDAO dao = new LogDAO();
-        
-        System.out.println("log: "+log);
+
+        System.out.println("log: " + log);
         dao.addLog(log);
         //----------------------------------------------------------------------
     }
@@ -47,17 +48,17 @@ public class ProdutoDAO {
         EzattaProduto prod = em.find(EzattaProduto.class, produto.getId());
         em.remove(prod);
         em.getTransaction().commit();
-        
-                //log-------------------------------------------------------------------
-        String acao = "Remover Produto: "+produto;
+
+        //log-------------------------------------------------------------------
+        String acao = "Remover Produto: " + produto;
         EzattaLog log = new EzattaLog();
         Timestamp data = new Timestamp(System.currentTimeMillis());
         log.setData(data);
         log.setAcao(acao);
         log.setEmpresa(ezattaEmpresaStatic);
         LogDAO dao = new LogDAO();
-        
-        System.out.println("log: "+log);
+
+        System.out.println("log: " + log);
         dao.addLog(log);
         //----------------------------------------------------------------------
     }
@@ -66,17 +67,25 @@ public class ProdutoDAO {
         em.getTransaction().begin();
         em.merge(produto);
         em.getTransaction().commit();
-        
-                //log-------------------------------------------------------------------
-        String acao = "Alterar Produto: "+produto;
+
+        //log-------------------------------------------------------------------
+        String acao = "Alterar Produto: " + produto;
         EzattaLog log = new EzattaLog();
+
+        if (ezattaEmpresaStatic instanceof EzattaEmpresa) {
+            log.setEmpresa(ezattaEmpresaStatic);
+            System.out.println("ezattaEmpresaStatic instanceof EzattaEmpresa");
+        }else{
+            System.out.println("ezattaUsuarioStatic.getEmpresa(): " + ezattaUsuarioStatic.getEmpresa());
+            log.setEmpresa(ezattaUsuarioStatic.getEmpresa());
+        }
+
         Timestamp data = new Timestamp(System.currentTimeMillis());
         log.setData(data);
         log.setAcao(acao);
-        log.setEmpresa(ezattaEmpresaStatic);
+
         LogDAO dao = new LogDAO();
-        
-        System.out.println("log: "+log);
+        System.out.println("log: " + log);
         dao.addLog(log);
         //----------------------------------------------------------------------
     }
@@ -115,7 +124,7 @@ public class ProdutoDAO {
         }
         return em.createNativeQuery(qry, EzattaProduto.class).getResultList();
     }
-    
+
 //    public long getValueProduto(){
 //        Query query = em.createQuery("Select count(p) from EzattaProduto p");
 //        long count = (long) query.getSingleResult(); 

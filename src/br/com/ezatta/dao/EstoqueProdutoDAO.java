@@ -3,6 +3,7 @@ package br.com.ezatta.dao;
 import br.com.ezatta.model.EzattaEstoqueProduto;
 import br.com.ezatta.model.EzattaProduto;
 import br.com.ezatta.util.JPAUtil;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -10,9 +11,10 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-public class EstoqueProdutoDAO {
+public class EstoqueProdutoDAO implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     EntityManager em = JPAUtil.getEntityManager();
     
     public EstoqueProdutoDAO() {

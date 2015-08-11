@@ -215,6 +215,10 @@ public class LoginController implements Initializable {
             } else if (validUsuario) {
                 try {
                     ezattaUsuarioStatic = usuariodao.getUserByLogAndPassword(ezattaUsuarioStatic);
+                    System.out.println("ezattaUsuarioStatic: "+ezattaUsuarioStatic);
+                    System.out.println("Empresa: "+ezattaUsuarioStatic.getEmpresa());
+                    ezattaEmpresaStatic = ezattaUsuarioStatic.getEmpresa();
+                    System.out.println("ezattaEmpresaStatic: "+ezattaEmpresaStatic);
                     Stage telaPrincipal = new Stage();
                     new FormFX<PrincipalController>("PrincipalUsuario.fxml", telaPrincipal, "Ezatta Inteligent Oil Supply", false);
                 } catch (Exception e) {

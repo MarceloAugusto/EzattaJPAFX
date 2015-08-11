@@ -178,6 +178,7 @@ public class ProdutoController implements Initializable {
             new FXDialog(Type.ERROR, "Favor selecionar o item primeiro... ").showDialog();
         } else {
             tabTela.getSelectionModel().select(1);
+            txtQuantidade.setDisable(true);
             setOperacao(1);
             setEzattaProduto(tb.getSelectionModel().getSelectedItem());
             SetValoresComponentes(getEzattaProduto());

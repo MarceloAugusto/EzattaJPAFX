@@ -19,13 +19,9 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "ezatta_estoque_produto")
 
-
 @NamedQueries({
     @NamedQuery(name = "EzattaEstoqueProduto.findAll", query = "SELECT e FROM EzattaEstoqueProduto e"),
     @NamedQuery(name = "EzattaEstoqueProduto.findById", query = "SELECT e FROM EzattaEstoqueProduto e WHERE e.id = :id")})
-
-
-
     
 public class EzattaEstoqueProduto implements Serializable {
     private static final long serialVersionUID = 1L;

@@ -229,7 +229,11 @@ public class FatorEscalaController implements Initializable {
         } else {
             boolean ok = new FXDialog(FXDialog.Type.CONFIRM, "Tem Certeza que deseja excluir este registro?").showDialog();
             if (ok) {
-                bicoCtr.removeBico(getEzattaBico());
+                try {
+                    bicoCtr.removeBico(getEzattaBico());
+                } catch (SQLException ex) {
+                    Logger.getLogger(FatorEscalaController.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 ok = true;
                 if (ok) {
                     new FXDialog(FXDialog.Type.INFO, "Operaçao realizada com sucesso!").showDialog();
@@ -246,7 +250,11 @@ public class FatorEscalaController implements Initializable {
     void btnExcluir(ActionEvent event) {
         boolean ok = new FXDialog(FXDialog.Type.CONFIRM, "Tem Certeza que deseja excluir este registro?").showDialog();
         if ((ok) && (getOperacao() == 1)) {
-            bicoCtr.removeBico(getEzattaBico());
+            try {
+                bicoCtr.removeBico(getEzattaBico());
+            } catch (SQLException ex) {
+                Logger.getLogger(FatorEscalaController.class.getName()).log(Level.SEVERE, null, ex);
+            }
             ok = true;
             if (ok) {
                 new FXDialog(FXDialog.Type.INFO, "Operaçao realizada com sucesso!").showDialog();
@@ -289,7 +297,13 @@ public class FatorEscalaController implements Initializable {
                 case 0:
                     //EzattaBico bico = new EzattaBico(txtNome.getText(),txtEndereco.getText(), cbProduto.getSelectionModel().getSelectedItem());
                     EzattaBico bico = new EzattaBico(txtNome.getText(), txtEndereco.getText(), "208", cbProduto.getSelectionModel().getSelectedItem());
+            {
+                try {
                     bicoCtr.addBico(bico);
+                } catch (SQLException ex) {
+                    Logger.getLogger(FatorEscalaController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
                     popularDados();
                     new FXDialog(FXDialog.Type.INFO, "Registro inserido com sucesso!").showDialog();
                     tabTela.getSelectionModel().select(0);
@@ -297,7 +311,13 @@ public class FatorEscalaController implements Initializable {
                 case 1:
                     Integer id = Integer.parseInt(txtId.getText());
                     EzattaBico bicos = new EzattaBico(id, txtNome.getText(), txtEndereco.getText(), cbProduto.getSelectionModel().getSelectedItem());
+            {
+                try {
                     bicoCtr.updateBico(bicos);
+                } catch (SQLException ex) {
+                    Logger.getLogger(FatorEscalaController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
                     new FXDialog(FXDialog.Type.INFO, "Registro atualizado com sucesso!").showDialog();
                     tabTela.getSelectionModel().select(0);
                     popularDados();
@@ -488,7 +508,11 @@ public class FatorEscalaController implements Initializable {
 
     private void salvarFatorBanco(long i) {
         ezattaBico.setFatorescala(String.valueOf(i));
-        bicoCtr.updateBico(ezattaBico);
+        try {
+            bicoCtr.updateBico(ezattaBico);
+        } catch (SQLException ex) {
+            Logger.getLogger(FatorEscalaController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @FXML
