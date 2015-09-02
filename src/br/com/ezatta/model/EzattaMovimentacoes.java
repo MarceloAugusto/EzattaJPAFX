@@ -5,7 +5,9 @@
  */
 package br.com.ezatta.model;
 
+import br.com.ezatta.util.Colunas;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -31,6 +33,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "EzattaMovimentacoes.findAll", query = "SELECT e FROM EzattaMovimentacoes e"),
+    @NamedQuery(name = "EzattaMovimentacoes.findAllLimit", query = "SELECT e FROM EzattaMovimentacoes e ORDER BY e.id DESC"),
     @NamedQuery(name = "EzattaMovimentacoes.findById", query = "SELECT e FROM EzattaMovimentacoes e WHERE e.id = :id"),
     @NamedQuery(name = "EzattaMovimentacoes.findByQtdEstoque", query = "SELECT e FROM EzattaMovimentacoes e WHERE e.qtdEstoque = :qtdEstoque"),
     @NamedQuery(name = "EzattaMovimentacoes.findByDataEstoque", query = "SELECT e FROM EzattaMovimentacoes e WHERE e.dataEstoque = :dataEstoque"),
@@ -45,32 +48,43 @@ public class EzattaMovimentacoes implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id", nullable = false)
+    @Colunas(nome = "Código", size = 100)
     private Integer id;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "qtd_estoque", precision = 12)
+    @Colunas(nome = "Qtd.", size = 100)
     private Float qtdEstoque;
     @Column(name = "data_estoque")
     @Temporal(TemporalType.TIMESTAMP)
+    @Colunas(nome = "Data", size = 100)
     private Date dataEstoque;
     @Column(name = "os", length = 255)
+    @Colunas(nome = "O.S", size = 100)
     private String os;
     @Column(name = "placa", length = 255)
+    @Colunas(nome = "Placa", size = 100)
     private String placa;
     @Column(name = "km", length = 255)
+    @Colunas(nome = "KM", size = 100)
     private String km;
     @Column(name = "STATUS")
+   // @Colunas(nome = "Status", size = 100)
     private Integer status;
     @JoinColumn(name = "operador", referencedColumnName = "id")
     @ManyToOne
+    @Colunas(nome = "Operador", size = 100)
     private EzattaOperador operador;
     @JoinColumn(name = "bico", referencedColumnName = "ID")
     @ManyToOne
+    @Colunas(nome = "Bico", size = 100)
     private EzattaBico bico;
     @JoinColumn(name = "produto", referencedColumnName = "id")
     @ManyToOne
+    @Colunas(nome = "Produto", size = 100)
     private EzattaProduto produto;
     @JoinColumn(name = "usuario", referencedColumnName = "ID")
     @ManyToOne
+    @Colunas(nome = "Usuário", size = 100)
     private EzattaUsuario usuario;
 
     public EzattaMovimentacoes() {
@@ -190,7 +204,13 @@ public class EzattaMovimentacoes implements Serializable {
 
     @Override
     public String toString() {
-        return "EzattaEstoque{" + "id=" + id + ", qtdEstoque=" + qtdEstoque + ", dataEstoque=" + dataEstoque + ", os=" + os + ", placa=" + placa + ", km=" + km + ", status=" + status + ", operador=" + operador + ", bico=" + bico + ", produto=" + produto + ", usuario=" + usuario + '}';
+        //return "EzattaEstoque{" + "id=" + id + ", qtdEstoque=" + qtdEstoque + ", dataEstoque=" + dataEstoque + ", os=" + os + ", placa=" + placa + ", km=" + km + ", status=" + status + ", operador=" + operador + ", bico=" + bico + ", produto=" + produto + ", usuario=" + usuario + '}';
+
+        //DATE
+        SimpleDateFormat dt = new SimpleDateFormat("dd/MM/yyyy");
+        String dat = dt.format(dataEstoque);
+        
+        return "Data: "+dat+" - Qtd.: "+ qtdEstoque +" - O.S: " + os + " - Placa: " + placa + " - Bico: " + bico + " - Produto: " + produto + " - Operador: " + operador ;
     }
 
     

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.shape.*?>
 <?import javafx.scene.input.*?>
 <?import javafx.scene.effect.*?>
 <?import javafx.geometry.*?>
@@ -117,6 +118,60 @@
                                     <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                                        <children>
                                           <ListView fx:id="lvProdutos" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                          <StackPane fx:id="aviso" layoutX="281.0" layoutY="158.0" prefHeight="150.0" prefWidth="250.0" style="-fx-background-color: white; -fx-border-color: black; -fx-border-radius: 10;">
+                                             <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Favor configurar">
+                                                   <StackPane.margin>
+                                                      <Insets />
+                                                   </StackPane.margin>
+                                                </Text>
+                                                <Button mnemonicParsing="false" onAction="#fecharAviso" style="-fx-background-color: red;" StackPane.alignment="TOP_RIGHT">
+                                                   <graphic>
+                                                      <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                                                         <image>
+                                                            <Image url="@images/paperminus32.png" />
+                                                         </image>
+                                                      </ImageView>
+                                                   </graphic>
+                                                   <StackPane.margin>
+                                                      <Insets right="5.0" top="5.0" />
+                                                   </StackPane.margin>
+                                                </Button>
+                                                <Text layoutX="11.0" layoutY="89.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Erro de comunicação" StackPane.alignment="TOP_LEFT">
+                                                   <StackPane.margin>
+                                                      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                   </StackPane.margin>
+                                                   <font>
+                                                      <Font name="System Bold" size="15.0" />
+                                                   </font>
+                                                </Text>
+                                                <Text layoutX="11.0" layoutY="90.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Porta de comunicação">
+                                                   <StackPane.margin>
+                                                      <Insets top="40.0" />
+                                                   </StackPane.margin>
+                                                </Text>
+                                                <Line endX="100.0" startX="-100.0" StackPane.alignment="TOP_CENTER">
+                                                   <StackPane.margin>
+                                                      <Insets top="45.0" />
+                                                   </StackPane.margin>
+                                                </Line>
+                                                <Button fx:id="btnConfigurarPorta" mnemonicParsing="false" onAction="#configurarPorta" text="Configurar">
+                                                   <StackPane.margin>
+                                                      <Insets top="100.0" />
+                                                   </StackPane.margin>
+                                                   <graphic>
+                                                      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                         <image>
+                                                            <Image url="@images/Wheels.png" />
+                                                         </image>
+                                                      </ImageView>
+                                                   </graphic>
+                                                   <tooltip>
+                                                      <Tooltip text="Configurar porta de comunicação" />
+                                                   </tooltip>
+                                                </Button>
+                                             </children>
+                                          </StackPane>
                                        </children>
                                     </AnchorPane>
                                  </center>
@@ -126,7 +181,7 @@
                                           <DropShadow />
                                        </effect>
                                        <children>
-                                          <Text layoutX="14.0" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Selecione um produtos para abastecer">
+                                          <Text fx:id="txtTituloPrincipal" layoutX="14.0" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Selecione um produtos para abastecer">
                                              <font>
                                                 <Font name="System Bold" size="15.0" />
                                              </font>
@@ -184,6 +239,73 @@
                                     </AnchorPane>
                               </content>
                             </TitledPane>
+                              <TitledPane text="Últimos Registros">
+                                <content>
+                                  <AnchorPane fx:id="anchorUltimosRegistros">
+                                       <children>
+                                          <ListView fx:id="ultimosRegistros" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                          <StackPane minHeight="0.0" minWidth="0.0" prefHeight="30.0" prefWidth="30.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="3.0">
+                                             <children>
+                                                <Button mnemonicParsing="false" onAction="#atualizarListaRegistros">
+                                                   <graphic>
+                                                      <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                                                         <image>
+                                                            <Image url="@images/exchange32.png" />
+                                                         </image>
+                                                      </ImageView>
+                                                   </graphic>
+                                                   <tooltip>
+                                                      <Tooltip text="Atualizar lista" />
+                                                   </tooltip>
+                                                </Button>
+                                             </children>
+                                             <effect>
+                                                <DropShadow color="#29e4db" height="42.25" radius="15.3125" />
+                                             </effect>
+                                          </StackPane>
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </TitledPane>
+                              <TitledPane fx:id="acComunicacao" text="Comunicação">
+                                <content>
+                                  <AnchorPane fx:id="anchorComunicacao" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <Text fx:id="txtTextoSelecionarPorta" strokeType="OUTSIDE" strokeWidth="0.0" text="Selecione a porta:" textAlignment="CENTER" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
+                                             <font>
+                                                <Font name="System Bold" size="14.0" />
+                                             </font>
+                                          </Text>
+                                          <HBox spacing="7.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
+                                             <children>
+                                                <Button fx:id="btnAtualizarPort" mnemonicParsing="false" onAction="#btnAtualizarPorta">
+                                                   <graphic>
+                                                      <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                                                         <image>
+                                                            <Image url="@images/Refresh.png" />
+                                                         </image>
+                                                      </ImageView>
+                                                   </graphic>
+                                                   <tooltip>
+                                                      <Tooltip text="Atualizar lista de portas" />
+                                                   </tooltip>
+                                                </Button>
+                                                <ComboBox fx:id="cbPorta" layoutX="11.0" layoutY="45.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="9.800000000000011" AnchorPane.topAnchor="40.0" />
+                                             </children>
+                                          </HBox>
+                                          <Button fx:id="btnConectar" layoutX="77.0" layoutY="80.0" mnemonicParsing="false" onAction="#conectar" text="Conectar" AnchorPane.topAnchor="80.0">
+                                             <graphic>
+                                                <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@images/plug32.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                          </Button>
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </TitledPane>
                           </panes>
                         </Accordion>
                      </children></AnchorPane>
@@ -199,6 +321,7 @@
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="180.0" minWidth="10.0" prefWidth="50.0" />
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="180.0" minWidth="10.0" prefWidth="50.0" />
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -217,6 +340,19 @@
                         <Font size="14.0" />
                      </font>
                   </Text>
+                  <StackPane fx:id="portaSerial" prefHeight="150.0" prefWidth="200.0" GridPane.columnIndex="2">
+                     <children>
+                        <ImageView fx:id="iconeConectado" fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@images/usb_PNG9078-verde.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="iconeDesconectado" fitHeight="35.0" fitWidth="35.0" layoutX="83.0" layoutY="17.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@images/usb_PNG9078-vermelho.png" />
+                           </image>
+                        </ImageView>
+                     </children></StackPane>
                </children>
             </GridPane>
          </children>

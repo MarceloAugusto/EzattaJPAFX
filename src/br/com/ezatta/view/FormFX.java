@@ -1,11 +1,19 @@
 package br.com.ezatta.view;
 
+import static br.com.ezatta.controller.LoginController.defaultPort;
+import static br.com.ezatta.controller.LoginController.portFound;
+import static br.com.ezatta.controller.LoginController.serialPort;
+import br.com.ezatta.controller.PrincipalUsuarioController;
+import br.com.ezatta.util.JPAUtil;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
@@ -45,7 +53,24 @@ public class FormFX<T> {
         if (max) {
             this.formulario.setOnCloseRequest(new EventHandler<WindowEvent>() {
                 public void handle(WindowEvent we) {
+//---------------------------------------------------------------------------------------------------------------------
+                    //fechar conex'ao H2DB
+                    System.out.println("Fechou H2DB");
+                    JPAUtil.closeManager(JPAUtil.getEntityManager());
+
+                    //fecha aporta
+                    if (!portFound) {
+                        System.out.println("Porta fechada...");
+                    } else{
+                    System.out.println("port " + defaultPort + " not found.");
+                    serialPort.close();
+                    System.out.println("Porta fechada...");
+                    }
+
+                    //Platform.exit();
                     System.exit(0);
+//--------------------------------------------------------------------------------------------------------------------
+                    //System.exit(0);
                 }
             });
         }
@@ -53,7 +78,12 @@ public class FormFX<T> {
         if (!max) {
             this.formulario.initStyle(StageStyle.UTILITY);
             this.formulario.initModality(Modality.APPLICATION_MODAL);
+
+            
         }
+        
+        Image icon = new Image(getClass().getResourceAsStream("icone.png"));
+        formulario.getIcons().add(icon);
         this.formulario.setScene(scene);
         this.formulario.setTitle(titulo);
         if (!max) {
@@ -69,7 +99,7 @@ public class FormFX<T> {
             formulario.setWidth(bounds.getWidth());
             formulario.setHeight(bounds.getHeight());
 //fim
-            
+
             this.formulario.show();
         }
     }

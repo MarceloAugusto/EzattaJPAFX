@@ -5,9 +5,12 @@
  */
 package br.com.ezatta.controller;
 
+import static br.com.ezatta.controller.LoginController.ezattaEmpresaStatic;
 import static br.com.ezatta.controller.PrincipalController.principal;
 import br.com.ezatta.dao.EmpresaDAO;
+import br.com.ezatta.dao.LogDAO;
 import br.com.ezatta.model.EzattaEmpresa;
+import br.com.ezatta.model.EzattaLog;
 import br.com.ezatta.util.GenericTable;
 import br.com.ezatta.util.JPAUtil;
 import br.com.ezatta.util.Path;
@@ -18,6 +21,7 @@ import br.com.ezatta.view.FormFX;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -274,6 +278,19 @@ public class EmpresaController implements Initializable {
                     try {
                         EzattaEmpresa empresa = new EzattaEmpresa(txtNome.getText(), txtLogin.getText(), txtSenha.getText(), txtEmail.getText());
                         EmpresaCtr.addEmpresa(empresa);
+                        ezattaEmpresaStatic = empresa;
+                        //log-------------------------------------------------------------------
+                        String acao = "Adicionar empresa: " + empresa;
+                        EzattaLog log = new EzattaLog();
+                        Timestamp data = new Timestamp(System.currentTimeMillis());
+                        log.setData(data);
+                        log.setAcao(acao);
+                        log.setEmpresa(ezattaEmpresaStatic);
+                        LogDAO dao = new LogDAO();
+
+                        System.out.println("log: " + log);
+                        dao.addLog(log);
+                        //----------------------------------------------------------------------
                         popularDados();
                         new FXDialog(Type.INFO, "Registro inserido com sucesso!").showDialog();
                         tabTela.getSelectionModel().select(0);
@@ -412,7 +429,7 @@ public class EmpresaController implements Initializable {
         } catch (Exception e) {
         }
     }
-    
+
     public Node getNode(String node) {
         Node no = null;
         try {

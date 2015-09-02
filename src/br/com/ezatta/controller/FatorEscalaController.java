@@ -107,6 +107,12 @@ public class FatorEscalaController implements Initializable {
     private Button btnBuscar;
 
     @FXML
+    private TextField txtFatorEscala;
+
+    @FXML
+    private TextField txtNovoFatorEscala;
+
+    @FXML
     void enviarQuatroLitros(ActionEvent event) {
         try {
             setarFatorEscala(100);
@@ -287,6 +293,7 @@ public class FatorEscalaController implements Initializable {
         txtNome.setText("");
         txtNome.requestFocus();
         txtEndereco.setText("");
+        txtFatorEscala.setText("");
         cbProduto.getSelectionModel().select(null);
     }
 
@@ -297,13 +304,13 @@ public class FatorEscalaController implements Initializable {
                 case 0:
                     //EzattaBico bico = new EzattaBico(txtNome.getText(),txtEndereco.getText(), cbProduto.getSelectionModel().getSelectedItem());
                     EzattaBico bico = new EzattaBico(txtNome.getText(), txtEndereco.getText(), "208", cbProduto.getSelectionModel().getSelectedItem());
-            {
-                try {
-                    bicoCtr.addBico(bico);
-                } catch (SQLException ex) {
-                    Logger.getLogger(FatorEscalaController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
+
+                    try {
+                        bicoCtr.addBico(bico);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(FatorEscalaController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
                     popularDados();
                     new FXDialog(FXDialog.Type.INFO, "Registro inserido com sucesso!").showDialog();
                     tabTela.getSelectionModel().select(0);
@@ -311,13 +318,13 @@ public class FatorEscalaController implements Initializable {
                 case 1:
                     Integer id = Integer.parseInt(txtId.getText());
                     EzattaBico bicos = new EzattaBico(id, txtNome.getText(), txtEndereco.getText(), cbProduto.getSelectionModel().getSelectedItem());
-            {
-                try {
-                    bicoCtr.updateBico(bicos);
-                } catch (SQLException ex) {
-                    Logger.getLogger(FatorEscalaController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
+
+                    try {
+                        bicoCtr.updateBico(bicos);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(FatorEscalaController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
                     new FXDialog(FXDialog.Type.INFO, "Registro atualizado com sucesso!").showDialog();
                     tabTela.getSelectionModel().select(0);
                     popularDados();
@@ -348,6 +355,7 @@ public class FatorEscalaController implements Initializable {
         txtNome.setText("");
         txtNome.requestFocus();
         txtEndereco.setText("");
+        txtFatorEscala.setText("");
         cbProduto.getSelectionModel().select(null);
     }
 
@@ -371,6 +379,7 @@ public class FatorEscalaController implements Initializable {
                         setOperacao(1);
                         setEzattaBico(tb.getSelectionModel().getSelectedItem());
                         SetValoresComponentes(getEzattaBico());
+                        txtNovoFatorEscala.setText("");
                     } catch (NullPointerException e) {
 
                     }
@@ -386,6 +395,7 @@ public class FatorEscalaController implements Initializable {
         txtNome.setText(ezatta.getNome());
         txtEndereco.setText(ezatta.getEndereco());
         cbProduto.getSelectionModel().select(ezatta.getProduto());
+        txtFatorEscala.setText(ezatta.getFatorescala());
     }
 
     private void popularDados() {
@@ -530,7 +540,7 @@ public class FatorEscalaController implements Initializable {
 
         double vol = Double.parseDouble(enviar);
         //double fator = 100 * vol / 4;
-        double fator = 400/vol;
+        double fator = 400 / vol;
         fator = Math.ceil(fator);
 
         System.out.println("fator escala: " + fator);
@@ -541,7 +551,7 @@ public class FatorEscalaController implements Initializable {
         Thread.sleep(1000);
         tabTela.getSelectionModel().select(3);
     }
-    
+
     //---------------------------------------navega;'ao telas
     @FXML
     private Button btnVoltar;
@@ -568,6 +578,28 @@ public class FatorEscalaController implements Initializable {
             e.printStackTrace();
         }
         return no;
+    }
+
+    @FXML
+    void calibrarManual(ActionEvent event) {
+        
+        String fator = txtNovoFatorEscala.getText();
+        System.out.println("fator escala: " + fator);
+        try {
+            setarFatorEscala(Long.parseLong(fator));
+            salvarFatorBanco(Long.parseLong(fator));
+        } catch (IOException ex) {
+            Logger.getLogger(FatorEscalaController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(FatorEscalaController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        new FXDialog(FXDialog.Type.INFO, "Calibrado").showDialog();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(FatorEscalaController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        tabTela.getSelectionModel().select(3);
     }
 
 }

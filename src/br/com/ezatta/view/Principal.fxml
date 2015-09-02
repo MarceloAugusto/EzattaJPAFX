@@ -40,7 +40,7 @@
                         <MenuItem fx:id="miHistorico" mnemonicParsing="false" onAction="#historico" text="Historico" />
                         <MenuItem fx:id="miMovimentacoes" mnemonicParsing="false" onAction="#movimentacao" text="Movimentaçoes" />
                         <MenuItem fx:id="miBackUp" mnemonicParsing="false" onAction="#backup" text="Back up" />
-                      <MenuItem fx:id="miCBico" mnemonicParsing="false" onAction="#calibrarBico" text="Calibrar" />
+                      <MenuItem fx:id="miCBico" mnemonicParsing="false" onAction="#calibrarBico" text="Calibraçao" />
                         <MenuItem fx:id="miEncherTank" mnemonicParsing="false" onAction="#encherTank" text="Tanque" />
                         <MenuItem fx:id="miLog" mnemonicParsing="false" onAction="#log" text="Log" />
                     </items>
@@ -63,9 +63,9 @@
    <center>
       <AnchorPane fx:id="AnchorPanePrincipal">
          <children>
-            <SplitPane dividerPositions="0.9960861056751468" prefHeight="481.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <SplitPane dividerPositions="0.9960861056751468" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="481.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <items>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefWidth="2000.0">
                      <children>
                         <StackPane fx:id="stack" alignment="TOP_LEFT" nodeOrientation="LEFT_TO_RIGHT" prefHeight="479.0" prefWidth="234.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
@@ -190,7 +190,7 @@
                         </StackPane>
                      </children>
                   </AnchorPane>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="479.0" prefWidth="200.0">
+                <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="520.0" prefWidth="0.0">
                      <children>
                         <Accordion fx:id="acPrincipal" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <panes>

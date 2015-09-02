@@ -65,6 +65,14 @@ public class MovimentacoesDAO implements Serializable {
         List<EzattaMovimentacoes> listaEstoque = query.getResultList();
         return listaEstoque;
     }
+    
+    public List<EzattaMovimentacoes> getAllEstoqueLimitOrderBy() {
+        TypedQuery<EzattaMovimentacoes> query = em.createNamedQuery("EzattaMovimentacoes.findAllLimit", EzattaMovimentacoes.class);
+        query.setMaxResults(30);
+        
+        List<EzattaMovimentacoes> listaEstoque = query.getResultList();
+        return listaEstoque;
+    }
 
     public List<EzattaMovimentacoes> getAllByUsuario(EzattaUsuario usuario) {
         TypedQuery<EzattaMovimentacoes> query = em.createNamedQuery("EzattaMovimentacoes.findByUsuario", EzattaMovimentacoes.class);

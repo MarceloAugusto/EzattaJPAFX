@@ -1,10 +1,14 @@
 package br.com.ezatta.controller;
 
+import static br.com.ezatta.controller.LoginController.configurarPorta;
 import static br.com.ezatta.controller.LoginController.defaultPort;
 import static br.com.ezatta.controller.LoginController.entrada;
 import static br.com.ezatta.controller.LoginController.ezattaProdutoStatic;
 import static br.com.ezatta.controller.LoginController.ezattaUsuarioStatic;
+import static br.com.ezatta.controller.LoginController.outputStream;
 import static br.com.ezatta.controller.LoginController.portFound;
+import static br.com.ezatta.controller.LoginController.portId;
+import static br.com.ezatta.controller.LoginController.portList;
 import static br.com.ezatta.controller.LoginController.saida;
 import static br.com.ezatta.controller.LoginController.serialPort;
 import br.com.ezatta.dao.BicosDAO;
@@ -23,6 +27,9 @@ import br.com.ezatta.util.MaskTextField;
 import br.com.ezatta.util.ValidationFields;
 import br.com.ezatta.view.EzattaMain;
 import br.com.ezatta.view.FXDialog;
+import gnu.io.CommPortIdentifier;
+import gnu.io.PortInUseException;
+import gnu.io.UnsupportedCommOperationException;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -30,6 +37,8 @@ import java.math.RoundingMode;
 import java.net.URL;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.Normalizer;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -40,6 +49,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -60,7 +70,9 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -96,12 +108,16 @@ import javax.mail.internet.MimeMultipart;
  *
  * @author marcelo
  */
+
 public class PrincipalUsuarioController implements Initializable {
 
     public static PrincipalUsuarioController principal = new PrincipalUsuarioController();
 
     private ObservableList<EzattaMovimentacoes> dadosParaEnvase = FXCollections.observableArrayList();
     private MovimentacoesDAO EstoqueCtr = new MovimentacoesDAO();
+
+    String portaSelecionada = "";
+
     static StringBuilder outputBfj;
     static StringBuilder volumeBfj;
     static BufferedInputStream bufferedinputStream;
@@ -129,10 +145,11 @@ public class PrincipalUsuarioController implements Initializable {
     private Button[] btnEnviar = new Button[10000];
     private Button[] btnCancelarEstoque = new Button[10000];
     private Button[] btnSalvarEstoque = new Button[10000];
+    private Button[] btnFechar = new Button[10000];
     private Separator[] separator = new Separator[10000];
     private Text[] stringEstoque = new Text[10000];
     //--------------------------------------fim var componentes envase
-    
+
     @FXML
     private ListView<EzattaMovimentacoes> lvEstoque;
 
@@ -180,7 +197,6 @@ public class PrincipalUsuarioController implements Initializable {
 
 //    @FXML
 //    private Text txtNomeEmpresa;
-
     @FXML
     private MenuItem miProduto;
 
@@ -241,6 +257,24 @@ public class PrincipalUsuarioController implements Initializable {
     @FXML
     private AnchorPane anchorContainer;
 
+    @FXML
+    private StackPane portaSerial;
+
+    @FXML
+    private AnchorPane anchorUltimosRegistros;
+
+    @FXML
+    private ListView<EzattaMovimentacoes> ultimosRegistros;
+
+    @FXML
+    private StackPane aviso;
+
+    @FXML
+    private AnchorPane anchorComunicacao;
+
+    @FXML
+    private TitledPane acComunicacao;
+
     public StackPane getStack() {
         return stack;
     }
@@ -276,14 +310,22 @@ public class PrincipalUsuarioController implements Initializable {
             System.out.println("endBico: " + endBico[idEstoqueTh]);
 
             atualizaFatorEscala(dado);
-            //Thread.sleep(1000);
+            Thread.sleep(1000);
             enviarStringPlaca(dado);
-            //Thread.sleep(1000);
+            Thread.sleep(1000);
             enviarVolume(dado);
 
             t[idEstoqueTh] = new Thread(taskLeituraEnvase);
             t[idEstoqueTh].start();
+//            ---------------------------------------INICIO----------------------------------
+//            t[idEstoqueTh] = new Thread(new Runnable() { //thread que executa a leitura
+//                public void run() {
+//                
+//                }
+//            });
+            //----------------------------------------FIM-----------------------------------
 
+            System.out.println("t: " + t[idEstoqueTh].toString());
             //atualiza banco
             EzattaMovimentacoes est = EstoqueCtr.getEstoque(idEstoqueTh);
             est.setStatus(1);
@@ -300,8 +342,170 @@ public class PrincipalUsuarioController implements Initializable {
         }
     }
 
-    private void cancelarVolumePlaca(Integer idEstoqueTh) {
+    Task taskLeituraEnvase = new Task() {
         
+        @Override
+        public void run() {
+        //public void run(){
+            
+            System.out.println("entrou thread: ");
+            System.out.println("taskLeituraEnvase: " + taskLeituraEnvase.toString());
+            try {
+                long numBytes = 0;
+                int contAux = 0;
+                byte[] readBuffer = new byte[1000];
+                execucaoWhile[idEstoqueTh] = true;
+                while (execucaoWhile[idEstoqueTh]) {
+                    entrada = null;
+                    int timeout = 0;
+                    entrada = serialPort.getInputStream();
+
+                    //joga fora primeiras menssagens de outros pedidos 
+                    if (entrada.available() > 0) {
+                        entrada.read(readBuffer);
+                    }
+                                       
+                    numBytes = 0;
+                    while (numBytes < 24) {
+                        while (entrada.available() > 0) {
+                            numBytes = numBytes + entrada.read(readBuffer, (int) numBytes, 1);//recebe os bytes na leitura.
+                            timeout = 0;
+                        }
+
+                        Thread.sleep(1);
+
+                        timeout++;
+                        if (timeout > 25) {
+                            numBytes = 0;
+                            timeout = 0;
+                        }
+                        if (numBytes > 0) {
+                            System.out.println("numBytes: " + numBytes);
+
+                        }
+                    }
+
+                    String strCompleta = String.format("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x", readBuffer[0], readBuffer[1], readBuffer[2], readBuffer[3], readBuffer[4], readBuffer[5], readBuffer[6], readBuffer[7], readBuffer[8], readBuffer[9], readBuffer[10], readBuffer[11], readBuffer[12], readBuffer[13], readBuffer[14], readBuffer[15], readBuffer[16], readBuffer[17], readBuffer[18], readBuffer[19], readBuffer[20], readBuffer[21], readBuffer[22], readBuffer[23], readBuffer[24]);
+                    System.out.println("string completa: " + strCompleta);
+
+                    String endBicoRadio = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[4 + contAux], readBuffer[5 + contAux], readBuffer[6 + contAux], readBuffer[7 + contAux], readBuffer[8 + contAux], readBuffer[9 + contAux], readBuffer[10 + contAux], readBuffer[11 + contAux]);
+                    if (endBico[idEstoqueTh].toUpperCase().equals(endBicoRadio.toUpperCase())) {
+
+                        if (readBuffer[15 + contAux] == (byte) 0x4c) { //LIBERADO
+                            //if (readBuffer[15] == (byte) 0x4c || readBuffer[02] == (byte) 0x07) {
+                            String volumeTratado = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[15], readBuffer[16], readBuffer[17], readBuffer[18], readBuffer[19], readBuffer[20], readBuffer[21], readBuffer[22]);
+                            System.out.println("Liberado: " + volumeTratado);
+                            efetivo[idEstoqueTh].setText("Liberado");
+                            btnCancelarEstoque[idEstoqueTh].disableProperty();
+                        }
+                        if (readBuffer[15 + contAux] == (byte) 0x56) {//ENCHENDO
+
+                            //alterando status do botão enviar
+                            Tooltip tpCancelar = new Tooltip();
+                            tpCancelar.setText("Clique em cancelar para cancelar o volume na placa.");
+                            btnCancelarEstoque[idEstoqueTh].disableProperty();
+                            btnCancelarEstoque[idEstoqueTh].setDisable(true);
+                            btnCancelarEstoque[idEstoqueTh].setTooltip(tpCancelar);
+
+                            //btnSalvar
+                            Tooltip tpSalvar = new Tooltip();
+                            tpSalvar.setText("Clique em salvar para completar."
+                                    + "\n Esse recurso é utilizado quando se tem a necessidade de parar o envase"
+                                    + "\n e debitar a quantidade envasada...");
+                            btnSalvarEstoque[idEstoqueTh].setTooltip(tpSalvar);
+                            btnSalvarEstoque[idEstoqueTh].setDisable(false);
+
+                            //ProgressBar
+                            progressBarEstoque[idEstoqueTh].setVisible(true);
+
+                            String volumeTratado = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[15 + contAux], readBuffer[16 + contAux], readBuffer[17 + contAux], readBuffer[18 + contAux], readBuffer[19 + contAux], readBuffer[20 + contAux], readBuffer[21 + contAux], readBuffer[22 + contAux]);
+                            String volumeTratadoDouble = String.format("%02x%02x%02x%02x", readBuffer[19 + contAux], readBuffer[20 + contAux], readBuffer[21 + contAux], readBuffer[22 + contAux]);
+
+                            outputBfj = new StringBuilder();
+                            volumeBfj = new StringBuilder();
+
+                            //monta uma string com vol
+                            for (int ij = 0; ij < volumeTratado.length(); ij += 2) {
+                                String strj = volumeTratado.substring(ij, ij + 2);
+                                outputBfj.append((char) Integer.parseInt(strj, 16));
+                            }
+                            //monta uma string 00.00
+                            for (int ij = 0; ij < volumeTratadoDouble.length(); ij += 2) {
+                                String strjDouble = volumeTratadoDouble.substring(ij, ij + 2);
+                                volumeBfj.append((char) Integer.parseInt(strjDouble, 16));
+                            }
+                            String volumeSemVol = volumeBfj.toString();
+                            System.out.println("volumeSemVol: " + volumeSemVol);
+
+                            if (readBuffer[15 + contAux] == (byte) 0x56 && outputBfj.length() > 5) {
+                                try {
+                                    //efetivo[idEstoqueTh].setText(outputBfj.toString());
+                                    efetivo[idEstoqueTh].setText(volumeBfj.toString());
+                                    System.out.println("VolumeTotal " + volumeTotal[idEstoqueTh]);
+                                    if (!volumeSemVol.isEmpty() && volumeSemVol.length() > 0) {
+                                        atualizaBarraProgress(volumeBfj.toString());//barra de progresso
+                                    } else {
+                                        outputBfj.delete(0, outputBfj.length());//limpa buffer
+                                    }
+                                } catch (NullPointerException e) {
+                                    System.out.println("nullpointer");
+                                    e.printStackTrace();
+                                }
+                                outputBfj.delete(0, outputBfj.length());//limpa buffer
+                            }
+                        } else {
+                            try {
+                                outputBfj.delete(0, outputBfj.length());
+                            } catch (Exception e) {
+
+                            }
+                        }
+                        if (readBuffer[15 + contAux] == (byte) 0x46) {
+                            //mensagem de fim
+                            efetivo[idEstoqueTh].setText("FIM");
+                            execucaoWhile[idEstoqueTh] = false;
+                            Thread.sleep(100);
+
+                            removerRegistroTela(idEstoqueTh);
+
+                            //cancela thread
+                            //taskLeituraEnvase.cancel();
+                            //--------------------------atualizar status
+                            EzattaMovimentacoes e = EstoqueCtr.getEstoque(idEstoqueTh);
+                            e.setStatus(2);
+                            EstoqueCtr.updateEstoque(e);
+
+                            //limpa outputBuffer
+                            outputBfj.delete(0, outputBfj.length());
+                        }
+                    }
+                }
+            } catch (InterruptedException ex) {
+                System.out.println("InterruptedException");
+                ex.printStackTrace();
+            } catch (IOException ex) {
+                System.out.println("IOException");
+                ex.printStackTrace();
+            } catch (java.lang.NullPointerException e) {
+                System.out.println("NullPointerException: ");
+                e.printStackTrace();
+            }
+//fim------------------------------------------------------------------------------
+        }
+
+        @Override
+        protected Void call() throws Exception {
+            return null;
+        }
+
+        @Override
+        protected void succeeded() {
+        }
+
+    };
+
+    private void cancelarVolumePlaca(Integer idEstoqueTh) {
+
         vbList.getChildren().remove(gridpane[idEstoqueTh]);
         vbList.getChildren().remove(separator[idEstoqueTh]);
         //cancela no banco de dados
@@ -310,6 +514,7 @@ public class PrincipalUsuarioController implements Initializable {
     }
 
     public void completarTanque(int idEstoqueTh) {
+        Float valorARetornar;
         try {
             EzattaMovimentacoes ezattaEstoqueSalvar = estoqueCtr.getEstoque(idEstoqueTh);
 
@@ -318,26 +523,31 @@ public class PrincipalUsuarioController implements Initializable {
             //pega o valor atual na tabela produto
             Float qtdProduto = ezattaProdutoSalvar.getQuantidade().floatValue();
             //pega o valor do estoque a ser retornado na tabela produto
-            Float valorARetornar = ezattaEstoqueSalvar.getQtdEstoque();
+            valorARetornar = ezattaEstoqueSalvar.getQtdEstoque();
             //soma a quantidade tblEstoque a tblProduto
             Float calcularValor = 0f;
             calcularValor = qtdProduto + valorARetornar;
+            System.out.println("qtdProduto: " + qtdProduto);
+            System.out.println("valorARetornar: " + valorARetornar);
             calcularValor = calcularValor - Float.parseFloat(efetivo[idEstoqueTh].getText());
+            System.out.println("calcularValor: " + calcularValor);
 
             //atualizar quantidade tblProduto
             ezattaProdutoSalvar.setQuantidade(new BigDecimal(calcularValor));
+
+            //Salvar no banco volume efetivo----------------------------------------------------------------
+            Float quantidadeEfetiva = new Float(efetivo[idEstoqueTh].getText());
+            Float resto = valorARetornar - quantidadeEfetiva;
+            ezattaEstoqueSalvar.setQtdEstoque(resto);
+            ezattaEstoqueSalvar.setStatus(4);
+            //Thread.sleep(100);
+            estoqueCtr.updateEstoque(ezattaEstoqueSalvar);
+
             try {
                 produtoCtr.updateProduto(ezattaProdutoSalvar);
             } catch (SQLException ex) {
                 Logger.getLogger(PrincipalUsuarioController.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-            //Salvar no vanco volume efetivo----------------------------------------------------------------
-            Float quantidadeEfetiva = new Float(efetivo[idEstoqueTh].getText());
-            ezattaEstoqueSalvar.setQtdEstoque(quantidadeEfetiva);
-            ezattaEstoqueSalvar.setStatus(4);
-            //Thread.sleep(100);
-            estoqueCtr.updateEstoque(ezattaEstoqueSalvar);
 
             //Parar Thread
             execucaoWhile[idEstoqueTh] = false;
@@ -351,13 +561,27 @@ public class PrincipalUsuarioController implements Initializable {
             //remove Registro Tela
             removerRegistroTela(idEstoqueTh);
 
-        } catch (InterruptedException ex) {
-            Logger.getLogger(PrincipalUsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException | NumberFormatException ex) {
+            //Logger.getLogger(PrincipalUsuarioController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    Tooltip desconectado = new Tooltip("Favor verificar a conexão USB \ncom o Rádio transmissor \nVerifique a guia Configuração.");
+    Tooltip conectado = new Tooltip("Rádio conectado.");
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+
+        iconeConectado.setVisible(false);
+        iconeDesconectado.setVisible(false);
+
+        aviso.setVisible(false);
+
+        //valida porta e verifica se esta conectado na com 4
+        validaPorta();
+
+        //popular combobox portas
+        popularCbPortas();
+
         //ocultar progress bar bico
         progressBar.setVisible(false);
         //carrega aberto
@@ -368,7 +592,8 @@ public class PrincipalUsuarioController implements Initializable {
         paneBico.setVisible(false);
 
         //txtNomeEmpresa.setText("Seja bem vindo: " + ezattaUsuarioStatic.getEmpresa().getNome());
-        EzattaMain.stage.close();
+        //EzattaMain.stage.close();
+        EzattaMain.stage.hide();
 
         //carrega produtos tela principal
         popularProdutos();
@@ -435,175 +660,26 @@ public class PrincipalUsuarioController implements Initializable {
     private ProdutoDAO produtoCtr = new ProdutoDAO();
 
     private void popularProdutos() {
+        dadosParaEnvase.clear();
+        ultimosRegistros.getItems().clear();
+
         dadosProdutos.clear();
         lvProdutos.getItems().clear();
         try {
+            dadosParaEnvase.addAll(estoqueCtr.getAllEstoqueLimitOrderBy());
             dadosProdutos.addAll(produtoCtr.getAllProduto());
         } catch (Exception e) {
             new FXDialog(FXDialog.Type.ERROR, e.getCause().getMessage()).showDialog();
         }
+        ultimosRegistros.setItems(dadosParaEnvase);
         lvProdutos.setItems(dadosProdutos);
     }
 
     //fim popula lista Produtos ==================================================================================
-    
     @FXML
     void carregarProdutoTela(ActionEvent event) {
         popularProdutos();
     }
-
-    Task taskLeituraEnvase = new Task() {
-
-        @Override
-        public void run() {
-            System.out.println("entrou thread");
-            System.out.println("taskLeituraEnvase: " + taskLeituraEnvase.toString());
-            try {
-                long numBytes = 0;
-                int contAux = 0;
-                byte[] readBuffer = new byte[1000];
-                execucaoWhile[idEstoqueTh] = true;
-                while (execucaoWhile[idEstoqueTh]) {
-                    entrada = null;
-                    entrada = serialPort.getInputStream();
-
-                    //joga fora primeiras menssagens de outros pedidos 
-                    if (entrada.available() > 0) {
-                        entrada.read(readBuffer);
-                    }
-
-                    int timeout = 0;
-                    numBytes = 0;
-                    while (numBytes < 24) {
-                        while (entrada.available() > 0) {
-                            numBytes = numBytes + entrada.read(readBuffer, (int) numBytes, 1);//recebe os bytes na leitura.
-                            timeout = 0;
-                        }
-
-                        Thread.sleep(1);
-
-                        timeout++;
-                        if (timeout > 25) {
-                            numBytes = 0;
-                            timeout = 0;
-                        }
-                        if (numBytes > 0) {
-                            System.out.println("numBytes: " + numBytes);
-
-                        }
-                    }
-
-                    String strCompleta = String.format("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x", readBuffer[0], readBuffer[1], readBuffer[2], readBuffer[3], readBuffer[4], readBuffer[5], readBuffer[6], readBuffer[7], readBuffer[8], readBuffer[9], readBuffer[10], readBuffer[11], readBuffer[12], readBuffer[13], readBuffer[14], readBuffer[15], readBuffer[16], readBuffer[17], readBuffer[18], readBuffer[19], readBuffer[20], readBuffer[21], readBuffer[22], readBuffer[23], readBuffer[24]);
-                    System.out.println("string completa: " + strCompleta);
-
-                    String endBicoRadio = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[4 + contAux], readBuffer[5 + contAux], readBuffer[6 + contAux], readBuffer[7 + contAux], readBuffer[8 + contAux], readBuffer[9 + contAux], readBuffer[10 + contAux], readBuffer[11 + contAux]);
-                    if (endBico[idEstoqueTh].toUpperCase().equals(endBicoRadio.toUpperCase())) {
-
-                        if (readBuffer[15 + contAux] == (byte) 0x4c) { //LIBERADO
-                            //if (readBuffer[15] == (byte) 0x4c || readBuffer[02] == (byte) 0x07) {
-                            String volumeTratado = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[15], readBuffer[16], readBuffer[17], readBuffer[18], readBuffer[19], readBuffer[20], readBuffer[21], readBuffer[22]);
-                            System.out.println("Liberado: " + volumeTratado);
-                            efetivo[idEstoqueTh].setText("Liberado");
-                            btnCancelarEstoque[idEstoqueTh].disableProperty();
-                        }
-                        if (readBuffer[15 + contAux] == (byte) 0x56) {//ENCHENDO
-
-                            //alterando status do botão enviar
-                            btnCancelarEstoque[idEstoqueTh].disableProperty();
-                            btnCancelarEstoque[idEstoqueTh].setDisable(true);
-
-                            //btnSalvar
-                            btnSalvarEstoque[idEstoqueTh].setDisable(false);
-
-                            //ProgressBar
-                            progressBarEstoque[idEstoqueTh].setVisible(true);
-
-                            String volumeTratado = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[15 + contAux], readBuffer[16 + contAux], readBuffer[17 + contAux], readBuffer[18 + contAux], readBuffer[19 + contAux], readBuffer[20 + contAux], readBuffer[21 + contAux], readBuffer[22 + contAux]);
-                            String volumeTratadoDouble = String.format("%02x%02x%02x%02x", readBuffer[19 + contAux], readBuffer[20 + contAux], readBuffer[21 + contAux], readBuffer[22 + contAux]);
-
-                            outputBfj = new StringBuilder();
-                            volumeBfj = new StringBuilder();
-
-                            //monta uma string com vol
-                            for (int ij = 0; ij < volumeTratado.length(); ij += 2) {
-                                String strj = volumeTratado.substring(ij, ij + 2);
-                                outputBfj.append((char) Integer.parseInt(strj, 16));
-                            }
-                            //monta uma string 00.00
-                            for (int ij = 0; ij < volumeTratadoDouble.length(); ij += 2) {
-                                String strjDouble = volumeTratadoDouble.substring(ij, ij + 2);
-                                volumeBfj.append((char) Integer.parseInt(strjDouble, 16));
-                            }
-                            String volumeSemVol = volumeBfj.toString();
-                            System.out.println("volumeSemVol: " + volumeSemVol);
-
-                            if (readBuffer[15 + contAux] == (byte) 0x56 && outputBfj.length() > 5) {
-                                try {
-                                    //efetivo[idEstoqueTh].setText(outputBfj.toString());
-                                    efetivo[idEstoqueTh].setText(volumeBfj.toString());
-                                    System.out.println("VolumeTotal " + volumeTotal[idEstoqueTh]);
-                                    if (!volumeSemVol.isEmpty() && volumeSemVol.length() > 0) {
-                                        atualizaBarraProgress(volumeBfj.toString());//barra de progresso
-                                    } else {
-                                        outputBfj.delete(0, outputBfj.length());//limpa buffer
-                                    }
-                                } catch (NullPointerException e) {
-                                    System.out.println("nullpointer");
-                                    e.printStackTrace();
-                                }
-                                outputBfj.delete(0, outputBfj.length());//limpa buffer
-                            }
-                        } else {
-                            try {
-                                outputBfj.delete(0, outputBfj.length());
-                            } catch (Exception e) {
-
-                            }
-                        }
-                        if (readBuffer[15 + contAux] == (byte) 0x46) {
-                            //mensagem de fim
-                            efetivo[idEstoqueTh].setText("FIM");
-                            execucaoWhile[idEstoqueTh] = false;
-                            Thread.sleep(100);
-
-                            removerRegistroTela(idEstoqueTh);
-
-                            //cancela thread
-                            taskLeituraEnvase.cancel();
-                            //--------------------------atualizar status
-                            EzattaMovimentacoes e = EstoqueCtr.getEstoque(idEstoqueTh);
-                            e.setStatus(2);
-                            EstoqueCtr.updateEstoque(e);
-
-                            //limpa outputBuffer
-                            outputBfj.delete(0, outputBfj.length());
-                        }
-                    }
-                }
-            } catch (InterruptedException ex) {
-                System.out.println("InterruptedException");
-                ex.printStackTrace();
-            } catch (IOException ex) {
-                System.out.println("IOException");
-                ex.printStackTrace();
-            } catch (java.lang.NullPointerException e) {
-                System.out.println("NullPointerException: ");
-                e.printStackTrace();
-            }
-//fim------------------------------------------------------------------------------
-        }
-
-        @Override
-
-        protected Void call() throws Exception {
-            return null;
-        }
-
-        @Override
-        protected void succeeded() {
-        }
-
-    };
 
     private void removerRegistroTela(Integer idEstoqueTh) {
         //remove registro da tela
@@ -644,7 +720,7 @@ public class PrincipalUsuarioController implements Initializable {
                     System.out.println("volTotal: " + volTotal + " - volEfetivo: " + volEfetivo);
                     //progressBar[idEstoqueTh].setProgress(porcentagem);
                     progressBarEstoque[idEstoqueTh].setProgress(volEfetivo / volTotal);
-                } catch (IndexOutOfBoundsException | NumberFormatException e) {
+                } catch (IndexOutOfBoundsException | NumberFormatException | NullPointerException e) {
                     System.out.println("saber como validar");
                     //e.printStackTrace();
                 }
@@ -666,6 +742,7 @@ public class PrincipalUsuarioController implements Initializable {
 
         EzattaBico bico = (EzattaBico) dado.getBico();
         String txtPlaca = dado.getPlaca();
+        //String txtPlaca = "AAA12";
         int envia_texto = 0;
         int tamanho = txtPlaca.length();
         System.out.println("txtPlaca: " + txtPlaca);
@@ -694,11 +771,11 @@ public class PrincipalUsuarioController implements Initializable {
                 (byte) (int) Long.parseLong(bico.getEndereco().substring(14, 16), 16), -1, -2, 0, 0, 87, 77, (byte) label19, 0, (byte) stringConvertidaemInt, 13,
                 (byte) (int) crc};
             saida.write(uartout);
-//            try {
-//                Thread.sleep(1000);
-//            } catch (InterruptedException ex) {
-//                Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
-//            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
         int stringConvertidaemInt = 32;
@@ -804,7 +881,7 @@ public class PrincipalUsuarioController implements Initializable {
 
     private void atualizaFatorEscala(EzattaMovimentacoes dado) throws InterruptedException, IOException {
         try {
-            System.out.println("dados: "+dado);
+            System.out.println("dados: " + dado);
             saida = serialPort.getOutputStream();
             System.out.println("FLUXO OK!");
         } catch (Exception e) {
@@ -935,7 +1012,12 @@ public class PrincipalUsuarioController implements Initializable {
         serialPort.close();
         System.out.println("Porta fechada...");
 
-        Platform.exit();
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(PrincipalUsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        //Platform.exit();
         System.exit(0);
     }
 
@@ -1165,6 +1247,7 @@ public class PrincipalUsuarioController implements Initializable {
             } else {
                 salvarNoBanco();
                 cancelar(event);
+                acPrincipal.setExpandedPane(acEstoqueAtual);
             }
         }
     }
@@ -1275,7 +1358,12 @@ public class PrincipalUsuarioController implements Initializable {
         estoque.setBico((EzattaBico) cbBico.getValue());
         estoque.setOs(txtOs.getText());
         estoque.setKm(txtKm.getText());
-        estoque.setPlaca(txtPlaca.getText());
+        String placa = removerAcentos(txtPlaca.getText().toUpperCase());
+        if (placa.contains("-")) {
+            placa = placa.replace("-", "");
+        }
+        estoque.setPlaca(placa);
+        //estoque.setPlaca(txtPlaca.getText());
         estoque.setProduto(ezattaProdutoStatic);//ezattaProdutoStatic
         estoque.setStatus(0);
         Timestamp data = new Timestamp(System.currentTimeMillis());
@@ -1295,7 +1383,7 @@ public class PrincipalUsuarioController implements Initializable {
 
         //new FXDialog(FXDialog.Type.INFO, "ezattaProdutoStatic: "+ezattaProdutoStatic.getNome()+" - id: "+ezattaProdutoStatic.getId()+ " qtd: "+ezattaProdutoStatic.getQuantidade()).showDialog();
         estoqueCtr.addEstoque(estoque);
-        
+
         //adiciona estoque produto inicio------------------------------------
         EstoqueProdutoDAO produtoEstoqueDAO = new EstoqueProdutoDAO();
         EzattaEstoqueProduto estoque = new EzattaEstoqueProduto();
@@ -1334,7 +1422,8 @@ public class PrincipalUsuarioController implements Initializable {
         //atualizar Quantidade do produto
         ProdutoDAO produtoCtr = new ProdutoDAO();
         EzattaProduto prod = new EzattaProduto();
-        prod = produtoCtr.getProduto(ezattaUsuarioStatic.getId());
+        System.out.println("ezattaUsuarioStatic.getId(): " + e.getProduto().getId());
+        prod = produtoCtr.getProduto(e.getProduto().getId());
         BigDecimal quantidadeProduto = prod.getQuantidade().setScale(2, RoundingMode.FLOOR);
         BigDecimal quantidadeEstoque = new BigDecimal(e.getQtdEstoque()).setScale(2, RoundingMode.FLOOR);
         BigDecimal quantidadecalculada = quantidadeProduto.add(quantidadeEstoque).setScale(2, RoundingMode.FLOOR);
@@ -1344,12 +1433,12 @@ public class PrincipalUsuarioController implements Initializable {
         } catch (SQLException ex) {
             Logger.getLogger(PrincipalUsuarioController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         //adiciona estoque produto inicio------------------------------------
-        System.out.println("ezattaUsuarioStatic: "+ezattaUsuarioStatic);
-        System.out.println("ezattaUsuarioStatic.getEmpresa(): "+ezattaUsuarioStatic.getEmpresa());
-        System.out.println("ezattaProdutoStatic: "+ezattaProdutoStatic);
-        
+        System.out.println("ezattaUsuarioStatic: " + ezattaUsuarioStatic);
+        System.out.println("ezattaUsuarioStatic.getEmpresa(): " + ezattaUsuarioStatic.getEmpresa());
+        System.out.println("Produto Estoque: " + e.getProduto());
+
         EstoqueProdutoDAO produtoEstoqueDAO = new EstoqueProdutoDAO();
         EzattaEstoqueProduto estoque = new EzattaEstoqueProduto();
         Timestamp datas = new Timestamp(System.currentTimeMillis());
@@ -1432,6 +1521,7 @@ public class PrincipalUsuarioController implements Initializable {
         btnEnviar[idEstoqueTh] = new Button();
         btnCancelarEstoque[idEstoqueTh] = new Button();
         btnSalvarEstoque[idEstoqueTh] = new Button();
+        btnFechar[idEstoqueTh] = new Button();
         separator[idEstoqueTh] = new Separator();
         stringEstoque[idEstoqueTh] = new Text();
 
@@ -1444,8 +1534,21 @@ public class PrincipalUsuarioController implements Initializable {
         //separator[idEstoqueTh].setMinHeight(15);
         btnEnviar[idEstoqueTh].setText("Enviar");
         btnEnviar[idEstoqueTh].setMinWidth(70);
+        Tooltip tpEnviar = new Tooltip();
+        tpEnviar.setText("Enviar dados para o ponto de abastecimento.");
+        btnEnviar[idEstoqueTh].setTooltip(tpEnviar);
         btnCancelarEstoque[idEstoqueTh].setText("Cancelar");
         btnCancelarEstoque[idEstoqueTh].setMinWidth(75);
+        Tooltip tpCancelarr = new Tooltip();
+        tpCancelarr.setText("Remove da fila de envios"
+                + "\nCancela no ponto de abastecimento e"
+                + "\nCancelar o registro.");
+        btnCancelarEstoque[idEstoqueTh].setTooltip(tpCancelarr);
+        btnFechar[idEstoqueTh].setText("Fechar");
+        btnFechar[idEstoqueTh].setMinWidth(75);
+        Tooltip tpFechar = new Tooltip();
+        tpFechar.setText("Remove da fila de envios mas não cancela o envio nem o registro.");
+        btnFechar[idEstoqueTh].setTooltip(tpFechar);
         btnSalvarEstoque[idEstoqueTh].setText("Salvar");
         btnSalvarEstoque[idEstoqueTh].setMinWidth(75);
         btnSalvarEstoque[idEstoqueTh].setDisable(true);
@@ -1463,7 +1566,8 @@ public class PrincipalUsuarioController implements Initializable {
         progressBarEstoque[idEstoqueTh].setMinWidth(150);
         progressBarEstoque[idEstoqueTh].setMinHeight(22);
         progressBarEstoque[idEstoqueTh].setVisible(false);
-        hb[idEstoqueTh].getChildren().addAll(btnEnviar[idEstoqueTh], btnCancelarEstoque[idEstoqueTh], btnSalvarEstoque[idEstoqueTh]);
+        hb[idEstoqueTh].getChildren().addAll(btnEnviar[idEstoqueTh], btnCancelarEstoque[idEstoqueTh], btnSalvarEstoque[idEstoqueTh], btnFechar[idEstoqueTh]);
+        //hb[idEstoqueTh].getChildren().addAll(btnEnviar[idEstoqueTh], btnCancelarEstoque[idEstoqueTh], btnFechar[idEstoqueTh]);
 
         GridPane.setHalignment(stringEstoque[idEstoqueTh], HPos.LEFT);
         gridpane[idEstoqueTh].add(stringEstoque[idEstoqueTh], 0, 0);
@@ -1494,7 +1598,8 @@ public class PrincipalUsuarioController implements Initializable {
         btnCancelarEstoque[idEstoqueTh].setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                idEstoqueTh = dado.getId();
+                int idEstoqueTh = dado.getId();
+                System.out.println("idEstoqueTh cancelar: " + idEstoqueTh);
                 cancelarVolumePlaca(idEstoqueTh);
             }
         });
@@ -1505,10 +1610,30 @@ public class PrincipalUsuarioController implements Initializable {
                 completarTanque(idEstoqueTh);
             }
         });
+
+        btnFechar[idEstoqueTh].setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                int idEstoqueTh = dado.getId();
+                System.out.println("idEstoqueTh fechar: " + idEstoqueTh);
+                fecharItem(idEstoqueTh);
+                cancelarVolumePlaca(idEstoqueTh);
+            }
+        });
+
+    }
+
+    private void fecharItem(Integer idEstoqueTh) {
+        vbList.getChildren().remove(gridpane[idEstoqueTh]);
+        vbList.getChildren().remove(separator[idEstoqueTh]);
+//        //cancela no banco de dados
+//        cancelarNoBanco(idEstoqueTh);
+//        cancelarPlaca(idEstoqueTh);
     }
 
     @FXML
-    void gerarRelatorio(ActionEvent event) {
+    void gerarRelatorio(ActionEvent event
+    ) {
         try {
             stack.getChildren().clear();
             stack.getChildren().add(getNode("/br/com/ezatta/view/Relatorio.fxml"));
@@ -1547,17 +1672,17 @@ public class PrincipalUsuarioController implements Initializable {
             message.setFrom(new InternetAddress("marceloaugusto16@gmail.com"));
 
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("marceloaugusto16@gmail.com"));
-            
+
             if (ezattaProdutoStatic.getEmail() != null) {
-                System.out.println("ezattaProdutoStatic.getEmail(): "+ezattaProdutoStatic.getEmail());
+                System.out.println("ezattaProdutoStatic.getEmail(): " + ezattaProdutoStatic.getEmail());
                 message.addRecipients(Message.RecipientType.CC, InternetAddress.parse(ezattaProdutoStatic.getEmail()));
             }
-            
-            if(ezattaUsuarioStatic.getEmpresa().getEmail()!= null){
-                System.out.println("ezattaUsuarioStatic.getEmpresa().getEmail(): "+ezattaUsuarioStatic.getEmpresa().getEmail());
+
+            if (ezattaUsuarioStatic.getEmpresa().getEmail() != null) {
+                System.out.println("ezattaUsuarioStatic.getEmpresa().getEmail(): " + ezattaUsuarioStatic.getEmpresa().getEmail());
                 message.addRecipients(Message.RecipientType.CC, InternetAddress.parse(ezattaUsuarioStatic.getEmpresa().getEmail()));
             }
-            message.setSubject("Sistema Ezatta - Alerta - "+ezattaUsuarioStatic.getEmpresa().getNome());
+            message.setSubject("Sistema Ezatta - Alerta - " + ezattaUsuarioStatic.getEmpresa().getNome());
             message.setContent(corpoEmail, "text/html");
 
             //--------------------------inicio anexo------------------------------------------
@@ -1586,7 +1711,7 @@ public class PrincipalUsuarioController implements Initializable {
             Logger.getLogger(TesteEmail.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     @FXML
     void btnEnvasar(ActionEvent event) {
         //---------------------------------------------------fim
@@ -1604,7 +1729,201 @@ public class PrincipalUsuarioController implements Initializable {
             e.printStackTrace();
         }
     }
-    
- 
+
+    public static String removerAcentos(String str) {
+        return Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+    }
+
+    @FXML
+    private Text txtTituloPrincipal;
+
+    //-----------------------------------------Tratar abrertura de porta inicio
+    @FXML
+    private Text txtTextoSelecionarPorta;
+
+    @FXML
+    private Button btnAtualizarPort;
+
+    public void validaPorta() {
+        if (!configurarPorta) {
+
+            iconeConectado.setVisible(false);
+            iconeDesconectado.setVisible(true);
+
+            lvProdutos.setDisable(true);
+            Tooltip tooltip = new Tooltip();
+
+            tooltip.setText(
+                    "Selecione o produto"
+            );
+            lvProdutos.setTooltip(tooltip);
+            txtTituloPrincipal.setText("Favor configurar porta de comunicação.");
+            aviso.setVisible(true);
+        } else {
+            txtTituloPrincipal.setText("Selecione um produtos para abastecer");
+            iconeConectado.setVisible(true);
+            iconeDesconectado.setVisible(false);
+
+            mudarStatusConeccao();
+        }
+
+    }
+
+    public void mudarStatusConeccao() {
+        //mudar o status componentes conexao informando ja estar conectado
+        txtTextoSelecionarPorta.setText("Disopitivo ja conectado"
+                + "\n Porta Serial: " + defaultPort);
+        cbPorta.setDisable(true);
+        btnAtualizarPort.setDisable(true);
+        btnConectar.setDisable(true);
+    }
+
+    public void popularCbPortas() {
+        Enumeration<CommPortIdentifier> numPorta = CommPortIdentifier.getPortIdentifiers();
+        ObservableList<String> portas = FXCollections.observableArrayList();
+        while (numPorta.hasMoreElements()) {
+            CommPortIdentifier identificacaoPorta = numPorta.nextElement();
+            //portas.add(identificacaoPorta);
+            portas.add(identificacaoPorta.getName());
+            System.out.println("For Portas: " + identificacaoPorta.getName());
+            cbPorta.getItems().addAll(identificacaoPorta.getName());
+        }
+        System.out.println("Não entrou");
+    }
+
+    //-----------------------------------------Tratar abertura de porta fim
+    @FXML
+    void fecharAviso(ActionEvent event) {
+        System.out.println("Fechar aviso");
+        aviso.setVisible(false);
+    }
+
+    @FXML
+    private Button btnConectar;
+
+    //------------------------------inicio montar anchor comunicacao
+    @FXML
+    private ComboBox<String> cbPorta;
+
+    //String output = (String) Sample.getSelectionModel().getSelectedItem().toString();
+    //System.out.println(output);
+    @FXML
+    void conectar(ActionEvent event) {
+        String output = cbPorta.getSelectionModel().getSelectedItem();
+        System.out.println(output);
+        //defaultPort = "/dev/ttyACM0";
+        defaultPort = output;
+        System.out.println("Abrindo porta serial: " + defaultPort);
+
+        portList = gnu.io.CommPortIdentifier.getPortIdentifiers();
+        while (portList.hasMoreElements()) {
+            portId = (gnu.io.CommPortIdentifier) portList.nextElement();
+            if (portId.getPortType() == gnu.io.CommPortIdentifier.PORT_SERIAL) {
+                if (portId.getName().equals(defaultPort)) {
+
+                    System.out.println("Found port " + defaultPort);
+                    portFound = true;
+
+                    configurarPorta = true;
+
+                    //Verifica se a porta esta em Uso   
+                    try {
+                        serialPort = (gnu.io.SerialPort) portId.open("SimpleWrite", 9600);
+                        System.out.println("Abriu");
+                        iconeConectado.setVisible(true);
+                        iconeDesconectado.setVisible(false);
+                    } catch (PortInUseException e) {
+                        System.out.println("Port in use.");
+                        serialPort.close();
+                        new FXDialog(FXDialog.Type.ERROR, "Porta serial em uso...").showDialog();
+                        //Aqui tratar... 
+
+                        //continue;
+                        //------------------------------rever
+                        System.out.println("port " + defaultPort + " not found.");
+                        serialPort.close();
+                        System.out.println("Porta fechada...");
+
+                        //fechar conexao H2DB
+                        System.out.println("Fechou H2DB");
+                        JPAUtil.closeManager(JPAUtil.getEntityManager());
+
+                        //fechar conexao Mysql
+//                        System.out.println("Fechou Mysql");
+//                        JPAUtilChamado.closeManager(JPAUtilChamado.getEntityManager());
+                        
+                        //fechar aplicaçao
+                        Platform.exit();
+                        System.exit(0);
+                        EzattaMain.stage.close();
+                        //mensagem avisando que a porta esta em uso                        
+                    }
+                    //Abre a porta para utilizar-la
+                    try {
+                        System.out.println("Abriu...");
+                        mudarStatusConeccao();
+                        outputStream = serialPort.getOutputStream();
+                    } catch (IOException e) {
+                        System.out.println("Erro na abertura da porta.");
+                        new FXDialog(FXDialog.Type.ERROR, "Porta serial em uso.").showDialog();
+                        serialPort.close();
+                    }
+                    //Setar os parametros da porta
+                    try {
+                        serialPort.setSerialPortParams(19200, gnu.io.SerialPort.DATABITS_8, gnu.io.SerialPort.STOPBITS_1, gnu.io.SerialPort.PARITY_NONE);
+                    } catch (UnsupportedCommOperationException e) {
+                        System.out.println("Erro ao setar atributos na p.");
+                        serialPort.close();
+                    }
+                    //Deixa o fluxo limpo
+                    try {
+                        serialPort.notifyOnOutputEmpty(true);
+                    } catch (Exception e) {
+                        System.out.println("Error setting event notification");
+                        System.out.println(e.toString());
+                        System.exit(-1);
+                    }
+                    /*-------------------------lv Produtos-------------------------------*/
+                    lvProdutos.setDisable(false);
+                    /*-------------------------lv Produtos---------------------------------*/
+                } else {
+                    System.out.println("não conectou");
+                    //new FXDialog(FXDialog.Type.ERROR, "Porta serial em uso.").showDialog();
+                }
+                //se a porta não estiver funcionando mostra na tela...
+
+            } else {
+                new FXDialog(FXDialog.Type.ERROR, "Porta serial em uso.").showDialog();
+            }
+
+        }
+    }
+    //------------------------------fim montar anchor comunicação
+
+    @FXML
+    private Button btnConfigurarPorta;
+
+    @FXML
+    void configurarPorta(ActionEvent event) {
+        System.out.println("Fechar aviso");
+        aviso.setVisible(false);
+        acPrincipal.setExpandedPane(acComunicacao);
+    }
+
+    @FXML
+    void btnAtualizarPorta(ActionEvent event) {
+        popularCbPortas();
+    }
+
+    @FXML
+    private ImageView iconeConectado;
+
+    @FXML
+    private ImageView iconeDesconectado;
+
+    @FXML
+    void atualizarListaRegistros(ActionEvent event) {
+        popularProdutos();
+    }
 
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.0.4.final using JasperReports Library version 6.0.4  -->
-<!-- 2015-07-28T13:06:27 -->
+<!-- 2015-08-13T09:46:26 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BarCode" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0f73327b-c85b-4ffb-93e7-67ad1051bbda">
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
@@ -172,15 +172,15 @@ ORDER BY
 	</parameter>
 	<parameter name="DataFinal" class="java.sql.Timestamp"/>
 	<parameter name="Aplicador" class="java.lang.Integer"/>
-	<queryString>
+	<queryString language="SQL">
 		<![CDATA[select
-       (select nome from ezatta_operador where id = ezatta_estoque.operador) as Operador,
-       (select nome from ezatta_bico where id = ezatta_estoque.BICO) as Bico,
-       (select nome from ezatta_usuario where id = ezatta_estoque.USUARIO) as Usuario,
-       (select nome from ezatta_produto where id = ezatta_estoque.produto) as Produto,
+       (select nome from ezatta_operador where id = EZATTA_MOVIMENTACOES.operador) as Operador,
+       (select nome from ezatta_bico where id = EZATTA_MOVIMENTACOES.BICO) as Bico,
+       (select nome from ezatta_usuario where id = EZATTA_MOVIMENTACOES.USUARIO) as Usuario,
+       (select nome from ezatta_produto where id = EZATTA_MOVIMENTACOES.produto) as Produto,
        qtd_estoque, data_estoque,os,placa, km
 from
-     ezatta_estoque
+     EZATTA_MOVIMENTACOES
 where data_estoque >= $P{DataInicio} and data_estoque <= $P{DataFinal} and
 operador = $P{Aplicador}]]>
 	</queryString>
@@ -483,7 +483,7 @@ operador = $P{Aplicador}]]>
 		</band>
 	</detail>
 	<columnFooter>
-		<band height="106" splitType="Stretch">
+		<band height="49" splitType="Stretch">
 			<rectangle radius="10">
 				<reportElement x="2" y="15" width="551" height="34" uuid="2f378654-f02a-43eb-b526-2ea79eb0af66"/>
 			</rectangle>

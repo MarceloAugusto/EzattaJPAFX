@@ -10,12 +10,15 @@ import br.com.ezatta.backup.DatabaseBackup;
 import br.com.ezatta.backup.H2DatabaseBackup;
 import br.com.ezatta.backup.dao.BackupDao;
 import br.com.ezatta.dao.EmpresaDAO;
+import br.com.ezatta.dao.LogDAO;
 import br.com.ezatta.dao.UsuarioDAO;
 import br.com.ezatta.mail.TesteEmail;
 import br.com.ezatta.model.EzattaEmpresa;
+import br.com.ezatta.model.EzattaLog;
 import br.com.ezatta.model.EzattaProduto;
 import br.com.ezatta.model.EzattaUsuario;
 import br.com.ezatta.util.JPAUtil;
+import br.com.ezatta.util.JPAUtilMysql;
 import br.com.ezatta.util.Path;
 import br.com.ezatta.view.EzattaMain;
 import br.com.ezatta.view.FXDialog;
@@ -108,7 +111,7 @@ public class LoginController implements Initializable {
     private TextField txtUsuario;
 
     @FXML
-    private Button btnEntrar;    
+    private Button btnEntrar;
 
     /*----------------------inicio vars envio java com----------------------------------------*/
     public static Enumeration portList;
@@ -156,6 +159,7 @@ public class LoginController implements Initializable {
     public static EzattaEmpresa ezattaEmpresaStatic = new EzattaEmpresa();
     public static EzattaUsuario ezattaUsuarioStatic = new EzattaUsuario();
     public static EzattaProduto ezattaProdutoStatic = new EzattaProduto();
+    public static boolean configurarPorta = false;
     EmpresaDAO empresadao = new EmpresaDAO();
     UsuarioDAO usuariodao = new UsuarioDAO();
 
@@ -167,9 +171,7 @@ public class LoginController implements Initializable {
         if (txtUsuario.getText().equals("") && txtSenha.getText().equals("") && qtd == 0) {
             System.out.println("entrou sem dados");
             System.out.println("qtd: " + qtd);
-
             anchorNovaEmpresa.setVisible(true);
-
         } else {
 
             //Empresa recupera usuario e senha informado pelo usuario
@@ -184,51 +186,56 @@ public class LoginController implements Initializable {
             boolean validEmpresa = empresadao.isValidUserAndPassowrd(ezattaEmpresaStatic);
             boolean validUsuario = usuariodao.isValidUserAndPassowrd(ezattaUsuarioStatic);
 
-           
-            
-//            if (empresadao.listUserAndPassowrd(ezattaEmpresaStatic) != null) {
-//                System.out.println("entour no valida empresa");
-//                ezattaEmpresaStatic = empresadao.listUserAndPassowrd(ezattaEmpresaStatic);
-//                System.out.println("ezattaEmpresaStatic: " + ezattaEmpresaStatic.getNome());
-//            }else if (usuariodao.getUserByLogAndPassword(ezattaUsuarioStatic) != null) {
-//                System.out.println("Entou no valida usuario");
-//                ezattaUsuarioStatic = usuariodao.getUserByLogAndPassword(ezattaUsuarioStatic);
-//                System.out.println("ezattaUsuarioStatic: " + ezattaUsuarioStatic.getNome());
-//                System.out.println("ezattaUsuarioStatic.getEmpresa().getId(): "+ezattaUsuarioStatic.getEmpresa().getId());
-//                ezattaEmpresaStatic = empresadao.getEmpresa(ezattaUsuarioStatic.getEmpresa().getId());
-//                System.out.println("ezattaEmpresaStatic --: "+ezattaEmpresaStatic.getNome());
-//            }else{
-//                System.out.println("validar: "+usuariodao.getUserByLogAndPassword(ezattaUsuarioStatic));
-//            }
-
-
             if (validEmpresa) {
                 Stage telaPrincipal = new Stage();
                 try {
+                    //inicio tratamento de portas-----------------------------------------------
+                    if (!portFound) {
+                        System.out.println("port " + defaultPort + " not found.");
+                        //serialPort.close();
+                        System.out.println("Porta fechada...");
+                        configurarPorta = false;
+
+                        new FXDialog(FXDialog.Type.ERROR, "Favor configurar a porta serial.").showDialog();
+                    } 
+                    
+                    //fim tratamento de portas------------------------------------------------
+
                     ezattaEmpresaStatic = empresadao.listUserAndPassowrd(ezattaEmpresaStatic);
-                    System.out.println("ezattaEmpresaStatic: "+ ezattaEmpresaStatic);
-                    new FormFX<PrincipalController>("Principal.fxml", telaPrincipal, "Ezatta Inteligent Oil Supply", false);
+                    System.out.println("ezattaEmpresaStatic: " + ezattaEmpresaStatic);
+                    new FormFX<PrincipalController>("Principal.fxml", telaPrincipal, "Ezatta Inteligent Oil Supply", true);
+
                 } catch (Exception e) {
                     new FXDialog(Type.ERROR, "Erro ao carregar a tela -> Principal").showDialog();
                 }
-                EzattaMain.stage.close();
+                EzattaMain.stage.hide();
             } else if (validUsuario) {
                 try {
+                    //inicio tratamento de portas-----------------------------------------------
+                    if (!portFound) {
+                        System.out.println("port " + defaultPort + " not found.");
+                        //serialPort.close();
+                        System.out.println("Porta fechada...");
+                        configurarPorta = false;
+
+                        new FXDialog(FXDialog.Type.ERROR, "Favor configurar a porta serial.").showDialog();
+                    } 
+                    //fim tratamento de portas------------------------------------------------
+                    
                     ezattaUsuarioStatic = usuariodao.getUserByLogAndPassword(ezattaUsuarioStatic);
-                    System.out.println("ezattaUsuarioStatic: "+ezattaUsuarioStatic);
-                    System.out.println("Empresa: "+ezattaUsuarioStatic.getEmpresa());
+                    System.out.println("ezattaUsuarioStatic: " + ezattaUsuarioStatic);
+                    System.out.println("Empresa: " + ezattaUsuarioStatic.getEmpresa());
                     ezattaEmpresaStatic = ezattaUsuarioStatic.getEmpresa();
-                    System.out.println("ezattaEmpresaStatic: "+ezattaEmpresaStatic);
+                    System.out.println("ezattaEmpresaStatic: " + ezattaEmpresaStatic);
                     Stage telaPrincipal = new Stage();
-                    new FormFX<PrincipalController>("PrincipalUsuario.fxml", telaPrincipal, "Ezatta Inteligent Oil Supply", false);
+                    new FormFX<PrincipalController>("PrincipalUsuario.fxml", telaPrincipal, "Ezatta Inteligent Oil Supply", true);
                 } catch (Exception e) {
                     new FXDialog(Type.ERROR, "Erro ao carregar a tela -> Principal").showDialog();
                 }
-                EzattaMain.stage.close();
+                EzattaMain.stage.hide();
             } else {
                 new FXDialog(Type.ERROR, "Usuário ou senha incorreto...").showDialog();
             }
-
 
             //------------------------------------------------inicio bkp--------------------------------------------------
             try {
@@ -327,9 +334,13 @@ public class LoginController implements Initializable {
     @FXML
     void cancelar(ActionEvent event) throws IOException {
         //fecha aporta
-        System.out.println("port " + defaultPort + " not found.");
-        serialPort.close();
-        System.out.println("Porta fechada...");
+        try {
+            System.out.println("port " + defaultPort + " not found.");
+            serialPort.close();
+            System.out.println("Porta fechada...");
+        } catch (RuntimeException e) {
+
+        }
 
         //fechar conexao
         System.out.println("Fechou");
@@ -346,13 +357,13 @@ public class LoginController implements Initializable {
 
         anchorNovaEmpresa.setVisible(false);
 
-        // inicializa o Hibernate H2DB
+        //inicializa o Hibernate H2DB
         EntityManager manager = JPAUtil.getEntityManager();
         manager.clear();
 
-        // abre porta serial 
+        //abre porta serial
         //defaultPort = "COM4";
-        defaultPort = "/dev/ttyACM0";
+        defaultPort = "/dev/ttyUSB0";
         System.out.println("Abrindo porta serial: " + defaultPort);
 
         portList = gnu.io.CommPortIdentifier.getPortIdentifiers();
@@ -363,6 +374,8 @@ public class LoginController implements Initializable {
 
                     System.out.println("Found port " + defaultPort);
                     portFound = true;
+                    
+                    configurarPorta = true;
                     //Verifica se a porta esta em Uso   
                     try {
                         serialPort = (gnu.io.SerialPort) portId.open("SimpleWrite", 9600);
@@ -370,7 +383,9 @@ public class LoginController implements Initializable {
                     } catch (PortInUseException e) {
                         System.out.println("Port in use.");
                         serialPort.close();
-                        new FXDialog(FXDialog.Type.ERROR, "Porta serial COM4 em uso...").showDialog();
+                        new FXDialog(FXDialog.Type.ERROR, "Favor configurar a porta serial.").showDialog();
+                        //Aqui tratar... 
+
                         //continue;
                         //------------------------------rever
                         System.out.println("port " + defaultPort + " not found.");
@@ -417,17 +432,14 @@ public class LoginController implements Initializable {
                     /*-------------------------fim leitura---------------------------------*/
                 }
                 //se a porta não estiver funcionando mostra na tela...
-                if (!portFound) {
-                    System.out.println("port " + defaultPort + " not found.");
-                    //serialPort.close();
-                    System.out.println("Porta fechada...");
-                }
+                
             }
 
         }
-        /*---------------------------------------fim do metodo que abre a porta--------------------------------------*/
-        /*---------------------------------------inicio thread leitura da porta--------------------------------------*/
 
+        /*---------------------------------------fim do metodo que abre a porta--------------------------------------*/
+
+        /*---------------------------------------inicio thread leitura da porta--------------------------------------*/
         //new Thread(task).start();
     }
 
@@ -452,21 +464,26 @@ public class LoginController implements Initializable {
 
         EntityManager em = new JPAUtil().getEntityManager();
         em.getTransaction().begin();
-        Session hibernateSession = em.unwrap(Session.class);
-        hibernateSession.doWork(new org.hibernate.jdbc.Work() {
-            @Override
-            public void execute(Connection con) throws SQLException {
-                conn = con;
-            }
-        });
+        Session hibernateSession = em.unwrap(Session.class
+        );
+        hibernateSession.doWork(
+                new org.hibernate.jdbc.Work() {
+                    @Override
+                    public void execute(Connection con) throws SQLException {
+                        conn = con;
+                    }
+                }
+        );
 
-        if (file != null) {
+        if (file
+                != null) {
             try {
                 backup.backupDatabase(conn, file.getAbsolutePath());
             } catch (Throwable t) {
             }
 
         }
+
         try {
             String endMoreName = rais.concat(nome);
             enviarBkpEmail(endMoreName);
@@ -529,7 +546,8 @@ public class LoginController implements Initializable {
 
             //new FXDialog(FXDialog.Type.INFO, "").showDialog();
         } catch (AddressException ex) {
-            Logger.getLogger(TesteEmail.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TesteEmail.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -539,6 +557,20 @@ public class LoginController implements Initializable {
             try {
                 EzattaEmpresa empresa = new EzattaEmpresa(txtNome.getText(), txtLogin.getText(), txtSenhac.getText(), txtEmail.getText());
                 empresadao.addEmpresa(empresa);
+
+                //log-------------------------------------------------------------------
+                String acao = "Adicionar empresa: " + empresa;
+                EzattaLog log = new EzattaLog();
+                Timestamp data = new Timestamp(System.currentTimeMillis());
+                log.setData(data);
+                log.setAcao(acao);
+                log.setEmpresa(empresa);
+                LogDAO dao = new LogDAO();
+
+                System.out.println("log: " + log);
+                dao.addLog(log);
+                //----------------------------------------------------------------------
+
                 anchorNovaEmpresa.setVisible(false);
                 new FXDialog(Type.INFO, "Registro inserido com sucesso!").showDialog();
             } catch (SQLException e) {

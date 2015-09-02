@@ -31,6 +31,9 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -133,13 +136,13 @@ public class PrincipalController implements Initializable {
 
     @FXML
     private MenuItem miLog;
-    
+
     @FXML
     private MenuItem miMovimentacoes;
-    
+
     @FXML
     private MenuItem miHistorico;
-    
+
     @FXML
     private ListView<EzattaMovimentacoes> lvEstoque;
 
@@ -147,7 +150,7 @@ public class PrincipalController implements Initializable {
     public StackPane stack;
     //public static StackPane stack = new StackPane();
     // public static PrincipalController principal = new PrincipalController();
-    
+
     @FXML
     private MenuItem miEncherTank;
 
@@ -289,9 +292,177 @@ public class PrincipalController implements Initializable {
             //Thread.sleep(1000);
             enviarVolume(dado);
 
-            t[idEstoqueTh] = new Thread(taskLeituraEnvase);
-            t[idEstoqueTh].start();
+//            t[idEstoqueTh] = new Thread(taskLeituraEnvase);
+//            t[idEstoqueTh].start();
+            
+            
+            //---------------------------------------INICIO----------------------------------
+            
+            t[idEstoqueTh] = new Thread(new Runnable() {
+            public void run() {
+                //-------------------------inicio
+                System.out.println("entrou thread");
+                try {
+                    long numBytes = 0;
+                    int contAux = 0;
+                    //byte[] readBuffer = new byte[1000];
+                    byte[] readBuffer = new byte[100];
+                    execucaoWhile[idEstoqueTh] = true;
+                    while (execucaoWhile[idEstoqueTh]) {
+                        entrada = null;
+                        entrada = serialPort.getInputStream();
 
+                        //joga fora primeiras menssagens de outros pedidos 
+                        if (entrada.available() > 0) {
+                            entrada.read(readBuffer);
+                        }
+
+                        int timeout = 0;
+                        numBytes = 0;
+                        while (numBytes < 24) {
+                            while (entrada.available() > 0) {
+                                numBytes = numBytes + entrada.read(readBuffer, (int) numBytes, 1);//recebe os bytes na leitura.
+                                timeout = 0;
+                            }
+
+                            Thread.sleep(1);
+
+                            timeout++;
+                            if (timeout > 25) {
+                                numBytes = 0;
+                                timeout = 0;
+                            }
+                            if (numBytes > 0) {
+                                System.out.println("numBytes: " + numBytes + "thread: "+t[idEstoqueTh].toString());
+                            }
+                        }
+
+                        String strCompleta = String.format("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x", readBuffer[0], readBuffer[1], readBuffer[2], readBuffer[3], readBuffer[4], readBuffer[5], readBuffer[6], readBuffer[7], readBuffer[8], readBuffer[9], readBuffer[10], readBuffer[11], readBuffer[12], readBuffer[13], readBuffer[14], readBuffer[15], readBuffer[16], readBuffer[17], readBuffer[18], readBuffer[19], readBuffer[20], readBuffer[21], readBuffer[22], readBuffer[23], readBuffer[24]);
+                        System.out.println("string completa: " + strCompleta);
+
+                        String endBicoRadio = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[4 + contAux], readBuffer[5 + contAux], readBuffer[6 + contAux], readBuffer[7 + contAux], readBuffer[8 + contAux], readBuffer[9 + contAux], readBuffer[10 + contAux], readBuffer[11 + contAux]);
+                        if (endBico[idEstoqueTh].toUpperCase().equals(endBicoRadio.toUpperCase())) {
+
+                            if (readBuffer[15 + contAux] == (byte) 0x4c) { //LIBERADO
+                                //if (readBuffer[15] == (byte) 0x4c || readBuffer[02] == (byte) 0x07) {
+                                String volumeTratado = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[15], readBuffer[16], readBuffer[17], readBuffer[18], readBuffer[19], readBuffer[20], readBuffer[21], readBuffer[22]);
+                                System.out.println("Liberado: " + volumeTratado);
+                                efetivo[idEstoqueTh].setText("Liberado");
+                                btnCancelarEstoque[idEstoqueTh].disableProperty();
+                            }
+                            if (readBuffer[15 + contAux] == (byte) 0x56) {//ENCHENDO
+
+                                //alterando status do botão enviar
+                                btnCancelarEstoque[idEstoqueTh].disableProperty();
+                                btnCancelarEstoque[idEstoqueTh].setDisable(true);
+
+                                //btnSalvar
+                                btnSalvarEstoque[idEstoqueTh].setDisable(false);
+
+                                //ProgressBar
+                                progressBarEstoque[idEstoqueTh].setVisible(true);
+
+                                String volumeTratado = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[15 + contAux], readBuffer[16 + contAux], readBuffer[17 + contAux], readBuffer[18 + contAux], readBuffer[19 + contAux], readBuffer[20 + contAux], readBuffer[21 + contAux], readBuffer[22 + contAux]);
+                                String volumeTratadoDouble = String.format("%02x%02x%02x%02x", readBuffer[19 + contAux], readBuffer[20 + contAux], readBuffer[21 + contAux], readBuffer[22 + contAux]);
+
+                                outputBfj = new StringBuilder();
+                                volumeBfj = new StringBuilder();
+
+                                //monta uma string com vol
+                                for (int ij = 0; ij < volumeTratado.length(); ij += 2) {
+                                    String strj = volumeTratado.substring(ij, ij + 2);
+                                    outputBfj.append((char) Integer.parseInt(strj, 16));
+                                }
+                                //monta uma string 00.00
+                                for (int ij = 0; ij < volumeTratadoDouble.length(); ij += 2) {
+                                    String strjDouble = volumeTratadoDouble.substring(ij, ij + 2);
+                                    volumeBfj.append((char) Integer.parseInt(strjDouble, 16));
+                                }
+                                String volumeSemVol = volumeBfj.toString();
+                                System.out.println("volumeSemVol: " + volumeSemVol);
+                                System.out.println("thread: "+t[idEstoqueTh].toString());
+
+                                if (readBuffer[15 + contAux] == (byte) 0x56 && outputBfj.length() > 5) {
+                                    try {
+                                        //efetivo[idEstoqueTh].setText(outputBfj.toString());
+                                        efetivo[idEstoqueTh].setText(volumeBfj.toString());
+                                        System.out.println("VolumeTotal " + volumeTotal[idEstoqueTh]);
+                                        if (!volumeSemVol.isEmpty() && volumeSemVol.length() > 0) {
+                                            atualizaBarraProgress(volumeBfj.toString());//barra de progresso
+                                        } else {
+                                            outputBfj.delete(0, outputBfj.length());//limpa buffer
+                                        }
+                                    } catch (NullPointerException e) {
+                                        System.out.println("nullpointer");
+                                        e.printStackTrace();
+                                    }
+                                    outputBfj.delete(0, outputBfj.length());//limpa buffer
+                                }
+                            } else {
+                                try {
+                                    outputBfj.delete(0, outputBfj.length());
+                                } catch (Exception e) {
+
+                                }
+                            }
+                            if (readBuffer[15 + contAux] == (byte) 0x46) {
+                                //mensagem de fim
+                                efetivo[idEstoqueTh].setText("FIM");
+                                execucaoWhile[idEstoqueTh] = false;
+                                Thread.sleep(100);
+
+                                removerRegistroTela(idEstoqueTh);
+
+                                //cancela thread
+                                //taskLeituraEnvase.cancel();
+                                //t[idEstoqueTh].interrupt();
+                                t[idEstoqueTh].stop();
+                                //--------------------------atualizar status
+                                EzattaMovimentacoes e = EstoqueCtr.getEstoque(idEstoqueTh);
+                                e.setStatus(2);
+                                EstoqueCtr.updateEstoque(e);
+
+                                //limpa outputBuffer
+                                outputBfj.delete(0, outputBfj.length());
+                            }
+                        }
+                    }
+                } catch (InterruptedException ex) {
+                    System.out.println("InterruptedException");
+                    ex.printStackTrace();
+                } catch (IOException ex) {
+                    System.out.println("IOException");
+                    ex.printStackTrace();
+                } catch (java.lang.NullPointerException e) {
+                    System.out.println("NullPointerException: ");
+                    e.printStackTrace();
+                }
+                //--------------------------fim
+                //t[idEstoqueTh].interrupt();
+            }
+        });
+            
+            //----------------------------------------FIM-----------------------------------
+
+            t[idEstoqueTh].start();
+            System.out.println("t: "+t[idEstoqueTh].toString());
+            //--------------------------------------inicio-------------------------
+            // create a pool of threads, 10 max jobs will execute in parallel
+            //            ExecutorService threadPool = Executors.newFixedThreadPool(10);
+            //            // submit jobs to be executing by the pool
+            //
+            //            for (int i = 0; i < 10; i++) {
+            //                threadPool.submit(new Runnable() {
+            //                    public void run() {
+            //                        // some code to run in parallel
+            //                    }
+            //                });
+            //            }
+            //            // once you've submitted your last job to the service it should be shut down
+            //            threadPool.shutdown();
+            //            // wait for the threads to finish if necessary
+            //            threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+            //---------------------------------------fim---------------------------
             //atualiza banco
             EzattaMovimentacoes est = EstoqueCtr.getEstoque(idEstoqueTh);
             est.setStatus(1);
@@ -308,6 +479,302 @@ public class PrincipalController implements Initializable {
         }
     }
 
+    //t[idEstoqueTh]
+    public void th() {
+//        t[idEstoqueTh] = new Thread(new Runnable() {
+//            public void run() {
+//                //-------------------------inicio
+//                System.out.println("entrou thread");
+//                try {
+//                    long numBytes = 0;
+//                    int contAux = 0;
+//                    byte[] readBuffer = new byte[1000];
+//                    execucaoWhile[idEstoqueTh] = true;
+//                    while (execucaoWhile[idEstoqueTh]) {
+//                        entrada = null;
+//                        entrada = serialPort.getInputStream();
+//
+//                        //joga fora primeiras menssagens de outros pedidos 
+//                        if (entrada.available() > 0) {
+//                            entrada.read(readBuffer);
+//                        }
+//
+//                        int timeout = 0;
+//                        numBytes = 0;
+//                        while (numBytes < 24) {
+//                            while (entrada.available() > 0) {
+//                                numBytes = numBytes + entrada.read(readBuffer, (int) numBytes, 1);//recebe os bytes na leitura.
+//                                timeout = 0;
+//                            }
+//
+//                            Thread.sleep(1);
+//
+//                            timeout++;
+//                            if (timeout > 25) {
+//                                numBytes = 0;
+//                                timeout = 0;
+//                            }
+//                            if (numBytes > 0) {
+//                                System.out.println("numBytes: " + numBytes);
+//                            }
+//                        }
+//
+//                        String strCompleta = String.format("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x", readBuffer[0], readBuffer[1], readBuffer[2], readBuffer[3], readBuffer[4], readBuffer[5], readBuffer[6], readBuffer[7], readBuffer[8], readBuffer[9], readBuffer[10], readBuffer[11], readBuffer[12], readBuffer[13], readBuffer[14], readBuffer[15], readBuffer[16], readBuffer[17], readBuffer[18], readBuffer[19], readBuffer[20], readBuffer[21], readBuffer[22], readBuffer[23], readBuffer[24]);
+//                        System.out.println("string completa: " + strCompleta);
+//
+//                        String endBicoRadio = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[4 + contAux], readBuffer[5 + contAux], readBuffer[6 + contAux], readBuffer[7 + contAux], readBuffer[8 + contAux], readBuffer[9 + contAux], readBuffer[10 + contAux], readBuffer[11 + contAux]);
+//                        if (endBico[idEstoqueTh].toUpperCase().equals(endBicoRadio.toUpperCase())) {
+//
+//                            if (readBuffer[15 + contAux] == (byte) 0x4c) { //LIBERADO
+//                                //if (readBuffer[15] == (byte) 0x4c || readBuffer[02] == (byte) 0x07) {
+//                                String volumeTratado = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[15], readBuffer[16], readBuffer[17], readBuffer[18], readBuffer[19], readBuffer[20], readBuffer[21], readBuffer[22]);
+//                                System.out.println("Liberado: " + volumeTratado);
+//                                efetivo[idEstoqueTh].setText("Liberado");
+//                                btnCancelarEstoque[idEstoqueTh].disableProperty();
+//                            }
+//                            if (readBuffer[15 + contAux] == (byte) 0x56) {//ENCHENDO
+//
+//                                //alterando status do botão enviar
+//                                btnCancelarEstoque[idEstoqueTh].disableProperty();
+//                                btnCancelarEstoque[idEstoqueTh].setDisable(true);
+//
+//                                //btnSalvar
+//                                btnSalvarEstoque[idEstoqueTh].setDisable(false);
+//
+//                                //ProgressBar
+//                                progressBarEstoque[idEstoqueTh].setVisible(true);
+//
+//                                String volumeTratado = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[15 + contAux], readBuffer[16 + contAux], readBuffer[17 + contAux], readBuffer[18 + contAux], readBuffer[19 + contAux], readBuffer[20 + contAux], readBuffer[21 + contAux], readBuffer[22 + contAux]);
+//                                String volumeTratadoDouble = String.format("%02x%02x%02x%02x", readBuffer[19 + contAux], readBuffer[20 + contAux], readBuffer[21 + contAux], readBuffer[22 + contAux]);
+//
+//                                outputBfj = new StringBuilder();
+//                                volumeBfj = new StringBuilder();
+//
+//                                //monta uma string com vol
+//                                for (int ij = 0; ij < volumeTratado.length(); ij += 2) {
+//                                    String strj = volumeTratado.substring(ij, ij + 2);
+//                                    outputBfj.append((char) Integer.parseInt(strj, 16));
+//                                }
+//                                //monta uma string 00.00
+//                                for (int ij = 0; ij < volumeTratadoDouble.length(); ij += 2) {
+//                                    String strjDouble = volumeTratadoDouble.substring(ij, ij + 2);
+//                                    volumeBfj.append((char) Integer.parseInt(strjDouble, 16));
+//                                }
+//                                String volumeSemVol = volumeBfj.toString();
+//                                System.out.println("volumeSemVol: " + volumeSemVol);
+//
+//                                if (readBuffer[15 + contAux] == (byte) 0x56 && outputBfj.length() > 5) {
+//                                    try {
+//                                        //efetivo[idEstoqueTh].setText(outputBfj.toString());
+//                                        efetivo[idEstoqueTh].setText(volumeBfj.toString());
+//                                        System.out.println("VolumeTotal " + volumeTotal[idEstoqueTh]);
+//                                        if (!volumeSemVol.isEmpty() && volumeSemVol.length() > 0) {
+//                                            atualizaBarraProgress(volumeBfj.toString());//barra de progresso
+//                                        } else {
+//                                            outputBfj.delete(0, outputBfj.length());//limpa buffer
+//                                        }
+//                                    } catch (NullPointerException e) {
+//                                        System.out.println("nullpointer");
+//                                        e.printStackTrace();
+//                                    }
+//                                    outputBfj.delete(0, outputBfj.length());//limpa buffer
+//                                }
+//                            } else {
+//                                try {
+//                                    outputBfj.delete(0, outputBfj.length());
+//                                } catch (Exception e) {
+//
+//                                }
+//                            }
+//                            if (readBuffer[15 + contAux] == (byte) 0x46) {
+//                                //mensagem de fim
+//                                efetivo[idEstoqueTh].setText("FIM");
+//                                execucaoWhile[idEstoqueTh] = false;
+//                                Thread.sleep(100);
+//
+//                                removerRegistroTela(idEstoqueTh);
+//
+//                                //cancela thread
+//                                //taskLeituraEnvase.cancel();
+//                                //--------------------------atualizar status
+//                                EzattaMovimentacoes e = EstoqueCtr.getEstoque(idEstoqueTh);
+//                                e.setStatus(2);
+//                                EstoqueCtr.updateEstoque(e);
+//
+//                                //limpa outputBuffer
+//                                outputBfj.delete(0, outputBfj.length());
+//                            }
+//                        }
+//                    }
+//                } catch (InterruptedException ex) {
+//                    System.out.println("InterruptedException");
+//                    ex.printStackTrace();
+//                } catch (IOException ex) {
+//                    System.out.println("IOException");
+//                    ex.printStackTrace();
+//                } catch (java.lang.NullPointerException e) {
+//                    System.out.println("NullPointerException: ");
+//                    e.printStackTrace();
+//                }
+//                //--------------------------fim
+//            }
+//        });
+    }
+
+//    Task taskLeituraEnvase = new Task() {
+//
+//        @Override
+//        public void run() {
+//
+//            System.out.println("entrou thread");
+//            System.out.println("taskLeituraEnvase: " + taskLeituraEnvase.toString());
+//            try {
+//                long numBytes = 0;
+//                int contAux = 0;
+//                byte[] readBuffer = new byte[1000];
+//                execucaoWhile[idEstoqueTh] = true;
+//                while (execucaoWhile[idEstoqueTh]) {
+//                    entrada = null;
+//                    entrada = serialPort.getInputStream();
+//
+//                    //joga fora primeiras menssagens de outros pedidos 
+//                    if (entrada.available() > 0) {
+//                        entrada.read(readBuffer);
+//                    }
+//
+//                    int timeout = 0;
+//                    numBytes = 0;
+//                    while (numBytes < 24) {
+//                        while (entrada.available() > 0) {
+//                            numBytes = numBytes + entrada.read(readBuffer, (int) numBytes, 1);//recebe os bytes na leitura.
+//                            timeout = 0;
+//                        }
+//
+//                        Thread.sleep(1);
+//
+//                        timeout++;
+//                        if (timeout > 25) {
+//                            numBytes = 0;
+//                            timeout = 0;
+//                        }
+//                        if (numBytes > 0) {
+//                            System.out.println("numBytes: " + numBytes);
+//                            System.out.println("taskLeituraEnvase: " + taskLeituraEnvase.toString());
+//                        }
+//                    }
+//
+//                    String strCompleta = String.format("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x", readBuffer[0], readBuffer[1], readBuffer[2], readBuffer[3], readBuffer[4], readBuffer[5], readBuffer[6], readBuffer[7], readBuffer[8], readBuffer[9], readBuffer[10], readBuffer[11], readBuffer[12], readBuffer[13], readBuffer[14], readBuffer[15], readBuffer[16], readBuffer[17], readBuffer[18], readBuffer[19], readBuffer[20], readBuffer[21], readBuffer[22], readBuffer[23], readBuffer[24]);
+//                    System.out.println("string completa: " + strCompleta);
+//
+//                    String endBicoRadio = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[4 + contAux], readBuffer[5 + contAux], readBuffer[6 + contAux], readBuffer[7 + contAux], readBuffer[8 + contAux], readBuffer[9 + contAux], readBuffer[10 + contAux], readBuffer[11 + contAux]);
+//                    if (endBico[idEstoqueTh].toUpperCase().equals(endBicoRadio.toUpperCase())) {
+//
+//                        if (readBuffer[15 + contAux] == (byte) 0x4c) { //LIBERADO
+//                            //if (readBuffer[15] == (byte) 0x4c || readBuffer[02] == (byte) 0x07) {
+//                            String volumeTratado = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[15], readBuffer[16], readBuffer[17], readBuffer[18], readBuffer[19], readBuffer[20], readBuffer[21], readBuffer[22]);
+//                            System.out.println("Liberado: " + volumeTratado);
+//                            efetivo[idEstoqueTh].setText("Liberado");
+//                            btnCancelarEstoque[idEstoqueTh].disableProperty();
+//                        }
+//                        if (readBuffer[15 + contAux] == (byte) 0x56) {//ENCHENDO
+//
+//                            //alterando status do botão enviar
+//                            btnCancelarEstoque[idEstoqueTh].disableProperty();
+//                            btnCancelarEstoque[idEstoqueTh].setDisable(true);
+//
+//                            //btnSalvar
+//                            btnSalvarEstoque[idEstoqueTh].setDisable(false);
+//
+//                            //ProgressBar
+//                            progressBarEstoque[idEstoqueTh].setVisible(true);
+//
+//                            String volumeTratado = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[15 + contAux], readBuffer[16 + contAux], readBuffer[17 + contAux], readBuffer[18 + contAux], readBuffer[19 + contAux], readBuffer[20 + contAux], readBuffer[21 + contAux], readBuffer[22 + contAux]);
+//                            String volumeTratadoDouble = String.format("%02x%02x%02x%02x", readBuffer[19 + contAux], readBuffer[20 + contAux], readBuffer[21 + contAux], readBuffer[22 + contAux]);
+//                            System.out.println("taskLeituraEnvase: " + taskLeituraEnvase.toString());
+//
+//                            outputBfj = new StringBuilder();
+//                            volumeBfj = new StringBuilder();
+//
+//                            //monta uma string com vol
+//                            for (int ij = 0; ij < volumeTratado.length(); ij += 2) {
+//                                String strj = volumeTratado.substring(ij, ij + 2);
+//                                outputBfj.append((char) Integer.parseInt(strj, 16));
+//                            }
+//                            //monta uma string 00.00
+//                            for (int ij = 0; ij < volumeTratadoDouble.length(); ij += 2) {
+//                                String strjDouble = volumeTratadoDouble.substring(ij, ij + 2);
+//                                volumeBfj.append((char) Integer.parseInt(strjDouble, 16));
+//                            }
+//                            String volumeSemVol = volumeBfj.toString();
+//                            System.out.println("volumeSemVol: " + volumeSemVol);
+//
+//                            if (readBuffer[15 + contAux] == (byte) 0x56 && outputBfj.length() > 5) {
+//                                try {
+//                                    //efetivo[idEstoqueTh].setText(outputBfj.toString());
+//                                    efetivo[idEstoqueTh].setText(volumeBfj.toString());
+//                                    System.out.println("VolumeTotal " + volumeTotal[idEstoqueTh]);
+//                                    if (!volumeSemVol.isEmpty() && volumeSemVol.length() > 0) {
+//                                        atualizaBarraProgress(volumeBfj.toString());//barra de progresso
+//                                    } else {
+//                                        outputBfj.delete(0, outputBfj.length());//limpa buffer
+//                                    }
+//                                } catch (NullPointerException e) {
+//                                    System.out.println("nullpointer");
+//                                    e.printStackTrace();
+//                                }
+//                                outputBfj.delete(0, outputBfj.length());//limpa buffer
+//                            }
+//                        } else {
+//                            try {
+//                                outputBfj.delete(0, outputBfj.length());
+//                            } catch (Exception e) {
+//
+//                            }
+//                        }
+//                        if (readBuffer[15 + contAux] == (byte) 0x46) {
+//                            //mensagem de fim
+//                            efetivo[idEstoqueTh].setText("FIM");
+//                            execucaoWhile[idEstoqueTh] = false;
+//                            Thread.sleep(100);
+//
+//                            removerRegistroTela(idEstoqueTh);
+//
+//                            //cancela thread
+//                            taskLeituraEnvase.cancel();
+//                            //--------------------------atualizar status
+//                            EzattaMovimentacoes e = EstoqueCtr.getEstoque(idEstoqueTh);
+//                            e.setStatus(2);
+//                            EstoqueCtr.updateEstoque(e);
+//
+//                            //limpa outputBuffer
+//                            outputBfj.delete(0, outputBfj.length());
+//                        }
+//                    }
+//                }
+//            } catch (InterruptedException ex) {
+//                System.out.println("InterruptedException");
+//                ex.printStackTrace();
+//            } catch (IOException ex) {
+//                System.out.println("IOException");
+//                ex.printStackTrace();
+//            } catch (java.lang.NullPointerException e) {
+//                System.out.println("NullPointerException: ");
+//                e.printStackTrace();
+//            }
+////fim------------------------------------------------------------------------------
+//        }
+//
+//        @Override
+//
+//        protected Void call() throws Exception {
+//            return null;
+//        }
+//
+//        @Override
+//        protected void succeeded() {
+//        }
+//
+//    };
     private void cancelarVolumePlaca(Integer idEstoqueTh) {
         vbList.getChildren().remove(gridpane[idEstoqueTh]);
         vbList.getChildren().remove(separator[idEstoqueTh]);
@@ -369,7 +836,7 @@ public class PrincipalController implements Initializable {
             new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
             e.printStackTrace();
         }
-        
+
         //ocultar progress bar bico
         progressBar.setVisible(false);
         //carrega aberto
@@ -462,159 +929,6 @@ public class PrincipalController implements Initializable {
     void carregarProdutoTela(ActionEvent event) {
         popularProdutos();
     }
-
-    Task taskLeituraEnvase = new Task() {
-
-        @Override
-        public void run() {
-            System.out.println("entrou thread");
-            System.out.println("taskLeituraEnvase: " + taskLeituraEnvase.toString());
-            try {
-                long numBytes = 0;
-                int contAux = 0;
-                byte[] readBuffer = new byte[1000];
-                execucaoWhile[idEstoqueTh] = true;
-                while (execucaoWhile[idEstoqueTh]) {
-                    entrada = null;
-                    entrada = serialPort.getInputStream();
-
-                    //joga fora primeiras menssagens de outros pedidos 
-                    if (entrada.available() > 0) {
-                        entrada.read(readBuffer);
-                    }
-
-                    int timeout = 0;
-                    numBytes = 0;
-                    while (numBytes < 24) {
-                        while (entrada.available() > 0) {
-                            numBytes = numBytes + entrada.read(readBuffer, (int) numBytes, 1);//recebe os bytes na leitura.
-                            timeout = 0;
-                        }
-
-                        Thread.sleep(1);
-
-                        timeout++;
-                        if (timeout > 25) {
-                            numBytes = 0;
-                            timeout = 0;
-                        }
-                        if (numBytes > 0) {
-                            System.out.println("numBytes: " + numBytes);
-
-                        }
-                    }
-
-                    String strCompleta = String.format("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x", readBuffer[0], readBuffer[1], readBuffer[2], readBuffer[3], readBuffer[4], readBuffer[5], readBuffer[6], readBuffer[7], readBuffer[8], readBuffer[9], readBuffer[10], readBuffer[11], readBuffer[12], readBuffer[13], readBuffer[14], readBuffer[15], readBuffer[16], readBuffer[17], readBuffer[18], readBuffer[19], readBuffer[20], readBuffer[21], readBuffer[22], readBuffer[23], readBuffer[24]);
-                    System.out.println("string completa: " + strCompleta);
-
-                    String endBicoRadio = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[4 + contAux], readBuffer[5 + contAux], readBuffer[6 + contAux], readBuffer[7 + contAux], readBuffer[8 + contAux], readBuffer[9 + contAux], readBuffer[10 + contAux], readBuffer[11 + contAux]);
-                    if (endBico[idEstoqueTh].toUpperCase().equals(endBicoRadio.toUpperCase())) {
-
-                        if (readBuffer[15 + contAux] == (byte) 0x4c) { //LIBERADO
-                            //if (readBuffer[15] == (byte) 0x4c || readBuffer[02] == (byte) 0x07) {
-                            String volumeTratado = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[15], readBuffer[16], readBuffer[17], readBuffer[18], readBuffer[19], readBuffer[20], readBuffer[21], readBuffer[22]);
-                            System.out.println("Liberado: " + volumeTratado);
-                            efetivo[idEstoqueTh].setText("Liberado");
-                            btnCancelarEstoque[idEstoqueTh].disableProperty();
-                        }
-                        if (readBuffer[15 + contAux] == (byte) 0x56) {//ENCHENDO
-
-                            //alterando status do botão enviar
-                            btnCancelarEstoque[idEstoqueTh].disableProperty();
-                            btnCancelarEstoque[idEstoqueTh].setDisable(true);
-
-                            //btnSalvar
-                            btnSalvarEstoque[idEstoqueTh].setDisable(false);
-
-                            //ProgressBar
-                            progressBarEstoque[idEstoqueTh].setVisible(true);
-
-                            String volumeTratado = String.format("%02x%02x%02x%02x%02x%02x%02x%02x", readBuffer[15 + contAux], readBuffer[16 + contAux], readBuffer[17 + contAux], readBuffer[18 + contAux], readBuffer[19 + contAux], readBuffer[20 + contAux], readBuffer[21 + contAux], readBuffer[22 + contAux]);
-                            String volumeTratadoDouble = String.format("%02x%02x%02x%02x", readBuffer[19 + contAux], readBuffer[20 + contAux], readBuffer[21 + contAux], readBuffer[22 + contAux]);
-
-                            outputBfj = new StringBuilder();
-                            volumeBfj = new StringBuilder();
-
-                            //monta uma string com vol
-                            for (int ij = 0; ij < volumeTratado.length(); ij += 2) {
-                                String strj = volumeTratado.substring(ij, ij + 2);
-                                outputBfj.append((char) Integer.parseInt(strj, 16));
-                            }
-                            //monta uma string 00.00
-                            for (int ij = 0; ij < volumeTratadoDouble.length(); ij += 2) {
-                                String strjDouble = volumeTratadoDouble.substring(ij, ij + 2);
-                                volumeBfj.append((char) Integer.parseInt(strjDouble, 16));
-                            }
-                            String volumeSemVol = volumeBfj.toString();
-                            System.out.println("volumeSemVol: " + volumeSemVol);
-
-                            if (readBuffer[15 + contAux] == (byte) 0x56 && outputBfj.length() > 5) {
-                                try {
-                                    //efetivo[idEstoqueTh].setText(outputBfj.toString());
-                                    efetivo[idEstoqueTh].setText(volumeBfj.toString());
-                                    System.out.println("VolumeTotal " + volumeTotal[idEstoqueTh]);
-                                    if (!volumeSemVol.isEmpty() && volumeSemVol.length() > 0) {
-                                        atualizaBarraProgress(volumeBfj.toString());//barra de progresso
-                                    } else {
-                                        outputBfj.delete(0, outputBfj.length());//limpa buffer
-                                    }
-                                } catch (NullPointerException e) {
-                                    System.out.println("nullpointer");
-                                    e.printStackTrace();
-                                }
-                                outputBfj.delete(0, outputBfj.length());//limpa buffer
-                            }
-                        } else {
-                            try {
-                                outputBfj.delete(0, outputBfj.length());
-                            } catch (Exception e) {
-
-                            }
-                        }
-                        if (readBuffer[15 + contAux] == (byte) 0x46) {
-                            //mensagem de fim
-                            efetivo[idEstoqueTh].setText("FIM");
-                            execucaoWhile[idEstoqueTh] = false;
-                            Thread.sleep(100);
-
-                            removerRegistroTela(idEstoqueTh);
-
-                            //cancela thread
-                            taskLeituraEnvase.cancel();
-                            //--------------------------atualizar status
-                            EzattaMovimentacoes e = EstoqueCtr.getEstoque(idEstoqueTh);
-                            e.setStatus(2);
-                            EstoqueCtr.updateEstoque(e);
-
-                            //limpa outputBuffer
-                            outputBfj.delete(0, outputBfj.length());
-                        }
-                    }
-                }
-            } catch (InterruptedException ex) {
-                System.out.println("InterruptedException");
-                ex.printStackTrace();
-            } catch (IOException ex) {
-                System.out.println("IOException");
-                ex.printStackTrace();
-            } catch (java.lang.NullPointerException e) {
-                System.out.println("NullPointerException: ");
-                e.printStackTrace();
-            }
-//fim------------------------------------------------------------------------------
-        }
-
-        @Override
-
-        protected Void call() throws Exception {
-            return null;
-        }
-
-        @Override
-        protected void succeeded() {
-        }
-
-    };
 
     private void removerRegistroTela(Integer idEstoqueTh) {
         //remove registro da tela
@@ -948,10 +1262,10 @@ public class PrincipalController implements Initializable {
         Platform.exit();
         System.exit(0);
     }
-    
+
     @FXML
     void fecharCentro(ActionEvent event) {
-         try {
+        try {
             //stack.getChildren().clear();
             stack.getChildren().removeAll(getNode("/br/com/ezatta/view/Empresa.fxml"));
             //stack.getChildren().add(getNode("/br/com/ezatta/view/Empresa.fxml"));
@@ -960,8 +1274,8 @@ public class PrincipalController implements Initializable {
             e.printStackTrace();
         }
     }
-    
-    public void modificarStack(StackPane stack){
+
+    public void modificarStack(StackPane stack) {
         this.stack = stack;
     }
 
@@ -1683,7 +1997,7 @@ public class PrincipalController implements Initializable {
         //fechar conex'ao H2DB
         System.out.println("Fechou H2DB");
         JPAUtil.closeManager(JPAUtil.getEntityManager());
- 
+
         //fecha aporta
         System.out.println("port " + defaultPort + " not found.");
         serialPort.close();
@@ -1692,7 +2006,7 @@ public class PrincipalController implements Initializable {
         Platform.exit();
         System.exit(0);
     }
-    
+
     @FXML
     void log(ActionEvent event) {
         try {
@@ -1704,12 +2018,19 @@ public class PrincipalController implements Initializable {
             e.printStackTrace();
         }
     }
-    
+
     @FXML
     void historico(ActionEvent event) {
-
+        try {
+            stack.getChildren().clear();
+            stack.getChildren().add(getNode("/br/com/ezatta/view/Historico.fxml"));
+        } catch (Exception e) {
+            new FXDialog(FXDialog.Type.ERROR, "Tentar novamente").showDialog();
+            System.out.println("Erro ao carregar a tela de bicos");
+            e.printStackTrace();
+        }
     }
-    
+
     @FXML
     void movimentacao(ActionEvent event) {
         try {

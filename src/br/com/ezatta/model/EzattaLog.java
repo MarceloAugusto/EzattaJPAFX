@@ -58,9 +58,10 @@ public class EzattaLog implements Serializable {
 //    @Colunas(nome = "Usuário", size = 100)
 //    @Column(length = 250)
 //    private EzattaEmpresa empresa;
-    @JoinColumn(name = "empresa", referencedColumnName = "id")
-    @ManyToOne
+    
     @Colunas(nome = "Usuário", size = 100)
+    @JoinColumn(name = "EMPRESA", referencedColumnName = "ID")
+    @ManyToOne
     private EzattaEmpresa empresa;
 
     public EzattaLog() {

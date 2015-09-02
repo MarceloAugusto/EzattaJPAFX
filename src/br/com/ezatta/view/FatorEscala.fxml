@@ -10,7 +10,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
 <StackPane fx:id="stack" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.ezatta.controller.FatorEscalaController">
    <children>
       <AnchorPane id="AnchorPane">
@@ -130,6 +129,41 @@
                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                              </rowConstraints>
                                           </GridPane>
+                                          <TitledPane layoutX="5.0" layoutY="205.0" text="Configuração Manual" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="205.0">
+                                            <content>
+                                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                   <children>
+                                                      <GridPane layoutX="20.0" layoutY="23.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                                        <columnConstraints>
+                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="371.0" minWidth="10.0" prefWidth="165.0" />
+                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="593.0" minWidth="10.0" prefWidth="593.0" />
+                                                        </columnConstraints>
+                                                        <rowConstraints>
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                        </rowConstraints>
+                                                         <children>
+                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Fator de Escala Atual" />
+                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Novo fator" GridPane.rowIndex="1" />
+                                                            <TextField fx:id="txtFatorEscala" maxWidth="100.0" GridPane.columnIndex="1" />
+                                                            <TextField fx:id="txtNovoFatorEscala" maxWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                            <Button minHeight="30.0" mnemonicParsing="false" onAction="#calibrarManual" text="Calibrar" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                                               <graphic>
+                                                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                                     <image>
+                                                                        <Image url="@images/Wheels.png" />
+                                                                     </image>
+                                                                  </ImageView>
+                                                               </graphic>
+                                                            </Button>
+                                                         </children>
+                                                      </GridPane>
+                                                   </children>
+                                                </AnchorPane>
+                                            </content>
+                                          </TitledPane>
                                        </children>
                                     </AnchorPane>
                                  </children>
@@ -183,7 +217,7 @@
                           <content>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: lightgray;">
                                  <children>
-                                    <Button fx:id="btnEnviarQuatroLitros1" minHeight="30.0" mnemonicParsing="false" onAction="#enviarQuatroLitrosFinais" text="Enviar 4 litros para o ponto de abastecimento \n Verifique a quantidade envasada." AnchorPane.leftAnchor="6.0" AnchorPane.topAnchor="6.0">
+                                    <Button fx:id="btnEnviarQuatroLitros1" minHeight="30.0" mnemonicParsing="false" onAction="#enviarQuatroLitrosFinais" text="Enviar 4 litros para o ponto de abastecimento Verifique a quantidade envasada." AnchorPane.leftAnchor="6.0" AnchorPane.topAnchor="6.0">
                                        <graphic>
                                           <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                              <image>

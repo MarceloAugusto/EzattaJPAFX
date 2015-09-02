@@ -57,14 +57,23 @@ public class EzattaEmpresa implements Serializable {
     @Column(name = "email", length = 255)
     @Colunas(nome = "E-mail", size = 100)
     private String email;
-        
+
     @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL)
     private List<EzattaOperador> ezattaOperadorList;
+    
     @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL)
     private List<EzattaUsuario> ezattaUsuarioList;
+    
     @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL)
     private List<EzattaProduto> ezattaProdutoList;
+
+    @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL)
+    private List<EzattaLog> ezattaLogList;
     
+     @OneToMany(mappedBy = "empresa")
+    private List<EzattaEstoqueProduto> ezattaEstoqueProdutoList;
+    
+
     public EzattaEmpresa() {
     }
 
@@ -87,16 +96,28 @@ public class EzattaEmpresa implements Serializable {
         this.email = email;
     }
 
-   
-
     public EzattaEmpresa(String nome, String login, String senha, String email) {
         this.nome = nome;
         this.login = login;
         this.senha = senha;
         this.email = email;
     }
+
+    public List<EzattaEstoqueProduto> getEzattaEstoqueProdutoList() {
+        return ezattaEstoqueProdutoList;
+    }
+
+    public void setEzattaEstoqueProdutoList(List<EzattaEstoqueProduto> ezattaEstoqueProdutoList) {
+        this.ezattaEstoqueProdutoList = ezattaEstoqueProdutoList;
+    }
     
-    
+    public List<EzattaLog> getEzattaLogList() {
+        return ezattaLogList;
+    }
+
+    public void setEzattaLogList(List<EzattaLog> ezattaLogList) {
+        this.ezattaLogList = ezattaLogList;
+    }
 
     public Integer getId() {
         return id;
